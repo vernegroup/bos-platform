@@ -1,0 +1,130 @@
+"use client";
+
+import { useState } from "react";
+
+export default function CTA() {
+  const [showForm, setShowForm] = useState(false);
+
+  async function handleCheckout() {
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Nie udało się uruchomić płatności.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Błąd połączenia ze Stripe.");
+    }
+  }
+
+  return (
+    <>
+      <section className="action-section">
+        <div className="container">
+          <button
+            className="action-button"
+            onClick={handleCheckout}
+          >
+            Kup BOS Onboarding
+          </button>
+        </div>
+      </section>
+
+      <section className="action-section">
+        <div className="container">
+          <button
+            className="action-button"
+            onClick={() => setShowForm(!showForm)}
+          >
+            Wdrożenie z ekspertem
+          </button>
+        </div>
+      </section>
+
+      {showForm && (
+        <section
+          style={{
+            padding: "60px 0",
+          }}
+        >
+          <div
+            className="container"
+            style={{
+              maxWidth: "700px",
+              background: "#fff",
+              borderRadius: "20px",
+              padding: "40px",
+              color: "#1d2a3a",
+            }}
+          >
+            <h2>Zostaw kontakt</h2>
+
+            <p
+              style={{
+                marginBottom: "30px",
+              }}
+            >
+              Skontaktujemy się z Tobą i przedstawimy możliwości
+              wdrożenia Business Operating Standards.
+            </p>
+
+            <input
+              placeholder="Imię i nazwisko"
+              style={inputStyle}
+            />
+
+            <input
+              placeholder="Nazwa firmy"
+              style={inputStyle}
+            />
+
+            <input
+              placeholder="Adres e-mail"
+              style={inputStyle}
+            />
+
+            <input
+              placeholder="Telefon"
+              style={inputStyle}
+            />
+
+            <textarea
+              placeholder="Wiadomość"
+              rows={5}
+              style={{
+                ...inputStyle,
+                resize: "vertical",
+              }}
+            />
+
+            <button
+              className="action-button"
+              style={{
+                width: "100%",
+                marginTop: "20px",
+              }}
+            >
+              Zostaw kontakt
+            </button>
+          </div>
+        </section>
+      )}
+    </>
+  );
+}
+
+const inputStyle = {
+  width: "100%",
+  padding: "16px",
+  marginBottom: "18px",
+  borderRadius: "10px",
+  border: "1px solid #d8d8d8",
+  fontSize: "16px",
+} as const;
