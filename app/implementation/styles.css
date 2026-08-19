@@ -1,0 +1,1216 @@
+/* ===========================================================
+   BOS IMPLEMENTATION
+   =========================================================== */
+
+*,
+*::before,
+*::after{
+    box-sizing:border-box;
+}
+
+html,
+body{
+
+    margin:0;
+    padding:0;
+
+}
+
+body{
+
+    background:#0D1422;
+
+    color:#1D2940;
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    -webkit-font-smoothing:antialiased;
+
+}
+
+/* ===========================================================
+   VARIABLES
+   =========================================================== */
+
+:root{
+
+    --navy:#0D1422;
+
+    --paper:#FBFAF7;
+
+    --gold:#C8862A;
+
+    --text:#1B2940;
+
+    --text-light:#677385;
+
+    --line:#E8E4DD;
+
+    --border:#E8E3DA;
+
+    --shadow:
+        0 26px 70px rgba(0,0,0,.22);
+
+}
+
+/* ===========================================================
+   PAGE
+   =========================================================== */
+
+.bos-implementation-page{
+
+    min-height:100vh;
+
+    background:var(--navy);
+
+    padding:46px;
+
+}
+
+/* ===========================================================
+   WIDTH
+   =========================================================== */
+
+.bos-page-width{
+
+    max-width:1520px;
+
+    margin:auto;
+
+}
+
+/* ===========================================================
+   LAYOUT
+   =========================================================== */
+
+.bos-implementation-layout{
+
+    display:grid;
+
+    grid-template-columns:
+
+        520px
+
+        1fr;
+
+    gap:60px;
+
+    align-items:start;
+
+}
+
+/* ===========================================================
+   PAPER
+   =========================================================== */
+
+.bos-paper-wrapper{
+
+    width:100%;
+
+}
+
+.bos-paper{
+
+    background:var(--paper);
+
+    border:1px solid var(--border);
+
+    box-shadow:var(--shadow);
+
+    border-radius:4px;
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+.bos-paper::before{
+
+    content:"";
+
+    display:block;
+
+    width:100%;
+
+    height:3px;
+
+    background:var(--gold);
+
+}
+
+/* ===========================================================
+   TOP BAR
+   =========================================================== */
+
+.bos-topbar{
+
+    width:100%;
+
+    margin-bottom:34px;
+
+}
+
+.bos-topbar-inner{
+
+    max-width:1520px;
+
+    margin:auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.bos-brand{
+
+    display:flex;
+
+    gap:12px;
+
+    align-items:center;
+
+}
+
+.bos-brand-gold{
+
+    color:var(--gold);
+
+    font-size:34px;
+
+    font-weight:700;
+
+    letter-spacing:6px;
+
+}
+
+.bos-brand-white{
+
+    color:white;
+
+    font-size:34px;
+
+    font-weight:300;
+
+    letter-spacing:8px;
+
+}
+
+.bos-page-title{
+
+    color:#95A0AF;
+
+    font-size:15px;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-topbar-line{
+
+    margin-top:28px;
+
+    height:1px;
+
+    background:#2D3647;
+
+}/* ===========================================================
+   HERO
+   =========================================================== */
+
+.bos-hero{
+
+    padding-top:42px;
+
+}
+
+.bos-hero-eyebrow{
+
+    color:var(--gold);
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    margin-bottom:20px;
+
+}
+
+.bos-hero-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:64px;
+
+    font-weight:400;
+
+    line-height:1.05;
+
+    margin-bottom:28px;
+
+}
+
+.bos-hero-description{
+
+    color:var(--text-light);
+
+    font-size:19px;
+
+    line-height:1.9;
+
+    margin-bottom:56px;
+
+    max-width:470px;
+
+}
+
+
+/* ===========================================================
+   FEATURES
+   =========================================================== */
+
+.bos-hero-features{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:38px;
+
+}
+
+
+/* ===========================================================
+   FEATURE
+   =========================================================== */
+
+.bos-feature{
+
+    display:flex;
+
+    gap:22px;
+
+    align-items:flex-start;
+
+}
+
+.bos-feature-line{
+
+    width:4px;
+
+    min-width:4px;
+
+    height:72px;
+
+    background:var(--gold);
+
+    border-radius:10px;
+
+}
+
+.bos-feature-content{
+
+    flex:1;
+
+}
+
+.bos-feature-title{
+
+    color:var(--text);
+
+    font-size:22px;
+
+    font-weight:600;
+
+    margin-bottom:10px;
+
+}
+
+.bos-feature-text{
+
+    color:var(--text-light);
+
+    font-size:17px;
+
+    line-height:1.8;
+
+}
+
+
+/* ===========================================================
+   FORM
+   =========================================================== */
+
+.bos-form{
+
+    padding:
+
+        58px
+
+        60px
+
+        56px
+
+        60px;
+
+}
+
+.bos-form-header{
+
+    margin-bottom:42px;
+
+}
+
+.bos-form-eyebrow{
+
+    color:var(--gold);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    margin-bottom:18px;
+
+}
+
+.bos-form-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:44px;
+
+    font-weight:400;
+
+    line-height:1.1;
+
+    margin-bottom:22px;
+
+}
+
+.bos-form-text{
+
+    color:var(--text-light);
+
+    font-size:17px;
+
+    line-height:1.8;
+
+}/* ===========================================================
+   CONTACT FORM
+   =========================================================== */
+
+.bos-contact-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:28px;
+
+}
+
+
+/* ===========================================================
+   GRID
+   =========================================================== */
+
+.bos-form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:24px;
+
+}
+
+
+/* ===========================================================
+   FIELD
+   =========================================================== */
+
+.bos-field{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.bos-field label{
+
+    color:#566274;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:1.5px;
+
+    text-transform:uppercase;
+
+    margin-bottom:12px;
+
+}
+
+
+/* ===========================================================
+   INPUTS
+   =========================================================== */
+
+.bos-field input,
+.bos-field select,
+.bos-field textarea{
+
+    width:100%;
+
+    background:#FFFFFF;
+
+    border:1px solid #D9DDE3;
+
+    border-radius:3px;
+
+    padding:16px 18px;
+
+    color:#1B2940;
+
+    font-size:16px;
+
+    font-family:inherit;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+
+}
+
+
+.bos-field textarea{
+
+    resize:vertical;
+
+    min-height:170px;
+
+    line-height:1.7;
+
+}
+
+
+.bos-field input::placeholder,
+.bos-field textarea::placeholder{
+
+    color:#A6AFBB;
+
+}
+
+
+.bos-field input:focus,
+.bos-field select:focus,
+.bos-field textarea:focus{
+
+    outline:none;
+
+    border-color:var(--gold);
+
+    box-shadow:
+
+        0 0 0 3px rgba(200,134,42,.12);
+
+}
+
+
+/* ===========================================================
+   SELECT
+   =========================================================== */
+
+.bos-field select{
+
+    appearance:none;
+
+    cursor:pointer;
+
+}
+
+
+/* ===========================================================
+   CHECKBOX
+   =========================================================== */
+
+.bos-checkbox{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:14px;
+
+    margin-top:4px;
+
+    color:#687486;
+
+    font-size:14px;
+
+    line-height:1.8;
+
+    cursor:pointer;
+
+}
+
+.bos-checkbox input{
+
+    width:18px;
+
+    height:18px;
+
+    margin-top:3px;
+
+    accent-color:#13233F;
+
+}/* ===========================================================
+   SUBMIT BUTTON
+   =========================================================== */
+
+.bos-submit{
+
+    width:100%;
+
+    height:62px;
+
+    margin-top:10px;
+
+    border:none;
+
+    border-radius:3px;
+
+    background:#13233F;
+
+    color:#FFFFFF;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    cursor:pointer;
+
+    transition:
+        background .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease;
+
+    box-shadow:
+        0 10px 26px rgba(19,35,63,.18);
+
+}
+
+.bos-submit:hover{
+
+    background:#1A2F56;
+
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 16px 34px rgba(19,35,63,.24);
+
+}
+
+.bos-submit:active{
+
+    transform:translateY(0);
+
+}
+
+.bos-submit:focus{
+
+    outline:none;
+
+    box-shadow:
+        0 0 0 3px rgba(200,134,42,.22);
+
+}
+
+
+/* ===========================================================
+   BOTTOM BAR
+   =========================================================== */
+
+.bos-bottom-bar{
+
+    position:relative;
+
+    width:100%;
+
+    margin-top:120px;
+
+    padding:34px 0;
+
+    border-top:1px solid #E5E1D8;
+
+}
+
+.bos-bottom-bar-inner{
+
+    display:grid;
+
+    grid-template-columns:
+
+        1.3fr
+
+        1.3fr
+
+        1fr
+
+        .7fr;
+
+    gap:40px;
+
+    align-items:start;
+
+}
+
+.bos-footer-title{
+
+    color:#1B2940;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:14px;
+
+}
+
+.bos-footer-row{
+
+    color:#6E7888;
+
+    font-size:14px;
+
+    line-height:1.8;
+
+}
+
+.bos-footer-company,
+.bos-footer-platform,
+.bos-footer-contact{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.bos-footer-page{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    justify-content:flex-start;
+
+}
+
+.bos-footer-location{
+
+    color:#1B2940;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:14px;
+
+}
+
+.bos-footer-number{
+
+    color:#6E7888;
+
+    font-size:18px;
+
+    letter-spacing:2px;
+
+}
+/* ===========================================================
+   TRANSITIONS
+   =========================================================== */
+
+.bos-paper{
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+
+}
+
+.bos-paper:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 34px 80px rgba(0,0,0,.26);
+
+}/* ===========================================================
+   POLISH
+   =========================================================== */
+
+.bos-hero,
+.bos-form,
+.bos-paper{
+
+    backface-visibility:hidden;
+
+    -webkit-font-smoothing:antialiased;
+
+}
+
+.bos-feature-title,
+.bos-form-title,
+.bos-hero-title{
+
+    text-wrap:balance;
+
+}
+
+.bos-form p,
+.bos-hero p{
+
+    text-wrap:pretty;
+
+}
+
+
+/* ===========================================================
+   INPUT STATES
+   =========================================================== */
+
+.bos-field input:hover,
+.bos-field textarea:hover,
+.bos-field select:hover{
+
+    border-color:#C8CED8;
+
+}
+
+.bos-field input:disabled,
+.bos-field textarea:disabled,
+.bos-field select:disabled{
+
+    background:#F4F5F7;
+
+    cursor:not-allowed;
+
+    opacity:.7;
+
+}
+
+
+/* ===========================================================
+   SCROLLBAR
+   =========================================================== */
+
+textarea::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+textarea::-webkit-scrollbar-track{
+
+    background:#F2F3F5;
+
+}
+
+textarea::-webkit-scrollbar-thumb{
+
+    background:#BFC7D2;
+
+    border-radius:20px;
+
+}
+
+textarea::-webkit-scrollbar-thumb:hover{
+
+    background:#9EA9B7;
+
+}
+
+
+/* ===========================================================
+   HERO ANIMATION
+   =========================================================== */
+
+.bos-hero{
+
+    animation:heroFade .6s ease;
+
+}
+
+.bos-paper{
+
+    animation:paperFade .6s ease;
+
+}
+
+@keyframes heroFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(18px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+@keyframes paperFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(24px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+/* ===========================================================
+   VISUAL DETAILS
+   =========================================================== */
+
+.bos-feature{
+
+    padding-bottom:8px;
+
+}
+
+.bos-feature:last-child{
+
+    padding-bottom:0;
+
+}
+
+.bos-form-header{
+
+    padding-bottom:12px;
+
+    border-bottom:1px solid var(--line);
+
+    margin-bottom:36px;
+
+}
+
+.bos-contact-form{
+
+    margin-top:10px;
+
+}
+
+.bos-submit{
+
+    margin-top:18px;
+}/* ===========================================================
+   RESPONSIVE
+   =========================================================== */
+
+@media (max-width:1400px){
+
+    .bos-implementation-layout{
+
+        grid-template-columns:
+
+            430px
+
+            1fr;
+
+        gap:48px;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:56px;
+
+    }
+
+}
+
+
+@media (max-width:1100px){
+
+    .bos-implementation-layout{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .bos-paper-wrapper{
+
+        order:2;
+
+    }
+
+    .bos-hero{
+
+        order:1;
+
+        padding-top:0;
+
+        padding-bottom:24px;
+
+    }
+
+    .bos-hero-description{
+
+        max-width:none;
+
+    }
+
+}
+
+
+@media (max-width:900px){
+
+    .bos-page-title{
+
+        display:none;
+
+    }
+
+    .bos-topbar-inner{
+
+        justify-content:center;
+
+    }
+
+    .bos-form{
+
+        padding:42px;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:48px;
+
+    }
+
+    .bos-form-title{
+
+        font-size:36px;
+
+    }
+
+}
+
+
+@media (max-width:700px){
+
+    .bos-implementation-page{
+
+        padding:22px;
+
+    }
+
+    .bos-form{
+
+        padding:30px;
+
+    }
+
+    .bos-form-grid{
+
+        grid-template-columns:1fr;
+
+        gap:24px;
+
+    }
+
+    .bos-bottom-bar{
+
+        flex-direction:column;
+
+        gap:18px;
+
+        text-align:center;
+
+    }
+
+    .bos-bottom-left,
+    .bos-bottom-center,
+    .bos-bottom-right{
+
+        width:100%;
+
+        text-align:center;
+
+    }
+
+}
+
+
+@media (max-width:520px){
+
+    .bos-brand-gold{
+
+        font-size:26px;
+
+        letter-spacing:4px;
+
+    }
+
+    .bos-brand-white{
+
+        font-size:26px;
+
+        letter-spacing:5px;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:38px;
+
+    }
+
+    .bos-form-title{
+
+        font-size:30px;
+
+    }
+
+    .bos-hero-description{
+
+        font-size:17px;
+
+    }
+
+    .bos-feature-title{
+
+        font-size:20px;
+
+    }
+
+    .bos-feature-text{
+
+        font-size:15px;
+
+    }
+
+    .bos-submit{
+
+        height:56px;
+
+        font-size:13px;
+
+        letter-spacing:1.5px;
+
+    }
+
+}
+
+
+/* ===========================================================
+   PRINT
+   =========================================================== */
+
+@media print{
+
+    body{
+
+        background:white;
+
+    }
+
+    .bos-topbar,
+    .bos-bottom-bar{
+
+        display:none;
+
+    }
+
+    .bos-implementation-page{
+
+        padding:0;
+
+        background:white;
+
+    }
+
+    .bos-paper{
+
+        box-shadow:none;
+
+        border:none;
+
+    }
+
+}
+
+
+/* ===========================================================
+   END OF FILE
+   =========================================================== */

@@ -1,0 +1,1341 @@
+/* ===========================================================
+   BOS HOME
+   =========================================================== */
+
+*,
+*::before,
+*::after{
+
+    box-sizing:border-box;
+
+}
+
+html,
+body{
+
+    margin:0;
+    padding:0;
+
+}
+
+body{
+
+    background:#F6F3ED;
+
+    color:#18263D;
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    -webkit-font-smoothing:antialiased;
+
+}
+
+
+/* ===========================================================
+   VARIABLES
+   =========================================================== */
+
+:root{
+
+    --background:#F6F3ED;
+
+    --paper:#FBFAF7;
+
+    --navy:#0D1422;
+
+    --gold:#C8862A;
+
+    --text:#1B2940;
+
+    --text-light:#667487;
+
+    --border:#E7E3DB;
+
+    --line:#E5E1D8;
+
+    --shadow:
+        0 28px 80px rgba(0,0,0,.18);
+
+}
+
+
+/* ===========================================================
+   PAGE
+   =========================================================== */
+
+.bos-home{
+
+    width:100%;
+
+    background:var(--background);
+
+}
+
+
+/* ===========================================================
+   WIDTH
+   =========================================================== */
+
+.bos-page-width{
+
+    width:100%;
+
+    max-width:1540px;
+
+    margin:auto;
+
+    padding-left:48px;
+
+    padding-right:48px;
+
+}
+
+
+/* ===========================================================
+   TOP BAR
+   =========================================================== */
+
+.bos-topbar{
+
+    background:var(--background);
+
+    padding-top:28px;
+
+}
+
+.bos-topbar-container{
+
+    max-width:1540px;
+
+    margin:auto;
+
+    padding-left:48px;
+
+    padding-right:48px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.bos-topbar-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.bos-logo-bos{
+
+    color:var(--gold);
+
+    font-size:34px;
+
+    font-weight:700;
+
+    letter-spacing:6px;
+
+}
+
+.bos-logo-divider{
+
+    color:#B7B2A9;
+
+    font-size:22px;
+
+}
+
+.bos-logo-title{
+
+    color:#1B2940;
+
+    font-size:14px;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-topbar-right{
+
+    color:#7D8795;
+
+    font-size:13px;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-topbar-line{
+
+    margin-top:26px;
+
+    height:1px;
+
+    background:var(--line);
+
+}
+
+
+/* ===========================================================
+   HERO
+   =========================================================== */
+
+.bos-hero-section{
+
+    padding-top:70px;
+
+    padding-bottom:80px;
+
+}
+
+.bos-hero-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        520px
+
+        1fr;
+
+    gap:70px;
+
+    align-items:center;
+
+}/* ===========================================================
+   HERO TEXT
+   =========================================================== */
+
+.bos-hero-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    min-height:720px;
+
+}
+
+.bos-eyebrow{
+
+    color:var(--gold);
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    margin-bottom:22px;
+
+}
+
+
+/* ===========================================================
+   MAIN TITLE
+   =========================================================== */
+
+.bos-hero-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:112px;
+
+    font-weight:400;
+
+    line-height:.95;
+
+    letter-spacing:-2px;
+
+    margin-bottom:12px;
+
+}
+
+
+/* ===========================================================
+   SUBTITLE
+   =========================================================== */
+
+.bos-hero-subtitle{
+
+    color:#404E64;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:46px;
+
+    font-weight:400;
+
+    line-height:1.1;
+
+    margin-bottom:34px;
+
+}
+
+
+/* ===========================================================
+   DESCRIPTION
+   =========================================================== */
+
+.bos-hero-description{
+
+    max-width:470px;
+
+    color:var(--text-light);
+
+    font-size:19px;
+
+    line-height:1.9;
+
+    margin-bottom:56px;
+
+}
+
+
+/* ===========================================================
+   REFERENCE
+   =========================================================== */
+
+.bos-reference{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+}
+
+.bos-reference-line{
+
+    width:74px;
+
+    height:2px;
+
+    background:var(--gold);
+
+}
+
+.bos-reference-text{
+
+    color:#7A8797;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* ===========================================================
+   HERO IMAGE
+   =========================================================== */
+
+.bos-hero-image{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.bos-hero-photo{
+
+    width:100%;
+
+    max-width:820px;
+
+    height:760px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+
+/* ===========================================================
+   HERO CARD
+   =========================================================== */
+
+.bos-hero-card{
+
+    position:absolute;
+
+    left:50px;
+
+    bottom:-56px;
+
+    width:330px;
+
+    background:#FFFFFF;
+
+    padding:34px;
+
+    color:inherit;
+
+    text-decoration:none;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+
+}
+
+.bos-hero-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+
+        0 34px 90px rgba(0,0,0,.20);
+
+}/* ===========================================================
+   HERO CARD CONTENT
+   =========================================================== */
+
+.bos-hero-card-label{
+
+    color:var(--gold);
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:16px;
+
+}
+
+.bos-hero-card-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:42px;
+
+    font-weight:400;
+
+    line-height:1.08;
+
+    margin-bottom:18px;
+
+}
+
+.bos-hero-card-description{
+
+    color:var(--text-light);
+
+    font-size:16px;
+
+    line-height:1.8;
+
+    margin-bottom:28px;
+
+}
+
+.bos-hero-card-button{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding-top:18px;
+
+    border-top:1px solid var(--line);
+
+    color:var(--text);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-arrow{
+
+    font-size:18px;
+
+    transition:transform .18s ease;
+
+}
+
+.bos-hero-card:hover .bos-arrow{
+
+    transform:translateX(6px);
+
+}
+
+
+/* ===========================================================
+   DIVIDER
+   =========================================================== */
+
+.bos-divider-section{
+
+    padding-top:90px;
+
+    padding-bottom:90px;
+
+}
+
+.bos-divider{
+
+    width:100%;
+
+    height:1px;
+
+    background:var(--line);
+
+}
+
+
+/* ===========================================================
+   SECOND SECTION
+   =========================================================== */
+
+.bos-binder-section{
+
+    padding-bottom:140px;
+
+}
+
+.bos-binder-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        520px
+
+        1fr;
+
+    gap:70px;
+
+    align-items:center;
+
+}
+
+
+/* ===========================================================
+   TEXT COLUMN
+   =========================================================== */
+
+.bos-binder-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+.bos-section-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:74px;
+
+    font-weight:400;
+
+    line-height:1.02;
+
+    margin-bottom:28px;
+
+}
+
+.bos-section-description{
+
+    color:var(--text-light);
+
+    font-size:18px;
+
+    line-height:1.9;
+
+    margin-bottom:48px;
+
+}/* ===========================================================
+   SPECIFICATION BOX
+   =========================================================== */
+
+.bos-spec-box{
+
+    background:#16243B;
+
+    color:#FFFFFF;
+
+    padding:34px;
+
+    width:100%;
+
+    max-width:440px;
+
+}
+
+.bos-spec-header{
+
+    color:#FFFFFF;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-spec-divider{
+
+    width:100%;
+
+    height:1px;
+
+    background:rgba(255,255,255,.15);
+
+    margin:24px 0;
+
+}
+
+.bos-spec-list{
+
+    margin:0;
+
+    padding:0;
+
+    list-style:none;
+
+}
+
+.bos-spec-list li{
+
+    position:relative;
+
+    padding-left:26px;
+
+    margin-bottom:18px;
+
+    color:rgba(255,255,255,.88);
+
+    font-size:16px;
+
+    line-height:1.7;
+
+}
+
+.bos-spec-list li:last-child{
+
+    margin-bottom:0;
+
+}
+
+.bos-spec-list li::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:10px;
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--gold);
+
+}
+
+.bos-spec-footer{
+
+    margin-top:30px;
+
+    padding-top:22px;
+
+    border-top:1px solid rgba(255,255,255,.12);
+
+    color:rgba(255,255,255,.62);
+
+    font-size:13px;
+
+    line-height:1.8;
+
+}
+
+
+/* ===========================================================
+   BINDER IMAGE
+   =========================================================== */
+
+.bos-binder-image{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.bos-binder-photo{
+
+    width:100%;
+
+    max-width:820px;
+
+    height:760px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+
+/* ===========================================================
+   IMPLEMENTATION CARD
+   =========================================================== */
+
+.bos-card-link{
+
+    color:inherit;
+
+    text-decoration:none;
+
+}
+
+.bos-implementation-card{
+
+    position:absolute;
+
+    left:50px;
+
+    bottom:-56px;
+
+    width:330px;
+
+    background:#FFFFFF;
+
+    padding:34px;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+
+}
+
+.bos-card-link:hover .bos-implementation-card{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+        0 34px 90px rgba(0,0,0,.20);
+
+}
+
+.bos-implementation-card-label{
+
+    color:var(--gold);
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:16px;
+
+}
+
+.bos-implementation-card-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:42px;
+
+    font-weight:400;
+
+    line-height:1.08;
+
+    margin-bottom:18px;
+
+}
+
+.bos-implementation-card-description{
+
+    color:var(--text-light);
+
+    font-size:16px;
+
+    line-height:1.8;
+
+    margin-bottom:28px;
+
+}
+
+.bos-implementation-card-button{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding-top:18px;
+
+    border-top:1px solid var(--line);
+
+    color:var(--text);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-card-link:hover .bos-arrow{
+
+    transform:translateX(6px);
+
+}/* ===========================================================
+   BOTTOM BAR
+   =========================================================== */
+
+.bos-bottom-bar{
+
+    position:fixed;
+
+    left:0;
+
+    right:0;
+
+    bottom:0;
+
+    height:82px;
+
+    background:rgba(246,243,237,.96);
+
+    backdrop-filter:blur(14px);
+
+    border-top:1px solid var(--line);
+
+    z-index:999;
+
+}
+
+.bos-bottom-bar-inner{
+
+    height:82px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.bos-bottom-left{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.bos-bottom-system{
+
+    color:var(--text);
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-bottom-subtitle{
+
+    color:var(--text-light);
+
+    font-size:13px;
+
+}
+
+.bos-bottom-center{
+
+    color:#6C7888;
+
+    font-size:13px;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-bottom-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.bos-bottom-page-current{
+
+    color:var(--text);
+
+    font-size:18px;
+
+    font-weight:600;
+
+}
+
+.bos-bottom-separator{
+
+    color:#9DA6B2;
+
+}
+
+.bos-bottom-page-total{
+
+    color:#9DA6B2;
+
+}
+
+
+/* ===========================================================
+   LINKS
+   =========================================================== */
+
+a{
+
+    color:inherit;
+
+    text-decoration:none;
+
+}
+
+
+/* ===========================================================
+   IMAGE POLISH
+   =========================================================== */
+
+.bos-hero-photo,
+.bos-binder-photo{
+
+    transition:
+
+        transform .45s ease,
+
+        filter .35s ease;
+
+}
+
+.bos-hero-image:hover .bos-hero-photo{
+
+    transform:scale(1.015);
+
+}
+
+.bos-binder-image:hover .bos-binder-photo{
+
+    transform:scale(1.015);
+
+}
+
+
+/* ===========================================================
+   CARD POLISH
+   =========================================================== */
+
+.bos-hero-card,
+.bos-implementation-card{
+
+    border:1px solid rgba(0,0,0,.05);
+
+}
+
+.bos-hero-card-button,
+.bos-implementation-card-button{
+
+    transition:letter-spacing .18s ease;
+
+}
+
+.bos-hero-card:hover .bos-hero-card-button{
+
+    letter-spacing:2.4px;
+
+}
+
+.bos-card-link:hover .bos-implementation-card-button{
+
+    letter-spacing:2.4px;
+
+}
+
+
+/* ===========================================================
+   SECTION SPACING
+   =========================================================== */
+
+.bos-hero-section{
+
+    margin-bottom:30px;
+
+}
+
+.bos-binder-section{
+
+    padding-bottom:180px;
+
+}/* ===========================================================
+   RESPONSIVE
+   =========================================================== */
+
+@media (max-width:1400px){
+
+    .bos-hero-grid,
+    .bos-binder-grid{
+
+        grid-template-columns:
+
+            430px
+
+            1fr;
+
+        gap:48px;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:88px;
+
+    }
+
+    .bos-section-title{
+
+        font-size:60px;
+
+    }
+
+}
+
+
+@media (max-width:1100px){
+
+    .bos-hero-grid,
+    .bos-binder-grid{
+
+        grid-template-columns:1fr;
+
+        gap:48px;
+
+    }
+
+    .bos-hero-text,
+    .bos-binder-text{
+
+        min-height:auto;
+
+    }
+
+    .bos-hero-photo,
+    .bos-binder-photo{
+
+        max-width:none;
+
+        height:640px;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        left:40px;
+
+        bottom:-40px;
+
+    }
+
+}
+
+
+@media (max-width:800px){
+
+    .bos-page-width{
+
+        padding-left:24px;
+
+        padding-right:24px;
+
+    }
+
+    .bos-topbar-container{
+
+        padding-left:24px;
+
+        padding-right:24px;
+
+    }
+
+    .bos-topbar-right{
+
+        display:none;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:64px;
+
+    }
+
+    .bos-section-title{
+
+        font-size:48px;
+
+    }
+
+    .bos-hero-subtitle{
+
+        font-size:34px;
+
+    }
+
+    .bos-hero-photo,
+    .bos-binder-photo{
+
+        height:520px;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        width:280px;
+
+        padding:28px;
+
+    }
+
+}
+
+
+@media (max-width:560px){
+
+    .bos-page-width{
+
+        padding-left:18px;
+
+        padding-right:18px;
+
+    }
+
+    .bos-topbar-container{
+
+        padding-left:18px;
+
+        padding-right:18px;
+
+    }
+
+    .bos-logo-title{
+
+        display:none;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:52px;
+
+    }
+
+    .bos-section-title{
+
+        font-size:40px;
+
+    }
+
+    .bos-hero-subtitle{
+
+        font-size:28px;
+
+    }
+
+    .bos-hero-description,
+    .bos-section-description{
+
+        font-size:16px;
+
+    }
+
+    .bos-hero-photo,
+    .bos-binder-photo{
+
+        height:420px;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        position:relative;
+
+        left:auto;
+
+        bottom:auto;
+
+        width:100%;
+
+        margin-top:20px;
+
+    }
+
+    .bos-bottom-bar{
+
+        height:auto;
+
+        padding:18px 0;
+
+    }
+
+    .bos-bottom-bar-inner{
+
+        height:auto;
+
+        flex-direction:column;
+
+        gap:14px;
+
+    }
+
+}
+
+
+/* ===========================================================
+   PRINT
+   =========================================================== */
+
+@media print{
+
+    body{
+
+        background:white;
+
+    }
+
+    .bos-bottom-bar{
+
+        display:none;
+
+    }
+
+    .bos-home{
+
+        background:white;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        box-shadow:none;
+
+    }
+
+}
+
+
+/* ===========================================================
+   END OF FILE
+   =========================================================== */

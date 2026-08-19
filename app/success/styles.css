@@ -1,0 +1,985 @@
+/* ===================================================================
+   BOS SUCCESS PAGE
+   Version 1.0
+   =================================================================== */
+
+
+/* ===================================================================
+   RESET
+   =================================================================== */
+
+*,
+*::before,
+*::after{
+    box-sizing:border-box;
+}
+
+html{
+
+    margin:0;
+    padding:0;
+
+}
+
+body{
+
+    margin:0;
+    padding:0;
+
+    background:#0D1422;
+
+    color:#17263E;
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+
+}
+
+
+/* ===================================================================
+   DESIGN TOKENS
+   =================================================================== */
+
+:root{
+
+    --navy:#0D1422;
+
+    --paper:#FBFAF7;
+
+    --gold:#C8862A;
+
+    --text:#1C2940;
+
+    --text-light:#647182;
+
+    --line:#E7E4DE;
+
+    --border:#E9E5DD;
+
+    --button:#13233F;
+
+    --shadow:
+        0 24px 80px rgba(0,0,0,.22);
+
+}
+
+
+/* ===================================================================
+   PAGE
+   =================================================================== */
+
+.bos-success-page{
+
+    width:100%;
+
+    min-height:100vh;
+
+    background:var(--navy);
+
+    padding:48px;
+
+}
+
+
+/* ===================================================================
+   PAGE WIDTH
+   =================================================================== */
+
+.bos-page-width{
+
+    width:100%;
+
+    max-width:1500px;
+
+    margin-left:auto;
+
+    margin-right:auto;
+
+}
+
+
+/* ===================================================================
+   PAPER
+   =================================================================== */
+
+.bos-paper{
+
+    width:100%;
+
+    background:var(--paper);
+
+    border:1px solid var(--border);
+
+    border-radius:3px;
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+
+    position:relative;
+
+}
+
+
+/* GOLD LINE */
+
+.bos-paper::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    width:100%;
+
+    height:3px;
+
+    background:var(--gold);
+
+}
+
+
+/* ===================================================================
+   CONTENT
+   =================================================================== */
+
+.bos-content{
+
+    padding:
+
+        62px
+
+        68px
+
+        56px
+
+        68px;
+
+}/* ===================================================================
+   TOP BAR
+   =================================================================== */
+
+.bos-topbar{
+
+    width:100%;
+
+    margin-bottom:34px;
+
+}
+
+.bos-topbar-inner{
+
+    max-width:1500px;
+
+    margin:0 auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+
+/* ===================================================================
+   LOGO
+   =================================================================== */
+
+.bos-brand{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    user-select:none;
+
+}
+
+.bos-brand-gold{
+
+    color:var(--gold);
+
+    font-size:34px;
+
+    font-weight:700;
+
+    letter-spacing:6px;
+
+    line-height:1;
+
+}
+
+.bos-brand-white{
+
+    color:white;
+
+    font-size:34px;
+
+    font-weight:300;
+
+    letter-spacing:8px;
+
+    line-height:1;
+
+}
+
+
+/* ===================================================================
+   PAGE TITLE
+   =================================================================== */
+
+.bos-page-title{
+
+    color:#8C96A5;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* ===================================================================
+   SEPARATOR
+   =================================================================== */
+
+.bos-topbar-line{
+
+    width:100%;
+
+    height:1px;
+
+    background:#293445;
+
+    margin-top:26px;
+
+}
+
+
+/* ===================================================================
+   HEADER
+   =================================================================== */
+
+.bos-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:80px;
+
+    margin-bottom:56px;
+
+}
+
+
+/* ===================================================================
+   LEFT COLUMN
+   =================================================================== */
+
+.bos-header-left{
+
+    flex:1;
+
+}
+
+
+/* ===================================================================
+   TRANSACTION
+   =================================================================== */
+
+.bos-order{
+
+    color:var(--gold);
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    margin-bottom:18px;
+
+}
+
+
+/* ===================================================================
+   MAIN TITLE
+   =================================================================== */
+
+.bos-title{
+
+    margin:0;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:72px;
+
+    font-weight:400;
+
+    line-height:1.04;
+
+    color:var(--text);
+
+}/* ===================================================================
+   LICENSE
+   =================================================================== */
+
+.bos-license{
+
+    width:320px;
+
+    flex-shrink:0;
+
+    text-align:right;
+
+    padding-top:8px;
+
+}
+
+.bos-license-label{
+
+    color:#A4ADB8;
+
+    font-size:13px;
+
+    letter-spacing:2.5px;
+
+    text-transform:uppercase;
+
+    margin-bottom:18px;
+
+}
+
+.bos-license-name{
+
+    color:#1B2940;
+
+    font-size:30px;
+
+    font-weight:600;
+
+    line-height:1.35;
+
+}
+
+
+/* ===================================================================
+   DOCUMENTS
+   =================================================================== */
+
+.bos-documents{
+
+    width:100%;
+
+    margin-top:72px;
+
+    border-top:1px solid var(--line);
+
+}
+
+
+/* ===================================================================
+   ROW
+   =================================================================== */
+
+.bos-document{
+
+    display:grid;
+
+    grid-template-columns:
+
+        90px
+
+        1fr
+
+        220px;
+
+    align-items:center;
+
+    min-height:110px;
+
+    border-bottom:1px solid var(--line);
+
+}
+
+
+/* ===================================================================
+   LEFT SIDE
+   =================================================================== */
+
+.bos-document-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:34px;
+
+    grid-column:1 / 3;
+
+}
+
+
+/* ===================================================================
+   NUMBER
+   =================================================================== */
+
+.bos-document-number{
+
+    width:70px;
+
+    text-align:center;
+
+    color:#B7C0CB;
+
+    font-size:34px;
+
+    font-weight:300;
+
+}
+
+
+/* ===================================================================
+   TITLE
+   =================================================================== */
+
+.bos-document-title{
+
+    color:#18263D;
+
+    font-size:24px;
+
+    font-weight:500;
+
+    margin-bottom:8px;
+
+}
+
+
+/* ===================================================================
+   DESCRIPTION
+   =================================================================== */
+
+.bos-document-description{
+
+    color:#7C8796;
+
+    font-size:15px;
+
+    line-height:1.7;
+
+}/* ===================================================================
+   DOWNLOAD BUTTON
+   =================================================================== */
+
+.bos-download{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    justify-self:end;
+
+    width:180px;
+
+    height:54px;
+
+    background:#13233F;
+
+    color:#FFFFFF;
+
+    border:none;
+
+    border-radius:2px;
+
+    cursor:pointer;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    transition:
+        background .20s ease,
+        transform .18s ease,
+        box-shadow .20s ease;
+
+    box-shadow:
+        0 8px 18px rgba(19,35,63,.18);
+
+}
+
+.bos-download:hover{
+
+    background:#1C3158;
+
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 14px 28px rgba(19,35,63,.22);
+
+}
+
+.bos-download:active{
+
+    transform:translateY(0);
+
+}
+
+
+/* ===================================================================
+   FOOTER
+   =================================================================== */
+
+.bos-footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding-top:42px;
+
+    margin-top:46px;
+
+    border-top:1px solid var(--line);
+
+}
+
+
+/* ===================================================================
+   CLIENT PORTAL
+   =================================================================== */
+
+.bos-portal-button{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    height:56px;
+
+    padding:0 34px;
+
+    background:#FFFFFF;
+
+    color:#13233F;
+
+    border:2px solid #13233F;
+
+    border-radius:2px;
+
+    cursor:pointer;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    transition:
+        all .20s ease;
+
+}
+
+.bos-portal-button:hover{
+
+    background:#13233F;
+
+    color:#FFFFFF;
+
+}
+
+
+/* ===================================================================
+   SIGNATURE
+   =================================================================== */
+
+.bos-footer-right{
+
+    text-align:right;
+
+}
+
+.bos-signature-label{
+
+    color:#9AA4B2;
+
+    font-size:12px;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:8px;
+
+}
+
+.bos-signature-value{
+
+    color:#5F6A79;
+
+    font-size:14px;
+
+    font-family:
+        "Courier New",
+        monospace;
+
+    letter-spacing:1px;
+
+}/* ===================================================================
+   TRANSITIONS
+   =================================================================== */
+
+.bos-document{
+
+    transition:
+        background .18s ease,
+        transform .18s ease;
+
+}
+
+.bos-document:hover{
+
+    background:#FDFCF9;
+
+}
+
+.bos-document:hover .bos-document-title{
+
+    color:#13233F;
+
+}
+
+.bos-document:hover .bos-document-number{
+
+    color:#7D8796;
+
+}
+
+
+/* ===================================================================
+   SPACING
+   =================================================================== */
+
+.bos-header + .bos-documents{
+
+    margin-top:48px;
+
+}
+
+.bos-documents + .bos-footer{
+
+    margin-top:54px;
+
+}
+
+
+/* ===================================================================
+   SELECTION
+   =================================================================== */
+
+::selection{
+
+    background:#13233F;
+
+    color:#FFFFFF;
+
+}
+
+
+/* ===================================================================
+   LINKS
+   =================================================================== */
+
+a{
+
+    color:inherit;
+
+    text-decoration:none;
+
+}
+
+
+/* ===================================================================
+   BUTTON RESET
+   =================================================================== */
+
+button{
+
+    font-family:inherit;
+
+}
+
+
+/* ===================================================================
+   RESPONSIVE
+   =================================================================== */
+
+@media (max-width:1200px){
+
+    .bos-content{
+
+        padding:48px;
+
+    }
+
+    .bos-title{
+
+        font-size:58px;
+
+    }
+
+    .bos-document{
+
+        grid-template-columns:
+
+            70px
+
+            1fr
+
+            180px;
+
+    }
+
+}
+
+
+@media (max-width:960px){
+
+    .bos-success-page{
+
+        padding:28px;
+
+    }
+
+    .bos-header{
+
+        flex-direction:column;
+
+        gap:40px;
+
+    }
+
+    .bos-license{
+
+        width:100%;
+
+        text-align:left;
+
+    }
+
+    .bos-document{
+
+        grid-template-columns:1fr;
+
+        gap:22px;
+
+        padding:30px 0;
+
+    }
+
+    .bos-document-left{
+
+        grid-column:auto;
+
+    }
+
+    .bos-download{
+
+        justify-self:start;
+
+    }
+
+    .bos-footer{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:26px;
+
+    }
+
+}
+
+
+@media (max-width:640px){
+
+    .bos-page-title{
+
+        display:none;
+
+    }
+
+    .bos-topbar-inner{
+
+        justify-content:center;
+
+    }
+
+    .bos-content{
+
+        padding:30px;
+
+    }
+
+    .bos-title{
+
+        font-size:42px;
+
+        line-height:1.12;
+
+    }
+
+    .bos-document-title{
+
+        font-size:20px;
+
+    }
+
+    .bos-document-description{
+
+        font-size:14px;
+
+    }
+
+}/* ===================================================================
+   POLISH
+   =================================================================== */
+
+.bos-paper{
+
+    backface-visibility:hidden;
+
+    will-change:transform;
+
+}
+
+.bos-document-title{
+
+    transition:color .18s ease;
+
+}
+
+.bos-document-description{
+
+    transition:color .18s ease;
+
+}
+
+.bos-download{
+
+    outline:none;
+
+}
+
+.bos-download:focus{
+
+    box-shadow:
+
+        0 0 0 3px rgba(200,134,42,.28);
+
+}
+
+.bos-portal-button{
+
+    outline:none;
+
+}
+
+.bos-portal-button:focus{
+
+    box-shadow:
+
+        0 0 0 3px rgba(19,35,63,.18);
+
+}
+
+
+/* ===================================================================
+   PRINT
+   =================================================================== */
+
+@media print{
+
+    body{
+
+        background:white;
+
+    }
+
+    .bos-success-page{
+
+        padding:0;
+
+        background:white;
+
+    }
+
+    .bos-topbar{
+
+        display:none;
+
+    }
+
+    .bos-paper{
+
+        box-shadow:none;
+
+        border:none;
+
+    }
+
+    .bos-download{
+
+        display:none;
+
+    }
+
+    .bos-portal-button{
+
+        display:none;
+
+    }
+
+}
+
+
+/* ===================================================================
+   END
+   =================================================================== */
