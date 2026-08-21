@@ -19,7 +19,7 @@ export default function DocumentTable() {
             </div>
 
             <div className="bos-document-description">
-              Executive Operating Standard
+              Kompletny standard operacyjny
             </div>
 
           </div>
@@ -27,9 +27,7 @@ export default function DocumentTable() {
         </div>
 
         <button className="bos-download">
-
-          DOWNLOAD
-
+          POBIERZ
         </button>
 
       </div>
@@ -45,11 +43,11 @@ export default function DocumentTable() {
           <div>
 
             <div className="bos-document-title">
-              BOS Onboarding.xlsx
+              BOS Forms.xlsx
             </div>
 
             <div className="bos-document-description">
-              Interactive Workbook
+              Aktywne formularze i checklisty
             </div>
 
           </div>
@@ -57,9 +55,7 @@ export default function DocumentTable() {
         </div>
 
         <button className="bos-download">
-
-          DOWNLOAD
-
+          POBIERZ
         </button>
 
       </div>
@@ -75,11 +71,11 @@ export default function DocumentTable() {
           <div>
 
             <div className="bos-document-title">
-              Editable PDF
+              Implementation Guide.pdf
             </div>
 
             <div className="bos-document-description">
-              Fillable Forms Package
+              Instrukcja wdrożenia produktu
             </div>
 
           </div>
@@ -87,39 +83,7 @@ export default function DocumentTable() {
         </div>
 
         <button className="bos-download">
-
-          DOWNLOAD
-
-        </button>
-
-      </div>
-
-      <div className="bos-document">
-
-        <div className="bos-document-left">
-
-          <div className="bos-document-number">
-            04
-          </div>
-
-          <div>
-
-            <div className="bos-document-title">
-              Instruction Guide
-            </div>
-
-            <div className="bos-document-description">
-              Executive Implementation Manual
-            </div>
-
-          </div>
-
-        </div>
-
-        <button className="bos-download">
-
-          DOWNLOAD
-
+          POBIERZ
         </button>
 
       </div>

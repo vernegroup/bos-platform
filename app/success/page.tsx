@@ -1,31 +1,32 @@
 import "./styles.css";
 
-import ExecutivePaper from "./components/ExecutivePaper";
 import TopBar from "./components/TopBar";
+import ExecutivePaper from "./components/ExecutivePaper";
 import PurchaseHeader from "./components/PurchaseHeader";
 import DocumentTable from "./components/DocumentTable";
+import Signature from "./components/Signature";
 import BottomBar from "./components/BottomBar";
 
 export default function SuccessPage() {
   return (
     <>
-
       <TopBar />
 
-      <ExecutivePaper>
+      <main className="bos-success-page">
 
-        <div className="bos-content">
+        <ExecutivePaper>
 
           <PurchaseHeader />
 
           <DocumentTable />
 
-          <BottomBar />
+          <Signature />
 
-        </div>
+        </ExecutivePaper>
 
-      </ExecutivePaper>
+      </main>
 
+      <BottomBar />
     </>
   );
 }

@@ -12,7 +12,11 @@ export default function ExecutivePaper({
     <main className="bos-success-page">
       <div className="bos-page-width">
         <div className="bos-paper">
-          {children}
+
+          <div className="bos-content">
+            {children}
+          </div>
+
         </div>
       </div>
     </main>
