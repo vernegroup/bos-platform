@@ -22,6 +22,15 @@
 
 .bos-product-story-panel{
   width:100%;
+  opacity:1;
+  transform:translateY(0);
+  transition:opacity .18s ease,transform .18s ease;
+  will-change:opacity,transform;
+}
+
+.bos-product-story-panel.is-transitioning{
+  opacity:0;
+  transform:translateY(10px);
 }
 
 /* ===========================================================
@@ -227,6 +236,17 @@
   text-transform:uppercase;
 }
 
+@media (prefers-reduced-motion:reduce){
+  .bos-product-story-panel{
+    transition:none;
+    transform:none;
+  }
+
+  .bos-product-story-panel.is-transitioning{
+    transform:none;
+  }
+}
+
 @media (max-width:1180px){
   .bos-product-stage-grid{
     grid-template-columns:1fr;
@@ -253,6 +273,11 @@
     min-height:0;
     display:block;
     overflow:visible;
+  }
+
+  .bos-product-story-panel{
+    transition:none;
+    transform:none;
   }
 
   .bos-product-stage{
