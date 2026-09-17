@@ -23,10 +23,7 @@ export default function ProductStory() {
     function updateActiveProduct() {
       frame = 0;
 
-      if (window.matchMedia("(max-width: 800px)").matches) {
-        setActiveIndex(0);
-        return;
-      }
+      if (window.matchMedia("(max-width: 800px)").matches) return;
 
       const rect = story.getBoundingClientRect();
       const scrollableDistance = Math.max(
@@ -38,7 +35,7 @@ export default function ProductStory() {
         Math.max(0, -rect.top / scrollableDistance)
       );
 
-      setActiveIndex(progress >= 0.5 ? 1 : 0);
+      setActiveIndex(progress >= 0.46 ? 1 : 0);
     }
 
     function handleScroll() {
@@ -86,17 +83,25 @@ export default function ProductStory() {
   }, [activeIndex, displayIndex]);
 
   return (
-    <div ref={storyRef} className="bos-product-story">
-      <div className="bos-product-story-sticky">
-        <div
-          className={`bos-product-story-panel${
-            isTransitioning ? " is-transitioning" : ""
-          }`}
-          data-active-product={bosProducts[displayIndex].id}
-        >
-          <ProductStage product={bosProducts[displayIndex]} />
+    <>
+      <div ref={storyRef} className="bos-product-story bos-product-story-desktop">
+        <div className="bos-product-story-sticky">
+          <div
+            className={`bos-product-story-panel${
+              isTransitioning ? " is-transitioning" : ""
+            }`}
+            data-active-product={bosProducts[displayIndex].id}
+          >
+            <ProductStage product={bosProducts[displayIndex]} />
+          </div>
         </div>
       </div>
-    </div>
+
+      <div className="bos-product-story-mobile">
+        {bosProducts.map((product) => (
+          <ProductStage key={product.id} product={product} />
+        ))}
+      </div>
+    </>
   );
 }
