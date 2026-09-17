@@ -22,12 +22,13 @@ export default function VideoSection() {
             </video>
 
             <div className="bos-video-title">
-              Pierwszy dzień pracownika
+              BOS Manager Workbook
             </div>
 
             <div className="bos-video-description">
-              Zobacz jak wygląda uporządkowany proces wdrożenia
-              od pierwszych minut pracy.
+              Interaktywny arkusz Excel umożliwiający planowanie,
+              monitorowanie oraz dokumentowanie procesu wdrożenia
+              pracownika.
             </div>
 
           </div>
@@ -48,12 +49,13 @@ export default function VideoSection() {
             </video>
 
             <div className="bos-video-title">
-              Formularze w praktyce
+              Executive Documentation
             </div>
 
             <div className="bos-video-description">
-              Przykład wykorzystania checklist, instrukcji
-              oraz dokumentacji operacyjnej.
+              Przegląd kompletnego pakietu dokumentów BOS gotowych
+              do natychmiastowego wykorzystania w procesie
+              wdrażania pracowników.
             </div>
 
           </div>
@@ -74,12 +76,13 @@ export default function VideoSection() {
             </video>
 
             <div className="bos-video-title">
-              Efekt wdrożenia
+              Real Implementation Workflow
             </div>
 
             <div className="bos-video-description">
-              Powtarzalny proces, mniejsza liczba błędów
-              i szybsze osiąganie samodzielności.
+              Zobacz, jak dokumentacja BOS oraz arkusz Manager
+              współpracują podczas rzeczywistego procesu
+              wdrażania pracownika.
             </div>
 
           </div>

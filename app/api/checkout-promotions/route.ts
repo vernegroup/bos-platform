@@ -3,11 +3,11 @@ import { stripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
   try {
-    const priceId = process.env.STRIPE_PRICE_ID;
+    const priceId = process.env.STRIPE_PRICE_ID_PROMOTIONS;
 
     if (!priceId) {
       return NextResponse.json(
-        { error: "STRIPE_PRICE_ID is not set" },
+        { error: "STRIPE_PRICE_ID_PROMOTIONS is not set" },
         { status: 500 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
             quantity: 1,
           },
         ],
-        success_url: `${origin}/success/onboarding?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${origin}/success/promotions?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/`,
       },
       {

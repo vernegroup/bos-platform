@@ -1,24 +1,24 @@
-import HeroCard from "./HeroCard";
+import PromotionCard from "./PromotionCard";
 import ProductVideo from "./ProductVideo";
 
-export default function HeroImage() {
+export default function PromotionImage() {
   return (
     <div className="bos-hero-image">
 
       <img
-        src="/images/hero-office.png"
-        alt="Business Operating Standards"
+        src="/images/promotions-hero.png"
+        alt="BOS Promotions"
         className="bos-hero-photo"
       />
 
       <div className="bos-product-media-stack">
 
         <ProductVideo
-          src="/videos/onboarding-test.mp4"
-          label="BOS Onboarding"
+          src="/videos/onboarding-02.mp4"
+          label="BOS Promotions"
         />
 
-        <HeroCard />
+        <PromotionCard />
 
       </div>
 

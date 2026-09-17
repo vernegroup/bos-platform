@@ -1,23 +1,23 @@
 import "../styles.css";
 
-export default function PurchaseHeader() {
+type PurchaseHeaderProps = {
+  product: string;
+};
+
+export default function PurchaseHeader({
+  product,
+}: PurchaseHeaderProps) {
   return (
     <section className="bos-header">
 
       <div className="bos-header-left">
 
         <div className="bos-order">
-
-          
-
         </div>
 
         <h1 className="bos-title">
-
-          Twój system BOS Onboarding jest gotowy
+          Twój produkt {product} jest gotowy do pobrania.
           <br />
-          
-
         </h1>
 
       </div>
@@ -25,19 +25,13 @@ export default function PurchaseHeader() {
       <div className="bos-license">
 
         <div className="bos-license-label">
-
-          
-
         </div>
 
         <div className="bos-license-name">
-
-          
-
         </div>
 
       </div>
 
     </section>
   );
-}   
+}
