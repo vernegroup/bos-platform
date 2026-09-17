@@ -1,6 +1,7 @@
 import "./styles.css";
 import "./product-stage.css";
 import "./product-flow.css";
+import "./navigation.css";
 
 import TopBar from "../components/TopBar";
 
