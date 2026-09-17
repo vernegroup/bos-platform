@@ -1,35 +1,37 @@
+import Link from "next/link";
+
 export default function TopBar() {
   return (
     <header className="bos-topbar">
-
       <div className="bos-topbar-container">
+        <Link href="/" className="bos-topbar-left" aria-label="BOS — strona główna">
+          <span className="bos-logo-bos">BOS</span>
 
-        <div className="bos-topbar-left">
-
-          <span className="bos-logo-bos">
-            BOS
-          </span>
-
-          <span className="bos-logo-divider">
+          <span className="bos-logo-divider" aria-hidden="true">
             |
           </span>
 
           <span className="bos-logo-title">
-            BUSINESS OPERATING STANDARDS - STANDARDY OPERACJNE BIZNESU
+            BUSINESS OPERATING STANDARDS
           </span>
+        </Link>
 
-        </div>
+        <nav className="bos-topbar-right" aria-label="Główna nawigacja">
+          <a className="bos-topbar-link" href="#produkty">
+            Produkty
+          </a>
 
-        <div className="bos-topbar-right">
+          <Link className="bos-topbar-link" href="/implementation">
+            Implementation
+          </Link>
 
-          
-
-        </div>
-
+          <a className="bos-topbar-link bos-topbar-contact" href="#kontakt">
+            Kontakt
+          </a>
+        </nav>
       </div>
 
       <div className="bos-topbar-line" />
-
     </header>
   );
 }
