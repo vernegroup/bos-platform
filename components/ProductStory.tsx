@@ -7,7 +7,11 @@ import { bosProducts } from "@/data/products";
 
 export default function ProductStory() {
   const storyRef = useRef<HTMLDivElement>(null);
+  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [activeIndex, setActiveIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const story = storyRef.current;
@@ -18,6 +22,11 @@ export default function ProductStory() {
 
     function updateActiveProduct() {
       frame = 0;
+
+      if (window.matchMedia("(max-width: 800px)").matches) {
+        setActiveIndex(0);
+        return;
+      }
 
       const rect = story.getBoundingClientRect();
       const scrollableDistance = Math.max(
@@ -53,14 +62,39 @@ export default function ProductStory() {
     };
   }, []);
 
+  useEffect(() => {
+    if (activeIndex === displayIndex) return;
+
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current);
+    }
+
+    setIsTransitioning(true);
+
+    transitionTimerRef.current = setTimeout(() => {
+      setDisplayIndex(activeIndex);
+      setIsTransitioning(false);
+      transitionTimerRef.current = null;
+    }, 180);
+
+    return () => {
+      if (transitionTimerRef.current) {
+        clearTimeout(transitionTimerRef.current);
+        transitionTimerRef.current = null;
+      }
+    };
+  }, [activeIndex, displayIndex]);
+
   return (
     <div ref={storyRef} className="bos-product-story">
       <div className="bos-product-story-sticky">
         <div
-          className="bos-product-story-panel"
-          data-active-product={bosProducts[activeIndex].id}
+          className={`bos-product-story-panel${
+            isTransitioning ? " is-transitioning" : ""
+          }`}
+          data-active-product={bosProducts[displayIndex].id}
         >
-          <ProductStage product={bosProducts[activeIndex]} />
+          <ProductStage product={bosProducts[displayIndex]} />
         </div>
       </div>
     </div>
