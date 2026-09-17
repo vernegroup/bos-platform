@@ -1,51 +1,58 @@
 export default function FeatureCards() {
   return (
-    <section className="bos-feature-grid">
+    <section className="bos-feature-strip" aria-label="Informacje o BOS">
+      <div className="bos-page-width">
+        <div className="bos-feature-grid">
+          <article className="bos-feature-card">
+            <span className="bos-feature-number" aria-hidden="true">
+              01
+            </span>
 
-      <article className="bos-feature-card">
+            <div className="bos-feature-content">
+              <h3 className="bos-feature-title">Dlaczego BOS?</h3>
 
-        <h3 className="bos-feature-title">
-          Dlaczego BOS?
-        </h3>
+              <p className="bos-feature-text">
+                BOS porządkuje procesy, które w małych i średnich firmach
+                często zależą od pamięci, doświadczenia i sposobu pracy
+                konkretnej osoby. Rozwiązanie pozostaje w organizacji i może
+                być używane ponownie.
+              </p>
+            </div>
+          </article>
 
-        <p className="bos-feature-text">
-          BOS Onboarding pozwala przekazywać wiedzę w uporządkowany,
-          powtarzalny sposób. Każdy nowy pracownik przechodzi ten sam
-          proces wdrożenia oparty na gotowych standardach operacyjnych,
-          a nie wyłącznie na pamięci i doświadczeniu managera.
-        </p>
+          <article className="bos-feature-card">
+            <span className="bos-feature-number" aria-hidden="true">
+              02
+            </span>
 
-      </article>
+            <div className="bos-feature-content">
+              <h3 className="bos-feature-title">Dla kogo?</h3>
 
-      <article className="bos-feature-card">
+              <p className="bos-feature-text">
+                Dla małych i średnich przedsiębiorstw, które chcą uporządkować
+                powtarzalne działania bez budowania rozbudowanej struktury
+                administracyjnej i bez projektowania całego procesu od zera.
+              </p>
+            </div>
+          </article>
 
-        <h3 className="bos-feature-title">
-          Dla kogo?
-        </h3>
+          <article className="bos-feature-card">
+            <span className="bos-feature-number" aria-hidden="true">
+              03
+            </span>
 
-        <p className="bos-feature-text">
-          System został przygotowany z myślą o małych i średnich
-          przedsiębiorstwach, które chcą wdrażać pracowników szybciej,
-          zachowując jakość procesu bez konieczności budowania
-          rozbudowanego działu HR.
-        </p>
+            <div className="bos-feature-content">
+              <h3 className="bos-feature-title">Co otrzymujesz?</h3>
 
-      </article>
-
-      <article className="bos-feature-card">
-
-        <h3 className="bos-feature-title">
-          Co otrzymujesz?
-        </h3>
-
-        <p className="bos-feature-text">
-          Kompletny pakiet dokumentów, formularzy oraz narzędzi
-          wspierających cały proces onboardingu — gotowy do wdrożenia
-          od pierwszego dnia po zakupie.
-        </p>
-
-      </article>
-
+              <p className="bos-feature-text">
+                Gotowe narzędzie operacyjne wraz z dokumentami, formularzami i
+                mechanizmami kontroli potrzebnymi do uruchomienia konkretnego
+                procesu w firmie.
+              </p>
+            </div>
+          </article>
+        </div>
+      </div>
     </section>
   );
 }
