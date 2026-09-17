@@ -1,0 +1,50 @@
+/* ===========================================================
+   BOS PRODUCT FLOW
+   Final flow rules layered over the ProductStage styles.
+   Desktop: one sticky product scene, then information strip.
+   Mobile: both products in normal document flow.
+   =========================================================== */
+
+.bos-product-story-desktop{
+  display:block;
+  height:220vh;
+}
+
+.bos-product-story-mobile{
+  display:none;
+}
+
+/* Give Promotions a slightly longer dwell before the sticky scene releases. */
+.bos-product-story-desktop .bos-product-story-sticky{
+  height:100vh;
+}
+
+/* The information strip begins only after the sticky story has fully released. */
+.bos-product-story-desktop + .bos-product-story-mobile + .bos-feature-strip,
+.bos-feature-strip{
+  position:relative;
+  z-index:2;
+}
+
+@media (max-width:800px){
+  .bos-product-story-desktop{
+    display:none;
+  }
+
+  .bos-product-story-mobile{
+    display:block;
+  }
+
+  .bos-product-story-mobile .bos-product-stage{
+    position:relative;
+  }
+
+  .bos-product-story-mobile .bos-product-stage + .bos-product-stage{
+    border-top:1px solid var(--line);
+    padding-top:54px;
+  }
+
+  .bos-product-story-mobile + .bos-feature-strip{
+    margin-top:0;
+  }
+}
