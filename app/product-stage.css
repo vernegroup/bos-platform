@@ -1,4 +1,30 @@
 /* ===========================================================
+   BOS PRODUCT STORY
+   Native document scroll + sticky stage.
+   No wheel interception and no scroll-jacking.
+   =========================================================== */
+
+.bos-product-story{
+  position:relative;
+  height:200vh;
+  background:var(--background);
+}
+
+.bos-product-story-sticky{
+  position:sticky;
+  top:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  background:var(--background);
+}
+
+.bos-product-story-panel{
+  width:100%;
+}
+
+/* ===========================================================
    BOS PRODUCT STAGE
    =========================================================== */
 
@@ -217,6 +243,18 @@
 }
 
 @media (max-width:800px){
+  .bos-product-story{
+    height:auto;
+  }
+
+  .bos-product-story-sticky{
+    position:relative;
+    top:auto;
+    min-height:0;
+    display:block;
+    overflow:visible;
+  }
+
   .bos-product-stage{
     padding:34px 0 54px;
   }
