@@ -1,5 +1,6 @@
 import "./styles.css";
 import "./product-stage.css";
+import "./product-flow.css";
 
 import TopBar from "../components/TopBar";
 
@@ -17,17 +18,14 @@ export default function HomePage() {
       <TopBar />
 
       <main className="bos-home">
-
         <ProductStory />
 
         <FeatureCards />
-
       </main>
 
       <BottomBar />
 
       <BOSSupport />
-
     </>
   );
 }
