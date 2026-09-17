@@ -1,4 +1,5 @@
 import "./styles.css";
+import "./product-stage.css";
 
 import TopBar from "../components/TopBar";
 
