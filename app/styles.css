@@ -1,1 +1,1726 @@
-PLACEHOLDER
+/* ===========================================================
+   BOS HOME
+   =========================================================== */
+
+*,
+*::before,
+*::after{
+
+    box-sizing:border-box;
+
+}
+
+html,
+body{
+
+    margin:0;
+    padding:0;
+
+}
+
+body{
+
+    background:#F6F3ED;
+
+    color:#18263D;
+
+    font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    -webkit-font-smoothing:antialiased;
+
+}
+
+
+/* ===========================================================
+   VARIABLES
+   =========================================================== */
+
+:root{
+
+    --background:#F6F3ED;
+
+    --paper:#FBFAF7;
+
+    --navy:#0D1422;
+
+    --gold:#C8862A;
+
+    --text:#1B2940;
+
+    --text-light:#667487;
+
+    --border:#E7E3DB;
+
+    --line:#E5E1D8;
+
+    --shadow:
+        0 28px 80px rgba(0,0,0,.18);
+
+}
+
+
+/* ===========================================================
+   PAGE
+   =========================================================== */
+
+.bos-home{
+
+    width:100%;
+
+    background:var(--background);
+
+}
+
+
+/* ===========================================================
+   WIDTH
+   =========================================================== */
+
+.bos-page-width{
+
+    width:100%;
+
+    max-width:1540px;
+
+    margin:auto;
+
+    padding-left:48px;
+
+    padding-right:48px;
+
+}
+
+
+/* ===========================================================
+   TOP BAR
+   =========================================================== */
+
+.bos-topbar{
+
+    background:var(--background);
+
+    padding-top:28px;
+
+}
+
+.bos-topbar-container{
+
+    max-width:1540px;
+
+    margin:auto;
+
+    padding-left:48px;
+
+    padding-right:48px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.bos-topbar-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.bos-logo-bos{
+
+    color:var(--gold);
+
+    font-size:34px;
+
+    font-weight:700;
+
+    letter-spacing:6px;
+
+}
+
+.bos-logo-divider{
+
+    color:#B7B2A9;
+
+    font-size:22px;
+
+}
+
+.bos-logo-title{
+
+    color:#1B2940;
+
+    font-size:14px;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-topbar-right{
+
+    color:#7D8795;
+
+    font-size:13px;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-topbar-line{
+
+    margin-top:26px;
+
+    height:1px;
+
+    background:var(--line);
+
+}
+
+
+/* ===========================================================
+   HERO
+   =========================================================== */
+
+.bos-hero-section{
+
+    padding-top:40px;
+    padding-bottom:40px;
+
+}
+
+.bos-hero-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        430px
+        1fr;
+
+    gap:50px;
+
+    align-items:center;
+
+}
+
+
+/* ===========================================================
+   HERO TEXT
+   =========================================================== */
+
+.bos-hero-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    min-height:480px;
+
+}
+
+.bos-eyebrow{
+
+    color:var(--gold);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:3px;
+
+    text-transform:uppercase;
+
+    margin-bottom:18px;
+
+}
+
+
+/* ===========================================================
+   MAIN TITLE
+   =========================================================== */
+
+.bos-hero-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:82px;
+
+    font-weight:400;
+
+    line-height:.94;
+
+    letter-spacing:-2px;
+
+    margin-bottom:8px;
+
+}
+
+
+/* ===========================================================
+   SUBTITLE
+   =========================================================== */
+
+.bos-hero-subtitle{
+
+    color:#404E64;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:36px;
+
+    font-weight:400;
+
+    line-height:1.08;
+
+    margin-bottom:26px;
+
+}
+
+
+/* ===========================================================
+   DESCRIPTION
+   =========================================================== */
+
+.bos-hero-description{
+
+    max-width:390px;
+
+    color:var(--text-light);
+
+    font-size:17px;
+
+    line-height:1.8;
+
+    margin-bottom:40px;
+
+}
+
+
+/* ===========================================================
+   REFERENCE
+   =========================================================== */
+
+.bos-reference{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.bos-reference-line{
+
+    width:60px;
+
+    height:2px;
+
+    background:var(--gold);
+
+}
+
+.bos-reference-text{
+
+    color:#7A8797;
+
+    font-size:11px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* ===========================================================
+   HERO IMAGE
+   =========================================================== */
+
+.bos-hero-image{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.bos-hero-photo{
+
+    width:100%;
+
+    max-width:620px;
+
+    height:560px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+
+/* ===========================================================
+   HERO CARD
+   =========================================================== */
+
+.bos-hero-card{
+
+    position:absolute;
+
+    left:40px;
+
+    bottom:-30px;
+
+    width:270px;
+
+    background:#FFFFFF;
+
+    padding:26px;
+
+    color:inherit;
+
+    text-decoration:none;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+
+}
+
+.bos-hero-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+        0 34px 90px rgba(0,0,0,.20);
+
+}
+
+
+/* ===========================================================
+   HERO CARD CONTENT
+   =========================================================== */
+
+.bos-hero-card-label{
+
+    color:var(--gold);
+
+    font-size:11px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:12px;
+
+}
+
+.bos-hero-card-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:32px;
+
+    font-weight:400;
+
+    line-height:1.08;
+
+    margin-bottom:14px;
+
+}
+
+.bos-hero-card-description{
+
+    color:var(--text-light);
+
+    font-size:14px;
+
+    line-height:1.7;
+
+    margin-bottom:22px;
+
+}
+
+.bos-hero-card-button{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding-top:14px;
+
+    border-top:1px solid var(--line);
+
+    color:var(--text);
+
+    font-size:11px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+/* ===========================================================
+   DIVIDER
+   =========================================================== */
+
+.bos-divider-section{
+
+    padding-top:90px;
+
+    padding-bottom:90px;
+
+}
+
+.bos-divider{
+
+    width:100%;
+
+    height:1px;
+
+    background:var(--line);
+
+}
+
+
+/* ===========================================================
+   SECOND SECTION
+   =========================================================== */
+
+.bos-binder-section{
+
+    padding-bottom:140px;
+
+}
+
+.bos-binder-grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+        520px
+
+        1fr;
+
+    gap:70px;
+
+    align-items:center;
+
+}
+
+
+/* ===========================================================
+   TEXT COLUMN
+   =========================================================== */
+
+.bos-binder-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+.bos-section-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:74px;
+
+    font-weight:400;
+
+    line-height:1.02;
+
+    margin-bottom:28px;
+
+}
+
+.bos-section-description{
+
+    color:var(--text-light);
+
+    font-size:18px;
+
+    line-height:1.9;
+
+    margin-bottom:48px;
+
+}/* ===========================================================
+   SPECIFICATION BOX
+   =========================================================== */
+
+.bos-spec-box{
+
+    background:#16243B;
+
+    color:#FFFFFF;
+
+    padding:34px;
+
+    width:100%;
+
+    max-width:440px;
+
+}
+
+.bos-spec-header{
+
+    color:#FFFFFF;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-spec-divider{
+
+    width:100%;
+
+    height:1px;
+
+    background:rgba(255,255,255,.15);
+
+    margin:24px 0;
+
+}
+
+.bos-spec-list{
+
+    margin:0;
+
+    padding:0;
+
+    list-style:none;
+
+}
+
+.bos-spec-list li{
+
+    position:relative;
+
+    padding-left:26px;
+
+    margin-bottom:18px;
+
+    color:rgba(255,255,255,.88);
+
+    font-size:16px;
+
+    line-height:1.7;
+
+}
+
+.bos-spec-list li:last-child{
+
+    margin-bottom:0;
+
+}
+
+.bos-spec-list li::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:10px;
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--gold);
+
+}
+
+.bos-spec-footer{
+
+    margin-top:30px;
+
+    padding-top:22px;
+
+    border-top:1px solid rgba(255,255,255,.12);
+
+    color:rgba(255,255,255,.62);
+
+    font-size:13px;
+
+    line-height:1.8;
+
+}
+
+
+/* ===========================================================
+   BINDER IMAGE
+   =========================================================== */
+
+.bos-binder-image{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+}
+
+.bos-binder-photo{
+
+    width:100%;
+
+    max-width:820px;
+
+    height:760px;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+
+/* ===========================================================
+   IMPLEMENTATION CARD
+   =========================================================== */
+
+.bos-card-link{
+
+    color:inherit;
+
+    text-decoration:none;
+
+}
+
+.bos-implementation-card{
+
+    position:absolute;
+
+    left:50px;
+
+    bottom:-56px;
+
+    width:330px;
+
+    background:#FFFFFF;
+
+    padding:34px;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+
+}
+
+.bos-card-link:hover .bos-implementation-card{
+
+    transform:translateY(-4px);
+
+    box-shadow:
+        0 34px 90px rgba(0,0,0,.20);
+
+}
+
+.bos-implementation-card-label{
+
+    color:var(--gold);
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+    margin-bottom:16px;
+
+}
+
+.bos-implementation-card-title{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size:42px;
+
+    font-weight:400;
+
+    line-height:1.08;
+
+    margin-bottom:18px;
+
+}
+
+.bos-implementation-card-description{
+
+    color:var(--text-light);
+
+    font-size:16px;
+
+    line-height:1.8;
+
+    margin-bottom:28px;
+
+}
+
+.bos-implementation-card-button{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding-top:18px;
+
+    border-top:1px solid var(--line);
+
+    color:var(--text);
+
+    font-size:13px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-card-link:hover .bos-arrow{
+
+    transform:translateX(6px);
+
+}/* ===========================================================
+   BOTTOM BAR
+   =========================================================== */
+
+.bos-bottom-bar{
+
+    position:fixed;
+
+    left:0;
+
+    right:0;
+
+    bottom:0;
+
+    height:82px;
+
+    background:rgba(246,243,237,.96);
+
+    backdrop-filter:blur(14px);
+
+    border-top:1px solid var(--line);
+
+    z-index:999;
+
+}
+
+.bos-bottom-bar-inner{
+
+    height:82px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.bos-bottom-left{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:6px;
+
+}
+
+.bos-bottom-system{
+
+    color:var(--text);
+
+    font-size:14px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-bottom-subtitle{
+
+    color:var(--text-light);
+
+    font-size:13px;
+
+}
+
+.bos-bottom-center{
+
+    color:#6C7888;
+
+    font-size:13px;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+
+}
+
+.bos-bottom-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.bos-bottom-page-current{
+
+    color:var(--text);
+
+    font-size:18px;
+
+    font-weight:600;
+
+}
+
+.bos-bottom-separator{
+
+    color:#9DA6B2;
+
+}
+
+.bos-bottom-page-total{
+
+    color:#9DA6B2;
+
+}
+
+
+/* ===========================================================
+   LINKS
+   =========================================================== */
+
+a{
+
+    color:inherit;
+
+    text-decoration:none;
+
+}
+
+
+/* ===========================================================
+   IMAGE POLISH
+   =========================================================== */
+
+.bos-hero-photo,
+.bos-binder-photo{
+
+    transition:
+
+        transform .45s ease,
+
+        filter .35s ease;
+
+}
+
+.bos-hero-image:hover .bos-hero-photo{
+
+    transform:scale(1.015);
+
+}
+
+.bos-binder-image:hover .bos-binder-photo{
+
+    transform:scale(1.015);
+
+}
+
+
+/* ===========================================================
+   CARD POLISH
+   =========================================================== */
+
+.bos-hero-card,
+.bos-implementation-card{
+
+    border:1px solid rgba(0,0,0,.05);
+
+}
+
+.bos-hero-card-button,
+.bos-implementation-card-button{
+
+    transition:letter-spacing .18s ease;
+
+}
+
+.bos-hero-card:hover .bos-hero-card-button{
+
+    letter-spacing:2.4px;
+
+}
+
+.bos-card-link:hover .bos-implementation-card-button{
+
+    letter-spacing:2.4px;
+
+}
+
+
+/* ===========================================================
+   SECTION SPACING
+   =========================================================== */
+
+.bos-hero-section{
+
+    margin-bottom:30px;
+
+}
+
+.bos-binder-section{
+
+    padding-bottom:180px;
+
+}/* ===========================================================
+   RESPONSIVE
+   =========================================================== */
+
+@media (max-width:1400px){
+
+    .bos-hero-grid,
+    .bos-binder-grid{
+
+        grid-template-columns:
+
+            430px
+
+            1fr;
+
+        gap:48px;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:88px;
+
+    }
+
+    .bos-section-title{
+
+        font-size:60px;
+
+    }
+
+}
+
+
+@media (max-width:1100px){
+
+    .bos-hero-grid,
+    .bos-binder-grid{
+
+        grid-template-columns:1fr;
+
+        gap:48px;
+
+    }
+
+    .bos-hero-text,
+    .bos-binder-text{
+
+        min-height:auto;
+
+    }
+
+    .bos-hero-photo,
+    .bos-binder-photo{
+
+        max-width:none;
+
+        height:640px;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        left:40px;
+
+        bottom:-40px;
+
+    }
+
+}
+
+
+@media (max-width:800px){
+
+    .bos-page-width{
+
+        padding-left:24px;
+
+        padding-right:24px;
+
+    }
+
+    .bos-topbar-container{
+
+        padding-left:24px;
+
+        padding-right:24px;
+
+    }
+
+    .bos-topbar-right{
+
+        display:none;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:64px;
+
+    }
+
+    .bos-section-title{
+
+        font-size:48px;
+
+    }
+
+    .bos-hero-subtitle{
+
+        font-size:34px;
+
+    }
+
+    .bos-hero-photo,
+    .bos-binder-photo{
+
+        height:520px;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        width:280px;
+
+        padding:28px;
+
+    }
+
+}
+
+
+@media (max-width:560px){
+
+    .bos-page-width{
+
+        padding-left:18px;
+
+        padding-right:18px;
+
+    }
+
+    .bos-topbar-container{
+
+        padding-left:18px;
+
+        padding-right:18px;
+
+    }
+
+    .bos-logo-title{
+
+        display:none;
+
+    }
+
+    .bos-hero-title{
+
+        font-size:52px;
+
+    }
+
+    .bos-section-title{
+
+        font-size:40px;
+
+    }
+
+    .bos-hero-subtitle{
+
+        font-size:28px;
+
+    }
+
+    .bos-hero-description,
+    .bos-section-description{
+
+        font-size:16px;
+
+    }
+
+    .bos-hero-photo,
+    .bos-binder-photo{
+
+        height:420px;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        position:relative;
+
+        left:auto;
+
+        bottom:auto;
+
+        width:100%;
+
+        margin-top:20px;
+
+    }
+
+    .bos-bottom-bar{
+
+        height:auto;
+
+        padding:18px 0;
+
+    }
+
+    .bos-bottom-bar-inner{
+
+        height:auto;
+
+        flex-direction:column;
+
+        gap:14px;
+
+    }
+
+}
+
+
+/* ===========================================================
+   PRINT
+   =========================================================== */
+
+@media print{
+
+    body{
+
+        background:white;
+
+    }
+
+    .bos-bottom-bar{
+
+        display:none;
+
+    }
+
+    .bos-home{
+
+        background:white;
+
+    }
+
+    .bos-hero-card,
+    .bos-implementation-card{
+
+        box-shadow:none;
+
+    }
+
+}/* ===========================================================
+   VIDEO SECTION
+   =========================================================== */
+
+.bos-video-section{
+
+    padding:90px 0;
+
+}
+
+.bos-video-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:48px;
+
+}
+
+.bos-video-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.bos-video{
+
+    width:100%;
+
+    aspect-ratio:1 / 1;
+
+    object-fit:cover;
+
+    background:#ECE8DF;
+
+    border:1px solid rgba(25,40,70,.14);
+
+    box-shadow:var(--shadow);
+
+}
+
+.bos-video-title{
+
+    margin-top:24px;
+
+    font-family:var(--font-display);
+
+    font-size:26px;
+
+    line-height:1.15;
+
+    color:var(--bos-navy);
+
+}
+
+.bos-video-description{
+
+    margin-top:12px;
+
+    font-size:16px;
+
+    line-height:1.8;
+
+    color:rgba(25,40,70,.72);
+
+}
+
+@media (max-width:1100px){
+
+    .bos-video-grid{
+
+        grid-template-columns:1fr;
+
+        gap:56px;
+
+    }
+
+}/* =========================================================
+   FEATURE CARDS
+========================================================= */
+
+.bos-feature-grid {
+  width: min(1140px, calc(100% - 64px));
+  margin: 56px auto 72px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 46px;
+}
+
+.bos-feature-card {
+  background: #f8f6f2;
+  border: 1px solid rgba(25, 42, 74, 0.12);
+
+  padding: 42px 34px;
+  min-height: 270px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.bos-feature-title {
+  margin: 0 0 24px;
+
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1.05;
+
+  color: #192a4a;
+}
+
+.bos-feature-text {
+  margin: 0;
+
+  font-size: 1rem;
+  line-height: 1.8;
+
+  color: #5f6878;
+}
+
+/* Tablet */
+
+@media (max-width: 1100px) {
+
+  .bos-feature-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .bos-feature-card {
+    min-height: auto;
+  }
+
+}/* ===========================================================
+   PRODUCT MEDIA STACK
+   =========================================================== */
+
+.bos-product-media-stack{
+    position:absolute;
+
+    left:40px;
+    bottom:-30px;
+
+    width:270px;
+
+    z-index:4;
+
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+
+    gap:24px;
+}
+
+
+/* ===========================================================
+   PRODUCT VIDEO
+   =========================================================== */
+
+.bos-product-video-wrap{
+    position:relative;
+
+    width:100%;
+    height:220px;
+
+    flex:none;
+
+    background:#ECE8DF;
+
+    border:1px solid rgba(25,40,70,.14);
+
+    box-shadow:var(--shadow);
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+}
+
+.bos-product-video-wrap:hover{
+    transform:translateY(-4px);
+
+    box-shadow:
+        0 34px 90px rgba(0,0,0,.20);
+}
+
+.bos-product-video{
+    display:block;
+
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+}
+
+
+/* ===========================================================
+   VIDEO HINT
+   =========================================================== */
+
+.bos-product-video-hint{
+    position:absolute;
+
+    right:14px;
+    bottom:12px;
+
+    padding:7px 10px;
+
+    background:rgba(13,20,34,.82);
+
+    color:#FFFFFF;
+
+    font-size:9px;
+    font-weight:600;
+
+    letter-spacing:1.8px;
+
+    pointer-events:none;
+
+    opacity:0;
+
+    transform:translateY(4px);
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease;
+}
+
+.bos-product-video-wrap:hover .bos-product-video-hint{
+    opacity:1;
+
+    transform:translateY(0);
+}
+
+
+/* ===========================================================
+   CARDS INSIDE PRODUCT MEDIA STACK
+   =========================================================== */
+
+.bos-product-media-stack > .bos-hero-card{
+    position:relative;
+
+    inset:auto;
+
+    left:auto;
+    right:auto;
+    top:auto;
+    bottom:auto;
+
+    width:100%;
+    min-width:0;
+
+    margin:0;
+
+    flex:none;
+
+    display:block;
+}
+
+
+/* ===========================================================
+   VIDEO MODAL
+   =========================================================== */
+
+.bos-video-modal{
+    position:fixed;
+
+    inset:0;
+
+    z-index:5000;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:48px;
+
+    background:rgba(13,20,34,.82);
+
+    backdrop-filter:blur(8px);
+}
+
+.bos-video-modal-content{
+    position:relative;
+
+    width:min(1100px, 90vw);
+
+    background:#0D1422;
+
+    box-shadow:
+        0 40px 120px rgba(0,0,0,.45);
+}
+
+.bos-video-modal-player{
+    display:block;
+
+    width:100%;
+
+    max-height:82vh;
+
+    background:#000000;
+}
+
+.bos-video-modal-close{
+    position:absolute;
+
+    top:-44px;
+    right:0;
+
+    width:38px;
+    height:38px;
+
+    padding:0;
+
+    border:0;
+
+    background:transparent;
+
+    color:#FFFFFF;
+
+    font-family:Arial, sans-serif;
+
+    font-size:34px;
+    font-weight:300;
+    line-height:38px;
+
+    cursor:pointer;
+
+    z-index:2;
+}
+
+
+/* ===========================================================
+   PRODUCT MEDIA STACK RESPONSIVE
+   =========================================================== */
+
+@media (max-width:1100px){
+
+    .bos-product-media-stack{
+        left:40px;
+        bottom:-40px;
+
+        width:240px;
+
+        gap:24px;
+    }
+
+    .bos-product-video-wrap{
+        height:195px;
+    }
+
+}
+
+
+@media (max-width:560px){
+
+    .bos-product-media-stack{
+        position:relative;
+
+        left:auto;
+        right:auto;
+        top:auto;
+        bottom:auto;
+
+        width:100%;
+
+        gap:20px;
+
+        margin-top:20px;
+    }
+
+    .bos-product-video-wrap{
+        width:100%;
+        height:auto;
+
+        aspect-ratio:16 / 10;
+    }
+
+    .bos-product-media-stack > .bos-hero-card{
+        position:relative;
+
+        inset:auto;
+
+        width:100%;
+
+        margin:0;
+    }
+
+    .bos-video-modal{
+        padding:18px;
+    }
+
+    .bos-video-modal-content{
+        width:100%;
+    }
+
+}
