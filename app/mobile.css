@@ -1,0 +1,267 @@
+/* ===========================================================
+   BOS MOBILE POLISH
+   Final responsive layer for the redesigned homepage.
+   Mobile uses normal document flow: no sticky storytelling.
+   =========================================================== */
+
+@media (max-width:800px){
+  html{
+    scroll-behavior:smooth;
+  }
+
+  body{
+    overflow-x:hidden;
+  }
+
+  .bos-page-width{
+    padding-left:28px;
+    padding-right:28px;
+  }
+
+  .bos-product-story-desktop{
+    display:none;
+  }
+
+  .bos-product-story-mobile{
+    display:block;
+  }
+
+  .bos-product-story-mobile .bos-product-stage{
+    position:relative;
+    padding:42px 0 58px;
+  }
+
+  .bos-product-story-mobile .bos-product-stage + .bos-product-stage{
+    padding-top:58px;
+    border-top:1px solid var(--line);
+  }
+
+  .bos-product-stage-grid{
+    min-height:0;
+    grid-template-columns:1fr;
+    gap:34px;
+  }
+
+  .bos-product-stage-copy{
+    max-width:620px;
+  }
+
+  .bos-product-stage-eyebrow{
+    margin-bottom:14px;
+    font-size:10px;
+    letter-spacing:2.2px;
+  }
+
+  .bos-product-stage-title{
+    max-width:620px;
+    margin-bottom:10px;
+    font-size:clamp(46px,9vw,62px);
+    line-height:.98;
+    letter-spacing:-1.8px;
+  }
+
+  .bos-product-stage-subtitle{
+    max-width:560px;
+    margin-bottom:20px;
+    font-size:26px;
+  }
+
+  .bos-product-stage-description{
+    max-width:600px;
+    margin-bottom:28px;
+    font-size:15px;
+    line-height:1.72;
+  }
+
+  .bos-product-stage-reference{
+    gap:11px;
+    font-size:9px;
+    letter-spacing:1.5px;
+  }
+
+  .bos-product-stage-reference-line{
+    width:42px;
+  }
+
+  .bos-product-stage-showcase{
+    min-height:0;
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:auto;
+    gap:18px;
+  }
+
+  .bos-product-stage-demo,
+  .bos-product-stage-photo-wrap,
+  .bos-product-stage-purchase{
+    grid-column:1;
+    grid-row:auto;
+  }
+
+  .bos-product-stage-demo{
+    order:1;
+  }
+
+  .bos-product-stage-photo-wrap{
+    order:2;
+    min-height:0;
+  }
+
+  .bos-product-stage-purchase{
+    order:3;
+  }
+
+  .bos-product-stage-demo .bos-product-video-wrap{
+    width:100%;
+    height:auto;
+    aspect-ratio:16 / 10;
+    box-shadow:0 18px 46px rgba(13,20,34,.14);
+  }
+
+  .bos-product-stage-photo{
+    width:100%;
+    height:auto;
+    min-height:0;
+    aspect-ratio:16 / 10;
+    object-fit:cover;
+  }
+
+  .bos-product-stage-index{
+    top:14px;
+    right:14px;
+  }
+
+  .bos-product-stage-purchase{
+    padding:22px 24px;
+    box-shadow:0 16px 44px rgba(13,20,34,.12);
+  }
+
+  .bos-product-stage-purchase:hover{
+    transform:none;
+  }
+
+  .bos-product-stage-purchase-title{
+    font-size:27px;
+  }
+
+  .bos-product-stage-purchase-action{
+    gap:12px;
+    font-size:9px;
+    letter-spacing:1.25px;
+  }
+
+  .bos-feature-strip{
+    padding:10px 0 54px;
+  }
+
+  .bos-feature-strip .bos-feature-card{
+    padding:26px 0;
+  }
+
+  .bos-feature-strip .bos-feature-title{
+    margin-bottom:11px;
+  }
+
+  .bos-feature-strip .bos-feature-text{
+    max-width:none;
+  }
+}
+
+@media (max-width:560px){
+  .bos-page-width{
+    padding-left:22px;
+    padding-right:22px;
+  }
+
+  .bos-product-story-mobile .bos-product-stage{
+    padding:34px 0 48px;
+  }
+
+  .bos-product-story-mobile .bos-product-stage + .bos-product-stage{
+    padding-top:48px;
+  }
+
+  .bos-product-stage-grid{
+    gap:28px;
+  }
+
+  .bos-product-stage-title{
+    font-size:clamp(42px,12vw,52px);
+    letter-spacing:-1.4px;
+  }
+
+  .bos-product-stage-subtitle{
+    font-size:23px;
+    line-height:1.14;
+  }
+
+  .bos-product-stage-description{
+    font-size:14px;
+    line-height:1.68;
+  }
+
+  .bos-product-stage-demo .bos-product-video-wrap,
+  .bos-product-stage-photo{
+    aspect-ratio:4 / 3;
+  }
+
+  .bos-product-stage-purchase{
+    padding:20px;
+  }
+
+  .bos-product-stage-purchase-title{
+    font-size:25px;
+  }
+
+  .bos-product-stage-purchase-description{
+    font-size:12px;
+  }
+
+  .bos-product-stage-purchase-action{
+    align-items:flex-end;
+    font-size:8px;
+    line-height:1.45;
+  }
+
+  .bos-feature-strip{
+    padding-bottom:42px;
+  }
+
+  .bos-feature-strip .bos-feature-card{
+    grid-template-columns:24px 1fr;
+    gap:10px;
+    padding:24px 0;
+  }
+
+  .bos-feature-strip .bos-feature-title{
+    font-size:23px;
+  }
+
+  .bos-feature-strip .bos-feature-text{
+    font-size:12px;
+    line-height:1.65;
+  }
+}
+
+@media (max-width:380px){
+  .bos-page-width{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .bos-product-stage-title{
+    font-size:40px;
+  }
+
+  .bos-product-stage-subtitle{
+    font-size:21px;
+  }
+
+  .bos-product-stage-reference{
+    align-items:flex-start;
+  }
+
+  .bos-product-stage-purchase-action{
+    letter-spacing:.9px;
+  }
+}
