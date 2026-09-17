@@ -1,6 +1,6 @@
 export default function BottomBar() {
   return (
-    <footer className="bos-bottom-bar">
+    <footer id="kontakt" className="bos-bottom-bar">
 
       <div className="bos-page-width">
 
