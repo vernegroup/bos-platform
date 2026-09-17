@@ -4,6 +4,7 @@ import "./product-flow.css";
 import "./navigation.css";
 import "./footer.css";
 import "./mobile.css";
+import "./product-alignment.css";
 
 import TopBar from "../components/TopBar";
 
