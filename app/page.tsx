@@ -3,15 +3,13 @@ import "./product-stage.css";
 
 import TopBar from "../components/TopBar";
 
-import ProductStage from "../components/ProductStage";
+import ProductStory from "../components/ProductStory";
 
 import FeatureCards from "../components/FeatureCards";
 
 import BottomBar from "../components/BottomBar";
 
 import BOSSupport from "../components/BOSSupport/BOSSupport";
-
-import { bosProducts } from "../data/products";
 
 export default function HomePage() {
   return (
@@ -20,9 +18,7 @@ export default function HomePage() {
 
       <main className="bos-home">
 
-        <ProductStage product={bosProducts[0]} />
-
-        <ProductStage product={bosProducts[1]} />
+        <ProductStory />
 
         <FeatureCards />
 
