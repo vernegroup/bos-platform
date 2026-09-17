@@ -83,7 +83,7 @@ export default function ProductStory() {
   }, [activeIndex, displayIndex]);
 
   return (
-    <>
+    <section id="produkty" className="bos-product-story-root" aria-label="Produkty BOS">
       <div ref={storyRef} className="bos-product-story bos-product-story-desktop">
         <div className="bos-product-story-sticky">
           <div
@@ -102,6 +102,6 @@ export default function ProductStory() {
           <ProductStage key={product.id} product={product} />
         ))}
       </div>
-    </>
+    </section>
   );
 }
