@@ -4,7 +4,6 @@ import "./product-stage.css";
 import TopBar from "../components/TopBar";
 
 import ProductStage from "../components/ProductStage";
-import PromotionSection from "../components/PromotionSection";
 
 import FeatureCards from "../components/FeatureCards";
 
@@ -23,7 +22,7 @@ export default function HomePage() {
 
         <ProductStage product={bosProducts[0]} />
 
-        <PromotionSection />
+        <ProductStage product={bosProducts[1]} />
 
         <FeatureCards />
 
