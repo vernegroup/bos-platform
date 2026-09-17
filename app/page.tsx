@@ -2,6 +2,7 @@ import "./styles.css";
 import "./product-stage.css";
 import "./product-flow.css";
 import "./navigation.css";
+import "./footer.css";
 
 import TopBar from "../components/TopBar";
 
