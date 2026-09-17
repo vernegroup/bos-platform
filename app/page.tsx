@@ -3,7 +3,7 @@ import "./product-stage.css";
 
 import TopBar from "../components/TopBar";
 
-import HeroSection from "../components/HeroSection";
+import ProductStage from "../components/ProductStage";
 import PromotionSection from "../components/PromotionSection";
 
 import FeatureCards from "../components/FeatureCards";
@@ -12,6 +12,8 @@ import BottomBar from "../components/BottomBar";
 
 import BOSSupport from "../components/BOSSupport/BOSSupport";
 
+import { bosProducts } from "../data/products";
+
 export default function HomePage() {
   return (
     <>
@@ -19,7 +21,7 @@ export default function HomePage() {
 
       <main className="bos-home">
 
-        <HeroSection />
+        <ProductStage product={bosProducts[0]} />
 
         <PromotionSection />
 
