@@ -26,7 +26,7 @@ export default async function OnboardingSuccessPage({
     notFound();
   }
 
-  const checkout = await verifyCheckout(session_id);
+  const checkout = await verifyCheckout(session_id, "onboarding");
 
   if (!checkout) {
     notFound();
