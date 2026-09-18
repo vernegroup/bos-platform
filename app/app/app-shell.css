@@ -1489,3 +1489,20 @@
 .bos-update-row div p{margin-top:5px;color:var(--app-muted);font-size:9px;line-height:1.45}
 .bos-update-row b{font-size:7px;letter-spacing:.7px;color:#536a54}
 @media(max-width:680px){.bos-update-versions{grid-template-columns:1fr}.bos-update-version{border-right:0;border-bottom:1px solid var(--app-line)}.bos-update-version:last-child{border-bottom:0}.bos-update-row{padding:14px 0;grid-template-columns:70px minmax(0,1fr)}.bos-update-product{grid-column:2}.bos-update-row div{grid-column:2}.bos-update-row b{grid-column:2}}
+
+/* BOS PROMOTIONS */
+.bos-promotions-summary{margin-top:32px;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:repeat(3,1fr)}
+.bos-promotions-summary>div{min-height:120px;padding:20px;border-right:1px solid var(--app-line)}.bos-promotions-summary>div:last-child{border-right:0}
+.bos-promotions-summary span{display:block;color:var(--app-accent);font-size:7px;font-weight:700;letter-spacing:1px}.bos-promotions-summary strong{display:block;margin-top:10px;font-family:var(--font-heading),serif;font-size:23px}.bos-promotions-summary p{margin-top:8px;color:var(--app-muted);font-size:9px;line-height:1.5}
+.bos-promotion-list,.bos-promotion-history,.bos-promotion-checks{margin-top:28px;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line)}
+.bos-promotion-list>header,.bos-promotion-row{display:grid;grid-template-columns:minmax(140px,1fr) minmax(180px,1.2fr) 90px 85px 70px 18px;gap:12px;align-items:center}
+.bos-promotion-list>header{min-height:34px;border-bottom:1px solid var(--app-line);color:#969da4;font-size:7px;font-weight:700;letter-spacing:.8px}
+.bos-promotion-row{min-height:60px;border-bottom:1px solid var(--app-line);color:var(--app-navy)}.bos-promotion-row:last-child{border-bottom:0}.bos-promotion-row:hover{background:#eeece6}
+.bos-promotion-row strong{font-size:10px}.bos-promotion-row span{color:var(--app-muted);font-size:8px}.bos-promotion-row b,.bos-promotion-row em{font-size:7px;font-style:normal;letter-spacing:.5px}.bos-promotion-row i{font-style:normal}
+.bos-promotion-checks>header,.bos-promotion-checks>div{display:grid;grid-template-columns:38px 200px minmax(220px,1fr) 100px;gap:16px}
+.bos-promotion-checks>header{min-height:34px;align-items:center;border-bottom:1px solid var(--app-line);color:#969da4;font-size:7px;font-weight:700;letter-spacing:.7px}
+.bos-promotion-checks>div{min-height:66px;padding:13px 0;border-bottom:1px solid var(--app-line);align-items:start}.bos-promotion-checks>div:last-child{border-bottom:0}
+.bos-promotion-checks span{font-size:8px;color:#9ba1a7}.bos-promotion-checks strong{font-size:10px}.bos-promotion-checks p{font-size:9px;line-height:1.5}.bos-promotion-checks b{font-size:7px;color:#536a54}
+.bos-promotion-history article{min-height:76px;border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:85px 180px 90px minmax(180px,1fr) 90px;gap:14px;align-items:center}.bos-promotion-history article:last-child{border-bottom:0}
+.bos-promotion-history time,.bos-promotion-history span{color:var(--app-muted);font-size:8px}.bos-promotion-history div{display:flex;flex-direction:column;gap:4px}.bos-promotion-history strong{font-size:10px}.bos-promotion-history b,.bos-promotion-history em{font-size:7px;font-style:normal}.bos-promotion-history p{font-size:9px;line-height:1.45}
+@media(max-width:700px){.bos-promotions-summary{grid-template-columns:1fr}.bos-promotions-summary>div{border-right:0;border-bottom:1px solid var(--app-line)}.bos-promotion-list>header{display:none}.bos-promotion-row{padding:12px 0;grid-template-columns:1fr 70px 18px}.bos-promotion-row span:first-of-type{grid-column:1}.bos-promotion-row span:nth-of-type(2){grid-column:1}.bos-promotion-checks>header{display:none}.bos-promotion-checks>div{grid-template-columns:26px 1fr}.bos-promotion-checks p,.bos-promotion-checks b{grid-column:2}.bos-promotion-history article{padding:12px 0;grid-template-columns:70px 1fr}.bos-promotion-history article p,.bos-promotion-history article em{grid-column:2}}
