@@ -1506,3 +1506,285 @@
 .bos-promotion-history article{min-height:76px;border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:85px 180px 90px minmax(180px,1fr) 90px;gap:14px;align-items:center}.bos-promotion-history article:last-child{border-bottom:0}
 .bos-promotion-history time,.bos-promotion-history span{color:var(--app-muted);font-size:8px}.bos-promotion-history div{display:flex;flex-direction:column;gap:4px}.bos-promotion-history strong{font-size:10px}.bos-promotion-history b,.bos-promotion-history em{font-size:7px;font-style:normal}.bos-promotion-history p{font-size:9px;line-height:1.45}
 @media(max-width:700px){.bos-promotions-summary{grid-template-columns:1fr}.bos-promotions-summary>div{border-right:0;border-bottom:1px solid var(--app-line)}.bos-promotion-list>header{display:none}.bos-promotion-row{padding:12px 0;grid-template-columns:1fr 70px 18px}.bos-promotion-row span:first-of-type{grid-column:1}.bos-promotion-row span:nth-of-type(2){grid-column:1}.bos-promotion-checks>header{display:none}.bos-promotion-checks>div{grid-template-columns:26px 1fr}.bos-promotion-checks p,.bos-promotion-checks b{grid-column:2}.bos-promotion-history article{padding:12px 0;grid-template-columns:70px 1fr}.bos-promotion-history article p,.bos-promotion-history article em{grid-column:2}}
+
+
+/* ===========================================================
+   BOS UI 1.0 — UI-03 GLOBAL APP SHELL
+   Presentation override only. Existing route-specific styles remain intact.
+   =========================================================== */
+.bos-app-shell{
+  --app-navy:var(--bos-navy-950);
+  --app-muted:var(--bos-text-muted);
+  --app-line:var(--bos-border);
+  --app-paper:var(--bos-app-bg);
+  --app-panel:var(--bos-surface);
+  --app-accent:var(--bos-gold-500);
+  grid-template-columns:var(--bos-sidebar-w) minmax(0,1fr);
+  background:var(--bos-app-bg);
+}
+
+.bos-app-sidebar{
+  z-index:40;
+  padding:0;
+  border-right:0;
+  background:var(--bos-navy-950);
+  color:var(--bos-text-inverse);
+}
+
+.bos-app-sidebar-head{
+  min-height:82px;
+  padding:0 24px;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.bos-app-brand{
+  min-height:0;
+  padding:0;
+  border:0;
+  gap:11px;
+  color:var(--bos-text-inverse);
+}
+
+.bos-app-brand-mark{
+  color:var(--bos-text-inverse);
+  font-family:var(--bos-font-heading);
+  font-size:25px;
+  letter-spacing:.08em;
+}
+
+.bos-app-brand-name{
+  max-width:122px;
+  color:rgba(248,245,237,.58);
+  font-size:7px;
+  line-height:1.45;
+  letter-spacing:.12em;
+}
+
+.bos-app-sidebar-close{
+  display:none;
+  width:34px;
+  height:34px;
+  border:0;
+  background:transparent;
+  color:var(--bos-text-inverse);
+  font-size:24px;
+}
+
+.bos-app-sidebar-label{
+  padding:27px 26px 10px;
+  color:rgba(248,245,237,.38);
+  font-size:8px;
+  letter-spacing:.16em;
+}
+
+.bos-app-nav{
+  padding:0 14px;
+  gap:2px;
+}
+
+.bos-app-nav-link{
+  min-height:42px;
+  padding:0 12px;
+  border:0;
+  border-left:2px solid transparent;
+  display:flex;
+  align-items:center;
+  color:rgba(248,245,237,.7);
+  font-size:12px;
+}
+
+.bos-app-nav-link:hover,
+.bos-app-nav-link:focus-visible{
+  background:rgba(255,255,255,.055);
+  color:var(--bos-text-inverse);
+}
+
+.bos-app-nav-link.is-active{
+  border-left-color:var(--bos-gold-500);
+  background:rgba(255,255,255,.07);
+  color:var(--bos-text-inverse);
+  font-weight:650;
+}
+
+.bos-app-sidebar-bottom{
+  margin:0 14px 18px;
+  padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+
+.bos-app-utility-link{
+  padding:9px 12px;
+  color:rgba(248,245,237,.58);
+  font-size:11px;
+}
+
+.bos-app-utility-link:hover,
+.bos-app-utility-link:focus-visible,
+.bos-app-utility-link.is-active{
+  color:var(--bos-text-inverse);
+}
+
+.bos-app-public-link{
+  margin-top:12px;
+  padding:14px 12px 0;
+  border-top:1px solid rgba(255,255,255,.1);
+  color:rgba(248,245,237,.75);
+  font-size:8px;
+  letter-spacing:.1em;
+}
+
+.bos-app-main{
+  background:var(--bos-app-bg);
+}
+
+.bos-app-topbar{
+  height:64px;
+  padding:0 32px;
+  border-bottom:1px solid var(--bos-border);
+  background:rgba(253,252,248,.96);
+  backdrop-filter:blur(12px);
+}
+
+.bos-app-topbar-start{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.bos-app-menu-button{
+  display:none;
+  width:38px;
+  height:38px;
+  padding:9px;
+  border:1px solid var(--bos-border);
+  border-radius:var(--bos-radius-sm);
+  background:var(--bos-surface);
+}
+
+.bos-app-menu-button span{
+  display:block;
+  height:1px;
+  margin:4px 0;
+  background:var(--bos-navy-950);
+}
+
+.bos-app-search{
+  width:min(480px,45vw);
+  height:38px;
+  padding:0 12px;
+  border:1px solid var(--bos-border);
+  border-radius:var(--bos-radius-sm);
+  background:var(--bos-surface);
+  grid-template-columns:auto minmax(0,1fr);
+}
+
+.bos-app-search-label{
+  color:var(--bos-gold-600);
+}
+
+.bos-app-search-placeholder{
+  color:var(--bos-text-subtle);
+  font-size:11px;
+}
+
+.bos-app-account{
+  gap:12px;
+}
+
+.bos-app-account-copy strong{
+  color:var(--bos-navy-950);
+  font-size:10px;
+}
+
+.bos-app-account-copy span{
+  color:var(--bos-text-muted);
+  font-size:9px;
+}
+
+.bos-app-account-mark{
+  width:34px;
+  height:34px;
+  border:1px solid var(--bos-border-strong);
+  border-radius:50%;
+  background:var(--bos-cream-100);
+  color:var(--bos-navy-950);
+}
+
+.bos-app-workspace{
+  width:min(var(--bos-content-max),calc(100% - 64px));
+  padding:38px 0 72px;
+}
+
+.bos-app-scrim{display:none}
+
+@media(max-width:900px){
+  .bos-app-shell{grid-template-columns:210px minmax(0,1fr)}
+  .bos-app-brand-name{display:block}
+}
+
+@media(max-width:680px){
+  .bos-app-shell{display:block}
+
+  .bos-app-sidebar{
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    width:min(82vw,290px);
+    height:100dvh;
+    padding:0;
+    border:0;
+    transform:translateX(-102%);
+    transition:transform .2s ease;
+    overflow-y:auto;
+  }
+
+  .bos-app-sidebar.is-open{transform:translateX(0)}
+  .bos-app-sidebar-head{min-height:72px;padding:0 20px}
+  .bos-app-sidebar-close{display:block}
+  .bos-app-brand{padding:0}
+  .bos-app-sidebar-label{display:block}
+  .bos-app-nav{display:flex;padding:0 14px}
+  .bos-app-nav-link{display:flex;min-height:42px;padding:0 12px;border-bottom:0;font-size:12px}
+  .bos-app-nav-link:nth-child(n+4){display:flex}
+  .bos-app-nav-link.is-active{border-left-color:var(--bos-gold-500);border-bottom-color:transparent}
+  .bos-app-sidebar-bottom{display:flex}
+
+  .bos-app-scrim{
+    position:fixed;
+    z-index:35;
+    inset:0;
+    display:block;
+    border:0;
+    background:rgba(4,15,27,.58);
+  }
+
+  .bos-app-topbar{
+    height:58px;
+    padding:0 16px;
+  }
+
+  .bos-app-menu-button{display:block}
+
+  .bos-app-search{
+    width:min(58vw,320px);
+    height:36px;
+  }
+
+  .bos-app-search-label{display:none}
+  .bos-app-account-copy{display:none}
+
+  .bos-app-workspace{
+    width:calc(100% - 32px);
+    padding:28px 0 52px;
+  }
+}
+
+@media(max-width:420px){
+  .bos-app-search{width:46vw}
+  .bos-app-search-placeholder{font-size:10px}
+}
