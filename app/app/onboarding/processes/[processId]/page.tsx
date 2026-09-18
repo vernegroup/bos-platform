@@ -1,18 +1,14 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { onboardingProcesses, getProcessProgress } from "@/data/onboardingProcesses";
-import { onboardingStandards } from "@/data/onboardingStandards";
-
-export function generateStaticParams() {
-  return onboardingProcesses.map((process) => ({ processId: process.id }));
-}
+import { getProcess, getProcessProgress, getStandard } from "@/lib/bos/onboardingRepository";
 
 export default async function ProcessDetailPage({ params }: { params: Promise<{ processId: string }> }) {
   const { processId } = await params;
-  const process = onboardingProcesses.find((item) => item.id === processId);
+  const process = await getProcess(processId);
   if (!process) notFound();
 
-  const standard = onboardingStandards.find((item) => item.id === process.standardId);
+  const standard = await getStandard(process.standardId);
   const version = standard?.versions.find((item) => item.version === process.standardVersion);
   if (!standard || !version) notFound();
 
