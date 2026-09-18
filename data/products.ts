@@ -47,7 +47,7 @@ export const bosProducts: BOSProduct[] = [
       label: "STANDARD OPERACYJNY",
       title: "Kup BOS Onboarding",
       description:
-        "Kompletny system onboardingu dla małych i średnich firm.",
+        "Dożywotnia licencja na moduł BOS Onboarding w aplikacji webowej wraz z aktualizacjami.",
       checkoutEndpoint: "/api/checkout",
       ariaLabel: "Kup BOS Onboarding",
     },
@@ -73,7 +73,7 @@ export const bosProducts: BOSProduct[] = [
       label: "STANDARD OPERACYJNY",
       title: "Kup BOS Promotions",
       description:
-        "Kompletny system wspierający planowanie awansów wewnętrznych, przekazywanie obowiązków oraz rozwój pracowników w organizacji.",
+        "Dożywotnia licencja na moduł BOS Promotions w aplikacji webowej wraz z aktualizacjami.",
       checkoutEndpoint: "/api/checkout-promotions",
       ariaLabel: "Kup BOS Promotions",
     },
