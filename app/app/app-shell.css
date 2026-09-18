@@ -965,3 +965,289 @@
     grid-column:2 / 4;
   }
 }
+
+
+/* ===========================================================
+   BOS ONBOARDING — PRODUCT PANEL
+   Product structure prototype. Demo data only.
+   =========================================================== */
+
+.bos-onboarding-flow{
+  margin-top:26px;
+  border-top:1px solid var(--app-line);
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+
+.bos-onboarding-flow-step{
+  min-height:68px;
+  padding:0 18px;
+  border-right:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  transition:background .15s ease;
+}
+
+.bos-onboarding-flow-step:last-child{border-right:0}
+.bos-onboarding-flow-step:hover{background:#eeece6}
+
+.bos-onboarding-flow-index,
+.bos-onboarding-stage-number{
+  color:#9ba1a7;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.bos-onboarding-flow-copy{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.bos-onboarding-flow-copy strong{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.bos-onboarding-flow-copy small{
+  color:var(--app-muted);
+  font-size:8px;
+}
+
+.bos-onboarding-flow-arrow{
+  color:var(--app-accent);
+  font-size:13px;
+}
+
+.bos-onboarding-stages{margin-top:34px}
+
+.bos-onboarding-stage-list{
+  border-bottom:1px solid var(--app-line);
+}
+
+.bos-onboarding-stage-row{
+  min-height:86px;
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:38px minmax(230px,1fr) 160px 110px 82px;
+  align-items:center;
+  gap:16px;
+}
+
+.bos-onboarding-stage-row:last-child{border-bottom:0}
+
+.bos-onboarding-stage-row h3{
+  margin:0;
+  font-family:var(--font-body),sans-serif;
+  font-size:12px;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.bos-onboarding-stage-row p{
+  max-width:420px;
+  margin-top:5px;
+  font-size:9px;
+  line-height:1.45;
+}
+
+.bos-onboarding-stage-object,
+.bos-onboarding-stage-metric{
+  min-height:42px;
+  padding-left:14px;
+  border-left:1px solid var(--app-line);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+}
+
+.bos-onboarding-stage-object span,
+.bos-onboarding-stage-metric span{
+  color:#999fa5;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.8px;
+}
+
+.bos-onboarding-stage-object strong,
+.bos-onboarding-stage-metric strong{
+  font-size:9px;
+}
+
+.bos-onboarding-stage-open{
+  min-height:32px;
+  padding:0 9px;
+  border:1px solid #cfd3d5;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+.bos-onboarding-stage-open:hover{background:#ece9e2}
+
+.bos-onboarding-work-grid{
+  margin-top:42px;
+  display:grid;
+  grid-template-columns:1fr 1.15fr;
+  gap:38px;
+}
+
+.bos-onboarding-text-link{
+  padding-bottom:2px;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+.bos-onboarding-table,
+.bos-onboarding-process-list{
+  border-bottom:1px solid var(--app-line);
+}
+
+.bos-onboarding-table-row{
+  min-height:50px;
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 48px 82px 58px;
+  align-items:center;
+  gap:10px;
+}
+
+.bos-onboarding-table-row:last-child,
+.bos-onboarding-process-row:last-child{border-bottom:0}
+
+.bos-onboarding-table-row strong{font-size:10px}
+.bos-onboarding-table-row span{color:var(--app-muted);font-size:8px}
+.bos-onboarding-table-row b{color:#536a54;font-size:7px;letter-spacing:.6px}
+
+.bos-onboarding-process-row{
+  min-height:58px;
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:minmax(150px,1fr) 110px 46px 36px;
+  align-items:center;
+  gap:12px;
+}
+
+.bos-onboarding-process-row > div:first-child{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.bos-onboarding-process-row strong{font-size:10px}
+.bos-onboarding-process-row div span{color:var(--app-muted);font-size:8px}
+.bos-onboarding-process-row b{font-size:8px}
+.bos-onboarding-process-row em{font-size:8px;font-style:normal;font-weight:700}
+
+.bos-onboarding-progress{
+  height:4px;
+  background:#deddd8;
+  overflow:hidden;
+}
+
+.bos-onboarding-progress > span{
+  display:block;
+  height:100%;
+  background:var(--app-accent);
+}
+
+.bos-onboarding-close-summary{
+  margin-top:42px;
+  padding:22px 0;
+  border-top:1px solid var(--app-line);
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 120px 96px;
+  align-items:center;
+  gap:24px;
+}
+
+.bos-onboarding-close-summary h2{
+  margin:0;
+  font-size:20px;
+}
+
+.bos-onboarding-close-summary p{
+  max-width:580px;
+  margin-top:6px;
+  font-size:9px;
+  line-height:1.5;
+}
+
+.bos-onboarding-close-number{
+  min-height:48px;
+  padding-left:18px;
+  border-left:1px solid var(--app-line);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.bos-onboarding-close-number strong{
+  font-family:var(--font-heading),serif;
+  font-size:24px;
+  line-height:1;
+}
+
+.bos-onboarding-close-number span{
+  margin-top:4px;
+  color:#92999f;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.8px;
+}
+
+@media (max-width:1000px){
+  .bos-onboarding-stage-row{
+    grid-template-columns:30px minmax(200px,1fr) 140px 82px;
+  }
+  .bos-onboarding-stage-metric{display:none}
+  .bos-onboarding-work-grid{grid-template-columns:1fr}
+}
+
+@media (max-width:680px){
+  .bos-onboarding-flow{grid-template-columns:1fr}
+  .bos-onboarding-flow-step{
+    min-height:58px;
+    border-right:0;
+    border-bottom:1px solid var(--app-line);
+  }
+  .bos-onboarding-flow-step:last-child{border-bottom:0}
+
+  .bos-onboarding-stage-row{
+    padding:15px 0;
+    grid-template-columns:24px minmax(0,1fr) 72px;
+    gap:10px;
+  }
+  .bos-onboarding-stage-object{
+    grid-column:2 / 4;
+    min-height:0;
+    padding:0;
+    border-left:0;
+  }
+  .bos-onboarding-stage-open{grid-column:2 / 4}
+  .bos-onboarding-work-grid{gap:30px}
+  .bos-onboarding-process-row{
+    padding:10px 0;
+    grid-template-columns:minmax(0,1fr) 44px 34px;
+  }
+  .bos-onboarding-progress{grid-column:1}
+  .bos-onboarding-close-summary{
+    grid-template-columns:minmax(0,1fr) 90px;
+  }
+  .bos-onboarding-close-summary .bos-onboarding-stage-open{
+    grid-column:1 / 3;
+  }
+}
