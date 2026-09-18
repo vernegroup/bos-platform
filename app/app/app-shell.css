@@ -479,3 +479,369 @@
     border-bottom:0;
   }
 }
+
+
+/* ===========================================================
+   BOS CLIENT DASHBOARD
+   Dense application UI. Demo data only.
+   =========================================================== */
+
+.bos-dashboard-section{
+  margin-top:34px;
+}
+
+.bos-dashboard-section-head{
+  min-height:48px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--app-line);
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.bos-dashboard-section-kicker{
+  display:block;
+  margin-bottom:5px;
+  color:var(--app-accent);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1.4px;
+}
+
+.bos-dashboard-section-head h2{
+  margin:0;
+  color:var(--app-navy);
+  font-size:22px;
+  font-weight:600;
+  line-height:1.05;
+}
+
+.bos-dashboard-count{
+  padding-bottom:2px;
+  color:#8b9299;
+  font-size:9px;
+  letter-spacing:.5px;
+}
+
+.bos-dashboard-products{
+  border-bottom:1px solid var(--app-line);
+}
+
+.bos-dashboard-product{
+  min-height:96px;
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:42px minmax(260px,1fr) 126px 92px;
+  align-items:center;
+}
+
+.bos-dashboard-product:last-child{
+  border-bottom:0;
+}
+
+.bos-dashboard-product-index{
+  color:#9ca2a8;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.bos-dashboard-product-copy{
+  min-width:0;
+  padding:18px 22px 18px 0;
+}
+
+.bos-dashboard-product-topline{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.bos-dashboard-product-copy h3{
+  margin:0;
+  color:var(--app-navy);
+  font-family:var(--font-body),sans-serif;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:0;
+}
+
+.bos-dashboard-product-copy p{
+  margin-top:6px;
+  color:var(--app-muted);
+  font-size:10px;
+  line-height:1.45;
+}
+
+.bos-dashboard-status{
+  padding:3px 6px;
+  border:1px solid #c8d2c7;
+  color:#536a54;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.8px;
+}
+
+.bos-dashboard-product-metric{
+  min-height:46px;
+  padding-left:18px;
+  border-left:1px solid var(--app-line);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.bos-dashboard-product-metric span{
+  color:#989ea4;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.bos-dashboard-product-metric strong{
+  margin-top:5px;
+  font-size:10px;
+}
+
+.bos-dashboard-open{
+  min-height:34px;
+  border:1px solid #cfd3d5;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 10px;
+  color:var(--app-navy);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1px;
+  transition:background .15s ease,border-color .15s ease;
+}
+
+.bos-dashboard-open:hover,
+.bos-dashboard-open:focus-visible{
+  border-color:#aeb4b8;
+  background:#ece9e2;
+}
+
+.bos-dashboard-grid{
+  margin-top:38px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 250px;
+  gap:42px;
+  align-items:start;
+}
+
+.bos-dashboard-grid .bos-dashboard-section{
+  margin-top:0;
+}
+
+.bos-dashboard-activity-list{
+  border-bottom:1px solid var(--app-line);
+}
+
+.bos-dashboard-activity-row{
+  min-height:62px;
+  border-bottom:1px solid var(--app-line);
+  display:grid;
+  grid-template-columns:52px 90px minmax(0,1fr);
+  align-items:center;
+}
+
+.bos-dashboard-activity-row:last-child{
+  border-bottom:0;
+}
+
+.bos-dashboard-activity-row time{
+  color:#969da4;
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+
+.bos-dashboard-activity-type{
+  color:#7b858e;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+.bos-dashboard-activity-row div{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+}
+
+.bos-dashboard-activity-row strong{
+  overflow:hidden;
+  color:var(--app-navy);
+  font-size:10px;
+  font-weight:600;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.bos-dashboard-activity-row div span{
+  color:#969da4;
+  font-size:9px;
+}
+
+.bos-dashboard-side{
+  border-left:1px solid var(--app-line);
+}
+
+.bos-dashboard-side-block{
+  padding:0 0 24px 22px;
+}
+
+.bos-dashboard-side-block + .bos-dashboard-side-block{
+  padding-top:24px;
+  border-top:1px solid var(--app-line);
+}
+
+.bos-dashboard-side-block > strong{
+  display:block;
+  margin-top:3px;
+  color:var(--app-navy);
+  font-size:11px;
+}
+
+.bos-dashboard-side-block dl{
+  margin-top:15px;
+}
+
+.bos-dashboard-side-block dl div{
+  min-height:31px;
+  border-top:1px solid var(--app-line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.bos-dashboard-side-block dt{
+  color:var(--app-muted);
+  font-size:9px;
+}
+
+.bos-dashboard-side-block dd{
+  margin:0;
+  color:var(--app-navy);
+  font-size:9px;
+  font-weight:700;
+}
+
+.bos-dashboard-side-block p{
+  margin-top:10px;
+  color:var(--app-muted);
+  font-size:9px;
+  line-height:1.55;
+}
+
+@media (max-width:900px){
+  .bos-dashboard-product{
+    grid-template-columns:34px minmax(220px,1fr) 108px 82px;
+  }
+
+  .bos-dashboard-grid{
+    grid-template-columns:minmax(0,1fr) 210px;
+    gap:28px;
+  }
+}
+
+@media (max-width:760px){
+  .bos-dashboard-product{
+    padding:16px 0;
+    grid-template-columns:28px minmax(0,1fr) 82px;
+    row-gap:12px;
+  }
+
+  .bos-dashboard-product-copy{
+    padding:0 14px 0 0;
+  }
+
+  .bos-dashboard-product-metric{
+    padding-left:12px;
+  }
+
+  .bos-dashboard-open{
+    grid-column:2 / 4;
+    width:100%;
+  }
+
+  .bos-dashboard-grid{
+    grid-template-columns:1fr;
+    gap:32px;
+  }
+
+  .bos-dashboard-side{
+    border-left:0;
+    border-top:1px solid var(--app-line);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .bos-dashboard-side-block{
+    padding:22px 22px 0 0;
+  }
+
+  .bos-dashboard-side-block + .bos-dashboard-side-block{
+    padding:22px 0 0 22px;
+    border-top:0;
+    border-left:1px solid var(--app-line);
+  }
+}
+
+@media (max-width:520px){
+  .bos-dashboard-section{
+    margin-top:28px;
+  }
+
+  .bos-dashboard-section-head{
+    align-items:flex-start;
+  }
+
+  .bos-dashboard-product{
+    grid-template-columns:24px minmax(0,1fr);
+  }
+
+  .bos-dashboard-product-metric{
+    grid-column:2;
+    min-height:0;
+    padding:0;
+    border-left:0;
+  }
+
+  .bos-dashboard-open{
+    grid-column:2;
+  }
+
+  .bos-dashboard-activity-row{
+    padding:11px 0;
+    grid-template-columns:46px minmax(0,1fr);
+    row-gap:5px;
+  }
+
+  .bos-dashboard-activity-type{
+    grid-column:2;
+    grid-row:1;
+  }
+
+  .bos-dashboard-activity-row div{
+    grid-column:2;
+  }
+
+  .bos-dashboard-side{
+    display:block;
+  }
+
+  .bos-dashboard-side-block{
+    padding:22px 0;
+  }
+
+  .bos-dashboard-side-block + .bos-dashboard-side-block{
+    padding:22px 0;
+    border-left:0;
+    border-top:1px solid var(--app-line);
+  }
+}
