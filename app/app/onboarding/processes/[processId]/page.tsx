@@ -45,7 +45,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <span>LP.</span><span>CZYNNOŚĆ ZE STANDARDU</span><span>KRYTERIUM GOTOWOŚCI</span><span>STATUS</span><span>UWAGA / DATA</span>
         </div>
         {version.tasks.map((task) => {
-          const state = process.tasks.find((item) => item.standardTaskId === task.id);
+          const state = process.tasks.find((item: { standardTaskId: string }) => item.standardTaskId === task.id);
           if (!state) return null;
           return (
             <article className="bos-process-task-row" key={task.id}>
