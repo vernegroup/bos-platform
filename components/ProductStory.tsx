@@ -87,19 +87,24 @@ export default function ProductStory() {
       <div ref={storyRef} className="bos-product-story bos-product-story-desktop">
         <div className="bos-product-story-sticky">
           <div
-            className={`bos-product-story-panel${
-              isTransitioning ? " is-transitioning" : ""
-            }`}
+            className={`bos-product-story-panel${isTransitioning ? " is-transitioning" : ""}`}
             data-active-product={bosProducts[displayIndex].id}
           >
-            <ProductStage product={bosProducts[displayIndex]} />
+            <ProductStage
+              product={bosProducts[displayIndex]}
+              instanceId="desktop"
+            />
           </div>
         </div>
       </div>
 
       <div className="bos-product-story-mobile">
         {bosProducts.map((product) => (
-          <ProductStage key={product.id} product={product} />
+          <ProductStage
+            key={product.id}
+            product={product}
+            instanceId={`mobile-${product.id}`}
+          />
         ))}
       </div>
     </section>
