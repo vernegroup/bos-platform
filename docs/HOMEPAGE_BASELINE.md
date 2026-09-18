@@ -71,3 +71,5 @@ During the initial `/app` prototype:
 - do not change product copy or media as a side effect of application work.
 
 Public-site changes should be deliberate tasks, separate from BOS application development.
+
+<!-- Production build trigger: BOS Web 1.0 hardening verification. No runtime behavior change. -->
