@@ -9,6 +9,17 @@ function safeCallbackUrl(value?: string) {
   return value?.startsWith("/app") ? value : "/app";
 }
 
+function GoogleMark() {
+  return (
+    <svg className="bos-login-google-mark" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.07H12v3.92h5.38a4.6 4.6 0 0 1-2 3.02v2.54h3.24c1.9-1.75 2.98-4.33 2.98-7.41Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.97-.9 6.62-2.36l-3.24-2.54c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.62A10 10 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.39 13.93A6.02 6.02 0 0 1 6.08 12c0-.67.11-1.32.31-1.93V7.45H3.04A10 10 0 0 0 2 12c0 1.61.38 3.14 1.04 4.55l3.35-2.62Z" />
+      <path fill="#EA4335" d="M12 5.94c1.47 0 2.79.51 3.83 1.5l2.87-2.87A9.62 9.62 0 0 0 12 2a10 10 0 0 0-8.96 5.45l3.35 2.62C7.18 7.7 9.39 5.94 12 5.94Z" />
+    </svg>
+  );
+}
+
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const session = await auth();
   const params = await searchParams;
@@ -17,20 +28,46 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main className="bos-login">
-      <section className="bos-login-panel">
+      <div className="bos-login-backdrop" aria-hidden="true" />
+
+      <section className="bos-login-panel" aria-labelledby="bos-login-title">
         <Link href="/" className="bos-login-brand" aria-label="BOS — strona publiczna">
-          <strong>BOS</strong><span>Business Operating Standards</span>
+          <span className="bos-login-brand-name">BOS</span>
+          <span className="bos-login-brand-rule" aria-hidden="true" />
+          <span className="bos-login-brand-subtitle">BUSINESS OPERATING STANDARDS</span>
         </Link>
+
         <div className="bos-login-copy">
-          <span className="bos-login-kicker">DOSTĘP DO PLATFORMY</span>
-          <h1>Zaloguj się do BOS</h1>
-          <p>Konto użytkownika potwierdza tożsamość. Uprawnienia do firmy i produktów są przydzielane niezależnie w BOS.</p>
+          <span className="bos-login-kicker">PLATFORMA BOS</span>
+          <h1 id="bos-login-title">Zaloguj się do swojego konta</h1>
+          <p>
+            Uzyskaj dostęp do produktów, standardów i procesów przypisanych do
+            Twojej organizacji.
+          </p>
         </div>
-        <form action={async () => { "use server"; await signIn("google", { redirectTo: callbackUrl }); }}>
-          <button type="submit" className="bos-login-google">Kontynuuj z Google</button>
+
+        <form
+          className="bos-login-actions"
+          action={async () => {
+            "use server";
+            await signIn("google", { redirectTo: callbackUrl });
+          }}
+        >
+          <button type="submit" className="bos-login-google">
+            <GoogleMark />
+            <span>Kontynuuj z Google</span>
+          </button>
         </form>
-        <p className="bos-login-note">Logowanie e-mail zostanie podłączone jako niezależna metoda po skonfigurowaniu dostawcy poczty. BOS nie przechowuje hasła Google.</p>
+
+        <div className="bos-login-meta">
+          <p>Dostęp do BOS wymaga aktywnego konta organizacji.</p>
+          <Link href="/" className="bos-login-return">
+            Wróć do standardybiznesu.pl
+          </Link>
+        </div>
       </section>
+
+      <p className="bos-login-footer">BOS · BUSINESS OPERATING STANDARDS</p>
     </main>
   );
 }
