@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { requireBOSAccess } from "@/lib/bos/access";
+import { getPromotionProcess } from "@/lib/bos/promotionsRepository";
+export const dynamic="force-dynamic";
+export default async function PromotionProcessPage({params}:{params:Promise<{id:string}>}){const access=await requireBOSAccess();const {id}=await params;const p=await getPromotionProcess(access,id);if(!p)notFound();const done=p.checks.filter(c=>c.status==="DONE").length;return <><Link href="/app/promotions/processes" className="bos-standard-back">← ZMIANY W TOKU</Link><section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / PROMOTIONS / PROCES</div><h1>{p.employee}</h1><p>{p.fromRole} → {p.toRole} · {p.type}</p></div><div className="bos-app-build-state"><span>KONTROLA</span><strong>{done}/{p.checks.length}</strong></div></section><section className="bos-promotion-checks"><header><span>#</span><span>KROK</span><span>KRYTERIUM GOTOWOŚCI</span><span>STATUS</span></header>{p.checks.map(c=><div key={c.id}><span>{String(c.position).padStart(2,"0")}</span><strong>{c.name}</strong><p>{c.criterion}</p><b>{c.status==="DONE"?"GOTOWE":"DO WYKONANIA"}</b></div>)}</section></>;}
