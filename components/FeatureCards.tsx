@@ -45,9 +45,9 @@ export default function FeatureCards() {
               <h3 className="bos-feature-title">Co otrzymujesz?</h3>
 
               <p className="bos-feature-text">
-                Gotowe narzędzie operacyjne wraz z dokumentami, formularzami i
-                mechanizmami kontroli potrzebnymi do uruchomienia konkretnego
-                procesu w firmie.
+                Dostęp do modułu BOS w aplikacji webowej, zapis danych organizacji,
+                historię procesu oraz kolejne aktualizacje produktu w ramach
+                dożywotniej licencji.
               </p>
             </div>
           </article>
