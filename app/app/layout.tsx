@@ -16,5 +16,10 @@ export default async function BOSAppLayout({ children }: { children: React.React
     email: access.user.email,
     image: null,
   };
-  return <AppShell account={account}>{children}</AppShell>;
+
+  return (
+    <AppShell account={account} organizationName={access.organization.name}>
+      {children}
+    </AppShell>
+  );
 }
