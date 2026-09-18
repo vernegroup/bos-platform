@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import ProductStage from "./ProductStage";
+import ProductProof from "./ProductProof";
 import { bosProducts } from "@/data/products";
 
 export default function ProductStory() {
@@ -101,11 +102,19 @@ export default function ProductStory() {
 
       <div className="bos-product-story-mobile">
         {bosProducts.map((product) => (
-          <ProductStage
-            key={product.id}
-            product={product}
-            instanceId={`mobile-${product.id}`}
-          />
+          <div key={product.id}>
+            <ProductStage
+              product={product}
+              instanceId={`mobile-${product.id}`}
+            />
+            <ProductProof product={product} />
+          </div>
+        ))}
+      </div>
+
+      <div className="bos-product-proof-desktop">
+        {bosProducts.map((product) => (
+          <ProductProof key={product.id} product={product} />
         ))}
       </div>
     </section>
