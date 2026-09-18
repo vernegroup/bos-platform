@@ -1,0 +1,2 @@
+import AppPlaceholder from "@/components/app-shell/AppPlaceholder";
+export default function NewVersionPage(){return <AppPlaceholder kicker="BOS / ONBOARDING / WERSJONOWANIE" title="Nowa wersja standardu" description="Nowa wersja będzie tworzona z kopii aktywnego standardu, bez nadpisywania wersji użytych przez wcześniejsze wdrożenia." scope={["Kopia aktywnej wersji","Zmiana czynności i kryteriów","Opis zmiany","Publikacja nowej wersji"]}/>;}
