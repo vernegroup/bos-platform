@@ -2,13 +2,15 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProcess, getProcessProgress, getStandard } from "@/lib/bos/onboardingRepository";
+import { requireBOSAccess } from "@/lib/bos/access";
 
 export default async function ProcessDetailPage({ params }: { params: Promise<{ processId: string }> }) {
+  const access = await requireBOSAccess();
   const { processId } = await params;
-  const process = await getProcess(processId);
+  const process = await getProcess(processId, access.organization.id);
   if (!process) notFound();
 
-  const standard = await getStandard(process.standardId);
+  const standard = await getStandard(process.standardId, access.organization.id);
   const version = standard?.versions.find((item) => item.version === process.standardVersion);
   if (!standard || !version) notFound();
 
