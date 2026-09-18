@@ -92,3 +92,38 @@ export async function updateTaskProgress(input:{organizationId?:string;processId
 export async function archiveStandard(standardId:string, organizationId=DEMO_ORGANIZATION_ID) {
   await db()`UPDATE standards SET status='ARCHIVED',updated_at=now() WHERE id=${standardId} AND organization_id=${organizationId}`;
 }
+
+
+export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
+  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  return sql.begin(async tx=>{
+    const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id) VALUES(${organizationId},${input.productId},${input.name},${input.area??null},'ACTIVE',${input.createdByUserId}) RETURNING id`;
+    const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,published_at,created_by_user_id) VALUES(${organizationId},${standard.id},1,${input.versionLabel},'PUBLISHED',${input.changeNote??null},now(),${input.createdByUserId}) RETURNING id`;
+    for(let i=0;i<input.tasks.length;i++){const t=input.tasks[i];await tx`INSERT INTO standard_tasks(organization_id,standard_version_id,position,name,execution,ready_when) VALUES(${organizationId},${version.id},${i+1},${t.name},${t.execution},${t.readyWhen})`;}
+    await tx`UPDATE standards SET current_version_id=${version.id},updated_at=now() WHERE id=${standard.id} AND organization_id=${organizationId}`;
+    return standard.id as string;
+  });
+}
+
+export async function createProcess(input:{organizationId?:string;productId:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;ownerUserId:string;buddyUserId?:string;startedOn:string;targetOn?:string;createdByUserId:string}) {
+  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  return sql.begin(async tx=>{
+    const tasks=await tx`SELECT id FROM standard_tasks WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
+    const [process]=await tx`INSERT INTO onboarding_processes(organization_id,product_id,employee_id,employee_name_snapshot,standard_id,standard_version_id,owner_user_id,buddy_user_id,status,started_on,target_on,created_by_user_id) VALUES(${organizationId},${input.productId},${input.employeeId??null},${input.employeeName},${input.standardId},${input.standardVersionId},${input.ownerUserId},${input.buddyUserId??null},'IN_PROGRESS',${input.startedOn},${input.targetOn??null},${input.createdByUserId}) RETURNING id`;
+    for(const task of tasks){await tx`INSERT INTO onboarding_task_progress(organization_id,onboarding_process_id,standard_task_id,status) VALUES(${organizationId},${process.id},${task.id},'TODO')`;}
+    return process.id as string;
+  });
+}
+
+export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;result:"COMPLETED"|"COMPLETED_WITH_RECOMMENDATIONS";summary:string;recommendations?:string}) {
+  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  return sql.begin(async tx=>{
+    const [process]=await tx`SELECT id,standard_id,standard_version_id,employee_name_snapshot FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
+    if(!process) throw new Error("Onboarding process not found.");
+    const [remaining]=await tx`SELECT count(*)::int count FROM onboarding_task_progress WHERE onboarding_process_id=${input.processId} AND organization_id=${organizationId} AND status<>'DONE'`;
+    if(remaining.count>0) throw new Error("Onboarding process is not ready to close.");
+    const [closure]=await tx`INSERT INTO onboarding_closures(organization_id,onboarding_process_id,standard_id,standard_version_id,employee_name_snapshot,verified_by_user_id,result,summary,recommendations,verified_at) VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.verifiedByUserId},${input.result}::onboarding_closure_result,${input.summary},${input.recommendations??null},now()) RETURNING id`;
+    await tx`UPDATE onboarding_processes SET status='CLOSED',closed_at=now(),updated_at=now() WHERE id=${process.id} AND organization_id=${organizationId}`;
+    return closure.id as string;
+  });
+}
