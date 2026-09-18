@@ -5,9 +5,15 @@ import type { BOSProduct } from "@/data/products";
 
 type ProductStageProps = {
   product: BOSProduct;
+  instanceId?: string;
 };
 
-export default function ProductStage({ product }: ProductStageProps) {
+export default function ProductStage({
+  product,
+  instanceId = "default",
+}: ProductStageProps) {
+  const titleId = `bos-product-stage-title-${product.id}-${instanceId}`;
+
   async function handleCheckout() {
     const response = await fetch(product.purchase.checkoutEndpoint, {
       method: "POST",
@@ -32,7 +38,7 @@ export default function ProductStage({ product }: ProductStageProps) {
     <section
       className="bos-product-stage"
       data-product={product.id}
-      aria-labelledby={`bos-product-stage-title-${product.id}`}
+      aria-labelledby={titleId}
     >
       <div className="bos-page-width">
         <div className="bos-product-stage-grid">
@@ -41,10 +47,7 @@ export default function ProductStage({ product }: ProductStageProps) {
               {product.eyebrow}
             </div>
 
-            <h1
-              id={`bos-product-stage-title-${product.id}`}
-              className="bos-product-stage-title"
-            >
+            <h1 id={titleId} className="bos-product-stage-title">
               {product.title}
             </h1>
 
