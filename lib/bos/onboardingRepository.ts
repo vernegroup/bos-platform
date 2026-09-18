@@ -5,6 +5,11 @@ import { onboardingProcesses, getProcessProgress as demoProgress } from "@/data/
 import { onboardingClosures } from "@/data/onboardingClosures";
 
 export const DEMO_ORGANIZATION_ID = "00000000-0000-0000-0000-000000000001";
+function tenantId(organizationId?:string){
+  if (organizationId) return organizationId;
+  if (hasDatabase()) throw new Error("organizationId is required for persisted onboarding data.");
+  return DEMO_ORGANIZATION_ID;
+}
 
 const datePL = (value: string | Date | null) => {
   if (!value) return "";
@@ -12,9 +17,9 @@ const datePL = (value: string | Date | null) => {
   return new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
 };
 
-export async function listStandards(organizationId = DEMO_ORGANIZATION_ID) {
+export async function listStandards(organizationId?:string) {
   if (!hasDatabase()) return onboardingStandards;
-  const sql=db();
+  const sql=db(); organizationId=tenantId(organizationId);
   const rows=await sql`
     SELECT s.id,s.name,s.area,s.status,sv.version_label,sv.published_at,sv.change_note,
       (SELECT count(*)::int FROM standard_tasks st WHERE st.standard_version_id=sv.id) task_count
@@ -23,9 +28,9 @@ export async function listStandards(organizationId = DEMO_ORGANIZATION_ID) {
   return rows.map(r=>({id:r.id,name:r.name,area:r.area??"",status:r.status==="ACTIVE"?"AKTYWNY":"ROBOCZY",currentVersion:r.version_label,updatedAt:datePL(r.published_at),versions:[{version:r.version_label,date:datePL(r.published_at),note:r.change_note??"",tasks:Array.from({length:r.task_count},(_,i)=>({id:`count-${i}`,order:i+1,name:"",execution:"",readyWhen:""}))}]}));
 }
 
-export async function getStandard(standardId:string, organizationId = DEMO_ORGANIZATION_ID) {
+export async function getStandard(standardId:string, organizationId?:string) {
   if (!hasDatabase()) return onboardingStandards.find(s=>s.id===standardId) ?? null;
-  const sql=db();
+  const sql=db(); organizationId=tenantId(organizationId);
   const standards=await sql`SELECT id,name,area,status,current_version_id FROM standards WHERE id=${standardId} AND organization_id=${organizationId} LIMIT 1`;
   if(!standards[0]) return null;
   const versions=await sql`SELECT id,version_label,published_at,change_note FROM standard_versions WHERE standard_id=${standardId} AND organization_id=${organizationId} ORDER BY version_number DESC`;
@@ -38,7 +43,7 @@ export async function getStandard(standardId:string, organizationId = DEMO_ORGAN
   return {id:standards[0].id,name:standards[0].name,area:standards[0].area??"",status:standards[0].status==="ACTIVE"?"AKTYWNY" as const:"ROBOCZY" as const,currentVersion:current?.version_label??"",updatedAt:datePL(current?.published_at??null),versions:mapped};
 }
 
-export async function listProcesses(organizationId = DEMO_ORGANIZATION_ID) {
+export async function listProcesses(organizationId?:string) {
   if (!hasDatabase()) return onboardingProcesses;
   const sql=db();
   const rows=await sql`
@@ -64,7 +69,7 @@ export function getProcessProgress(process: Awaited<ReturnType<typeof listProces
   return {completed,total:process.tasks.length,percent:process.tasks.length?Math.round(completed/process.tasks.length*100):0};
 }
 
-export async function listClosures(organizationId = DEMO_ORGANIZATION_ID) {
+export async function listClosures(organizationId?:string) {
   if (!hasDatabase()) return onboardingClosures;
   const sql=db();
   const rows=await sql`
@@ -85,11 +90,12 @@ export async function getClosure(closureId:string, organizationId = DEMO_ORGANIZ
 }
 
 export async function updateTaskProgress(input:{organizationId?:string;processId:string;standardTaskId:string;status:"TODO"|"IN_PROGRESS"|"DONE";note?:string;completedByUserId?:string}) {
-  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  const sql=db(); const organizationId=tenantId(input.organizationId);
   await sql`UPDATE onboarding_task_progress SET status=${input.status}::onboarding_task_status,note=${input.note??null},completed_at=${input.status==="DONE"?new Date():null},completed_by_user_id=${input.completedByUserId??null},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId}`;
 }
 
-export async function archiveStandard(standardId:string, organizationId=DEMO_ORGANIZATION_ID) {
+export async function archiveStandard(standardId:string, organizationId?:string) {
+  organizationId=tenantId(organizationId);
   await db()`UPDATE standards SET status='ARCHIVED',updated_at=now() WHERE id=${standardId} AND organization_id=${organizationId}`;
 }
 
