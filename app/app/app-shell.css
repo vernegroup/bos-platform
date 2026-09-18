@@ -1451,3 +1451,23 @@
  .bos-close-gate>div{grid-template-columns:28px 1fr}.bos-close-gate b{grid-column:2}
  .bos-process-next{align-items:flex-start;flex-direction:column}.bos-process-next-action{width:100%;justify-content:space-between}
 }
+
+/* BOS GLOBAL SEARCH */
+.bos-global-search-form{margin-top:28px;border:1px solid var(--app-line);background:var(--app-panel);display:grid;grid-template-columns:minmax(0,1fr) 92px;min-height:46px}
+.bos-global-search-form input{min-width:0;border:0;background:transparent;padding:0 16px;color:var(--app-navy);font:inherit;font-size:12px;outline:none}
+.bos-global-search-form button{border:0;border-left:1px solid var(--app-line);background:transparent;color:var(--app-navy);font-size:8px;font-weight:700;letter-spacing:1px;cursor:pointer}
+.bos-global-search-form button:hover{background:#ece9e2}
+.bos-global-search-note,.bos-global-search-empty{padding:24px 0;color:var(--app-muted);font-size:10px}
+.bos-global-search-results{margin-top:26px;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line)}
+.bos-global-search-results>header{min-height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--app-line);font-size:8px;letter-spacing:1px}
+.bos-global-search-results>header strong{font-size:10px}
+.bos-global-search-row{min-height:62px;border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:38px 96px minmax(0,1fr) 74px;gap:12px;align-items:center;color:var(--app-navy)}
+.bos-global-search-row:last-child{border-bottom:0}
+.bos-global-search-row:hover{background:#eeece6}
+.bos-global-search-index{color:#9ba1a7;font-size:8px}
+.bos-global-search-type{color:var(--app-accent);font-size:7px;font-weight:700;letter-spacing:.8px}
+.bos-global-search-copy{min-width:0;display:flex;flex-direction:column;gap:4px}
+.bos-global-search-copy strong{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bos-global-search-copy small{color:var(--app-muted);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bos-global-search-open{font-size:7px;font-weight:700;letter-spacing:.7px}
+@media(max-width:680px){.bos-global-search-row{grid-template-columns:28px 74px minmax(0,1fr);padding:12px 0}.bos-global-search-open{grid-column:3}.bos-global-search-form{grid-template-columns:minmax(0,1fr) 74px}}
