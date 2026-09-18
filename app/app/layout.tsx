@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
-import { auth } from "@/auth";
 import AppShell from "@/components/app-shell/AppShell";
+import { requireBOSAccess } from "@/lib/bos/access";
 import "./app-shell.css";
 
 export const metadata: Metadata = {
@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function BOSAppLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
+  const access = await requireBOSAccess();
   const account = {
-    name: session?.user?.name ?? "Użytkownik BOS",
-    email: session?.user?.email ?? "",
-    image: session?.user?.image ?? null,
+    name: access.user.displayName,
+    email: access.user.email,
+    image: null,
   };
   return <AppShell account={account}>{children}</AppShell>;
 }
