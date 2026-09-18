@@ -96,7 +96,7 @@ export async function updateTaskProgress(input:{organizationId?:string;processId
 
 export async function archiveStandard(standardId:string, organizationId?:string) {
   organizationId=tenantId(organizationId);
-  await db()`UPDATE standards SET status='ARCHIVED',updated_at=now() WHERE id=${standardId} AND organization_id=${organizationId}`;
+  const sql=db(); await sql`UPDATE standards SET status='ARCHIVED',updated_at=now() WHERE id=${standardId} AND organization_id=${organizationId}`;
 }
 
 
