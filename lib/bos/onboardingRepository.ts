@@ -45,7 +45,7 @@ export async function getStandard(standardId:string, organizationId?:string) {
 
 export async function listProcesses(organizationId?:string) {
   if (!hasDatabase()) return onboardingProcesses;
-  const sql=db();
+  const sql=db(); organizationId=tenantId(organizationId);
   const rows=await sql`
     SELECT p.id,p.employee_name_snapshot,p.standard_id,sv.version_label,p.started_on,p.target_on,
       u.display_name owner,p.status,
@@ -59,7 +59,7 @@ export async function listProcesses(organizationId?:string) {
   return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,startedAt:datePL(r.started_on),targetDate:datePL(r.target_on),owner:r.owner,status:"W TOKU" as const,tasks:(r.tasks??[]).filter((x:any)=>x.standardTaskId).map((x:any)=>({standardTaskId:x.standardTaskId,status:x.status==="DONE"?"GOTOWE":x.status==="IN_PROGRESS"?"W TOKU":"DO WYKONANIA",completedAt:x.completedAt?datePL(x.completedAt):undefined,note:x.note??undefined}))}));
 }
 
-export async function getProcess(processId:string, organizationId = DEMO_ORGANIZATION_ID) {
+export async function getProcess(processId:string, organizationId?:string) {
   const all=await listProcesses(organizationId); return all.find(p=>p.id===processId) ?? null;
 }
 
@@ -71,7 +71,7 @@ export function getProcessProgress(process: Awaited<ReturnType<typeof listProces
 
 export async function listClosures(organizationId?:string) {
   if (!hasDatabase()) return onboardingClosures;
-  const sql=db();
+  const sql=db(); organizationId=tenantId(organizationId);
   const rows=await sql`
     SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,sv.version_label,
       p.started_on,c.verified_at,owner.display_name owner,verifier.display_name verified_by,
@@ -85,7 +85,7 @@ export async function listClosures(organizationId?:string) {
   return rows.map(r=>({id:r.id,processId:r.onboarding_process_id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,startedAt:datePL(r.started_on),closedAt:datePL(r.verified_at),owner:r.owner,verifiedBy:r.verified_by,result:r.result==="COMPLETED"?"WDROŻENIE ZAKOŃCZONE" as const:"ZAKOŃCZONE Z ZALECENIAMI" as const,completedTasks:r.completed_tasks,totalTasks:r.total_tasks,summary:r.summary,recommendations:r.recommendations??undefined}));
 }
 
-export async function getClosure(closureId:string, organizationId = DEMO_ORGANIZATION_ID) {
+export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
 }
 
@@ -101,7 +101,7 @@ export async function archiveStandard(standardId:string, organizationId?:string)
 
 
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
-  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
     const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id) VALUES(${organizationId},${input.productId},${input.name},${input.area??null},'ACTIVE',${input.createdByUserId}) RETURNING id`;
     const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,published_at,created_by_user_id) VALUES(${organizationId},${standard.id},1,${input.versionLabel},'PUBLISHED',${input.changeNote??null},now(),${input.createdByUserId}) RETURNING id`;
@@ -112,7 +112,7 @@ export async function createStandard(input:{organizationId?:string;productId:str
 }
 
 export async function createProcess(input:{organizationId?:string;productId:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;ownerUserId:string;buddyUserId?:string;startedOn:string;targetOn?:string;createdByUserId:string}) {
-  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
     const tasks=await tx`SELECT id FROM standard_tasks WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
     const [process]=await tx`INSERT INTO onboarding_processes(organization_id,product_id,employee_id,employee_name_snapshot,standard_id,standard_version_id,owner_user_id,buddy_user_id,status,started_on,target_on,created_by_user_id) VALUES(${organizationId},${input.productId},${input.employeeId??null},${input.employeeName},${input.standardId},${input.standardVersionId},${input.ownerUserId},${input.buddyUserId??null},'IN_PROGRESS',${input.startedOn},${input.targetOn??null},${input.createdByUserId}) RETURNING id`;
@@ -122,7 +122,7 @@ export async function createProcess(input:{organizationId?:string;productId:stri
 }
 
 export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;result:"COMPLETED"|"COMPLETED_WITH_RECOMMENDATIONS";summary:string;recommendations?:string}) {
-  const sql=db(); const organizationId=input.organizationId??DEMO_ORGANIZATION_ID;
+  const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
     const [process]=await tx`SELECT id,standard_id,standard_version_id,employee_name_snapshot FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
     if(!process) throw new Error("Onboarding process not found.");
