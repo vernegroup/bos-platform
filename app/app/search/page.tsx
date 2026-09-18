@@ -4,7 +4,7 @@ import { searchOrganization } from "@/lib/bos/searchRepository";
 
 export const dynamic = "force-dynamic";
 type SearchPageProps={searchParams:Promise<{q?:string}>};
-const labels={STANDARD:"STANDARD",TASK:"CZYNNOŚĆ",ONBOARDING:"WDROŻENIE",CLOSURE:"ZAMKNIĘCIE",USER:"UŻYTKOWNIK",FILE:"PLIK",ACTIVITY:"HISTORIA"};
+const labels={STANDARD:"STANDARD",TASK:"CZYNNOŚĆ",ONBOARDING:"WDROŻENIE",CLOSURE:"ZAMKNIĘCIE",PROMOTION:"ZMIANA ROLI",PROMOTION_CLOSURE:"ZAMKNIĘCIE ZMIANY",USER:"UŻYTKOWNIK",FILE:"PLIK",ACTIVITY:"HISTORIA"};
 
 export default async function SearchPage({searchParams}:SearchPageProps){
  const access=await requireBOSAccess();
