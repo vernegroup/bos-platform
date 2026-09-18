@@ -1,164 +1,348 @@
 :root {
+  /* BOS UI 1.0 — core palette */
+  --bos-navy-950: #07182b;
+  --bos-navy-900: #0b2038;
+  --bos-navy-800: #123252;
+  --bos-navy-700: #1b456d;
 
+  --bos-cream-50: #fdfcf8;
+  --bos-cream-100: #f7f4ec;
+  --bos-cream-200: #eee8dc;
+  --bos-white: #ffffff;
+
+  --bos-gold-600: #a87a31;
+  --bos-gold-500: #bd9147;
+  --bos-gold-400: #cfaa69;
+
+  --bos-green-700: #2f654e;
+  --bos-green-100: #e8f1ec;
+  --bos-red-700: #8b3d3d;
+  --bos-red-100: #f7eaea;
+  --bos-amber-700: #805d22;
+  --bos-amber-100: #f7f0df;
+
+  --bos-ink: #10233a;
+  --bos-text: var(--bos-ink);
+  --bos-text-muted: #66717d;
+  --bos-text-subtle: #87909a;
+  --bos-text-inverse: #f8f5ed;
+
+  --bos-surface: var(--bos-white);
+  --bos-surface-soft: var(--bos-cream-50);
+  --bos-surface-muted: var(--bos-cream-100);
+  --bos-app-bg: #f3f1eb;
+
+  --bos-border: #ddd9cf;
+  --bos-border-strong: #c9c2b4;
+  --bos-focus: rgba(189, 145, 71, .28);
+
+  /* Compatibility aliases for the existing marketing layer.
+     They can be retired deliberately as each view moves to BOS UI 1.0. */
   --bos-bg: #0d1d35;
   --bos-bg-2: #173d73;
-
-  --bos-surface: #fcfcfb;
-
-  --bos-text: #102542;
-  --bos-text-light: #667085;
-
-  --bos-border: rgba(16,37,66,.08);
-
+  --bos-text-light: var(--bos-text-muted);
   --bos-orange: #d97b18;
   --bos-orange-hover: #c86f14;
 
+  /* Typography */
+  --bos-font-heading: var(--font-heading), Georgia, serif;
+  --bos-font-body: var(--font-body), Arial, sans-serif;
+
+  --bos-fs-xs: .75rem;
+  --bos-fs-sm: .875rem;
+  --bos-fs-md: 1rem;
+  --bos-fs-lg: 1.125rem;
+  --bos-fs-xl: 1.375rem;
+  --bos-fs-2xl: clamp(1.75rem, 2vw, 2.25rem);
+  --bos-fs-display: clamp(2.35rem, 4vw, 4.5rem);
+
+  --bos-lh-tight: 1.15;
+  --bos-lh-ui: 1.45;
+  --bos-lh-copy: 1.7;
+
+  /* Spacing: one shared rhythm for Core and product modules */
+  --bos-space-1: .25rem;
+  --bos-space-2: .5rem;
+  --bos-space-3: .75rem;
+  --bos-space-4: 1rem;
+  --bos-space-5: 1.25rem;
+  --bos-space-6: 1.5rem;
+  --bos-space-8: 2rem;
+  --bos-space-10: 2.5rem;
+  --bos-space-12: 3rem;
+  --bos-space-16: 4rem;
+
+  /* Geometry: restrained, software-like */
+  --bos-radius-sm: 3px;
+  --bos-radius-md: 6px;
+  --bos-radius-lg: 10px;
+
+  --bos-control-h: 42px;
+  --bos-sidebar-w: 248px;
+  --bos-content-max: 1440px;
+
+  --bos-shadow-sm: 0 1px 2px rgba(7, 24, 43, .05);
+  --bos-shadow-md: 0 8px 24px rgba(7, 24, 43, .07);
+
+  /* Legacy aliases kept while old marketing components still use them. */
   --shadow-soft:
     0 18px 50px rgba(5,18,36,.08),
     0 6px 18px rgba(5,18,36,.05);
-
   --shadow-hover:
     0 24px 60px rgba(5,18,36,.11),
     0 10px 25px rgba(5,18,36,.08);
-
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html{
-
-  scroll-behavior:smooth;
-
+html {
+  scroll-behavior: smooth;
 }
 
-body{
-
-  font-family:var(--font-body),sans-serif;
-
-  color:var(--bos-text);
-
+body {
+  font-family: var(--bos-font-body);
+  color: var(--bos-text);
   background:
-  radial-gradient(circle at top,#1d4b88 0%,#11294d 30%,#0d1d35 100%);
-
-  min-height:100vh;
-
-  -webkit-font-smoothing:antialiased;
-
-  text-rendering:optimizeLegibility;
-
+    radial-gradient(circle at top,#1d4b88 0%,#11294d 30%,#0d1d35 100%);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
 h2,
 h3,
-h4{
-
-  font-family:var(--font-heading),serif;
-
-  font-weight:600;
-
-  letter-spacing:.2px;
-
-  color:var(--bos-text);
-
+h4 {
+  font-family: var(--bos-font-heading);
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: var(--bos-text);
 }
 
-p{
-
-  color:var(--bos-text-light);
-
-  line-height:1.85;
-
+p {
+  color: var(--bos-text-muted);
+  line-height: var(--bos-lh-copy);
 }
 
-a{
-
-  color:inherit;
-
-  text-decoration:none;
-
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
-button{
-
-  font-family:inherit;
-
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
-.bos-card{
-
-  background:var(--bos-surface);
-
-  border-radius:18px;
-
-  box-shadow:var(--shadow-soft);
-
-  transition:
-  transform .45s ease,
-  box-shadow .45s ease;
-
-  animation:bosFloat 8s ease-in-out infinite;
-
+button {
+  cursor: pointer;
 }
 
-.bos-card:hover{
-
-  box-shadow:var(--shadow-hover);
-
+:focus-visible {
+  outline: 3px solid var(--bos-focus);
+  outline-offset: 2px;
 }
 
-.bos-button{
-
-  display:inline-flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  padding:14px 28px;
-
-  border-radius:9px;
-
-  background:var(--bos-orange);
-
-  color:#fff;
-
-  font-weight:600;
-
-  transition:.25s;
-
+/* BOS UI 1.0 primitives.
+   New application views should use these rather than inventing local variants. */
+.bos-ui-surface {
+  background: var(--bos-surface);
+  border: 1px solid var(--bos-border);
+  border-radius: var(--bos-radius-md);
+  box-shadow: var(--bos-shadow-sm);
 }
 
-.bos-button:hover{
-
-  background:var(--bos-orange-hover);
-
-  transform:translateY(-1px);
-
+.bos-ui-panel {
+  background: var(--bos-surface);
+  border: 1px solid var(--bos-border);
+  border-radius: var(--bos-radius-md);
 }
 
-@keyframes bosFloat{
-
-0%{
-
-transform:translateY(0px);
-
+.bos-ui-label {
+  display: block;
+  margin-bottom: var(--bos-space-2);
+  color: var(--bos-text-muted);
+  font-size: var(--bos-fs-sm);
+  font-weight: 600;
 }
 
-50%{
-
-transform:translateY(-4px);
-
+.bos-ui-input {
+  width: 100%;
+  min-height: var(--bos-control-h);
+  padding: 0 var(--bos-space-3);
+  color: var(--bos-text);
+  background: var(--bos-white);
+  border: 1px solid var(--bos-border-strong);
+  border-radius: var(--bos-radius-sm);
 }
 
-100%{
-
-transform:translateY(0px);
-
+.bos-ui-input:focus {
+  border-color: var(--bos-gold-500);
+  outline: 3px solid var(--bos-focus);
 }
 
+.bos-ui-button {
+  min-height: var(--bos-control-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--bos-space-2);
+  padding: 0 var(--bos-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--bos-radius-sm);
+  font-weight: 650;
+  line-height: 1;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.bos-ui-button--primary {
+  background: var(--bos-navy-900);
+  border-color: var(--bos-navy-900);
+  color: var(--bos-text-inverse);
+}
+
+.bos-ui-button--primary:hover {
+  background: var(--bos-navy-800);
+  border-color: var(--bos-navy-800);
+}
+
+.bos-ui-button--gold {
+  background: var(--bos-gold-500);
+  border-color: var(--bos-gold-500);
+  color: var(--bos-navy-950);
+}
+
+.bos-ui-button--gold:hover {
+  background: var(--bos-gold-400);
+  border-color: var(--bos-gold-400);
+}
+
+.bos-ui-button--secondary {
+  background: var(--bos-white);
+  border-color: var(--bos-border-strong);
+  color: var(--bos-text);
+}
+
+.bos-ui-button--secondary:hover {
+  background: var(--bos-cream-100);
+}
+
+.bos-ui-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: var(--bos-fs-xs);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.bos-ui-status--success {
+  color: var(--bos-green-700);
+  background: var(--bos-green-100);
+}
+
+.bos-ui-status--warning {
+  color: var(--bos-amber-700);
+  background: var(--bos-amber-100);
+}
+
+.bos-ui-status--danger {
+  color: var(--bos-red-700);
+  background: var(--bos-red-100);
+}
+
+.bos-ui-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--bos-border);
+  border-radius: var(--bos-radius-md);
+  background: var(--bos-surface);
+}
+
+.bos-ui-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--bos-fs-sm);
+}
+
+.bos-ui-table th,
+.bos-ui-table td {
+  padding: var(--bos-space-3) var(--bos-space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--bos-border);
+}
+
+.bos-ui-table th {
+  color: var(--bos-text-muted);
+  background: var(--bos-surface-muted);
+  font-size: var(--bos-fs-xs);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.bos-ui-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.bos-ui-table tbody tr:hover {
+  background: var(--bos-surface-soft);
+}
+
+/* Existing marketing primitives intentionally retained.
+   UI-01 establishes the new system without redesigning the frozen sales page. */
+.bos-card {
+  background: var(--bos-surface);
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  transition: transform .45s ease, box-shadow .45s ease;
+  animation: bosFloat 8s ease-in-out infinite;
+}
+
+.bos-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.bos-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 9px;
+  background: var(--bos-orange);
+  color: #fff;
+  font-weight: 600;
+  transition: .25s;
+}
+
+.bos-button:hover {
+  background: var(--bos-orange-hover);
+  transform: translateY(-1px);
+}
+
+@keyframes bosFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
 }
