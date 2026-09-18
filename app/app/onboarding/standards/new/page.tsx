@@ -1,0 +1,2 @@
+import AppPlaceholder from "@/components/app-shell/AppPlaceholder";
+export default function NewStandardPage(){return <AppPlaceholder kicker="BOS / ONBOARDING / PRZYGOTUJ" title="Nowy Standard Stanowiska" description="Formularz tworzenia standardu zostanie podłączony do zapisu po ustaleniu modelu danych. Obecny krok definiuje jego miejsce w przepływie." scope={["Nazwa i obszar stanowiska","Czynności","Prawidłowe wykonanie","Kryteria gotowości"]}/>;}
