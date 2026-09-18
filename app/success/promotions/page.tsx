@@ -26,7 +26,7 @@ export default async function PromotionsSuccessPage({
     notFound();
   }
 
-  const checkout = await verifyCheckout(session_id);
+  const checkout = await verifyCheckout(session_id, "promotions");
 
   if (!checkout) {
     notFound();
