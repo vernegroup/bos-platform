@@ -60,7 +60,7 @@ export async function getProcess(processId:string, organizationId = DEMO_ORGANIZ
 
 export function getProcessProgress(process: Awaited<ReturnType<typeof listProcesses>>[number]) {
   if (!hasDatabase()) return demoProgress(process as any);
-  const completed=process.tasks.filter(t=>t.status==="GOTOWE").length;
+  const completed=process.tasks.filter((t: { status: string })=>t.status==="GOTOWE").length;
   return {completed,total:process.tasks.length,percent:process.tasks.length?Math.round(completed/process.tasks.length*100):0};
 }
 
