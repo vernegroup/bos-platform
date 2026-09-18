@@ -67,9 +67,16 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         <div>
           <span className="bos-dashboard-section-kicker">NASTĘPNY KROK</span>
           <strong>{progress.percent === 100 ? "Proces gotowy do zamknięcia" : "Dokończ czynności i potwierdź kryteria gotowości"}</strong>
-          <p>Zamknięcie procesu będzie osobnym etapem BOS Onboarding i powstanie w punkcie 8.</p>
+          <p>Karta Zakończenia powstaje dopiero po potwierdzeniu wykonania wszystkich wymaganych czynności i ich kryteriów gotowości.</p>
         </div>
-        <span>{progress.percent}%</span>
+        <div className="bos-process-next-action">
+          <span>{progress.percent}%</span>
+          {progress.percent === 100 ? (
+            <Link href={`/app/onboarding/processes/${process.id}/close`}>PRZEJDŹ DO WERYFIKACJI →</Link>
+          ) : (
+            <b>ZAMKNIĘCIE NIEDOSTĘPNE</b>
+          )}
+        </div>
       </section>
     </>
   );
