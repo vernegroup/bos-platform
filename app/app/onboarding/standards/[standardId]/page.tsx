@@ -2,14 +2,16 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getStandard } from "@/lib/bos/onboardingRepository";
+import { requireBOSAccess } from "@/lib/bos/access";
 
 export default async function StandardDetailPage({
   params,
 }: {
   params: Promise<{ standardId: string }>;
 }) {
+  const access = await requireBOSAccess();
   const { standardId } = await params;
-  const standard = await getStandard(standardId);
+  const standard = await getStandard(standardId, access.organization.id);
   if (!standard) notFound();
 
   const current = standard.versions.find((version) => version.version === standard.currentVersion)!;
