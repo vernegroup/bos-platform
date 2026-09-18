@@ -1,20 +1,16 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { onboardingClosures, getClosureProgress } from "@/data/onboardingClosures";
-import { onboardingStandards } from "@/data/onboardingStandards";
-
-export function generateStaticParams() {
-  return onboardingClosures.map((closure) => ({ closureId: closure.id }));
-}
+import { getClosure, getStandard } from "@/lib/bos/onboardingRepository";
 
 export default async function ClosureDetailPage({ params }: { params: Promise<{ closureId: string }> }) {
   const { closureId } = await params;
-  const closure = onboardingClosures.find((item) => item.id === closureId);
+  const closure = await getClosure(closureId);
   if (!closure) notFound();
-  const standard = onboardingStandards.find((item) => item.id === closure.standardId);
+  const standard = await getStandard(closure.standardId);
   const version = standard?.versions.find((item) => item.version === closure.standardVersion);
   if (!standard || !version) notFound();
-  const progress = getClosureProgress(closure);
+  const progress = closure.totalTasks ? Math.round((closure.completedTasks / closure.totalTasks) * 100) : 0;
 
   return (
     <>
