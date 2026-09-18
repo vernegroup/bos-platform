@@ -1471,3 +1471,21 @@
 .bos-global-search-copy small{color:var(--app-muted);font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bos-global-search-open{font-size:7px;font-weight:700;letter-spacing:.7px}
 @media(max-width:680px){.bos-global-search-row{grid-template-columns:28px 74px minmax(0,1fr);padding:12px 0}.bos-global-search-open{grid-column:3}.bos-global-search-form{grid-template-columns:minmax(0,1fr) 74px}}
+
+/* BOS PRODUCT UPDATES */
+.bos-update-versions{margin-top:28px;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.bos-update-version{min-height:86px;padding:18px;border-right:1px solid var(--app-line);display:flex;flex-direction:column;gap:5px}
+.bos-update-version:last-child{border-right:0}
+.bos-update-version span{color:var(--app-accent);font-size:7px;font-weight:700;letter-spacing:1px}
+.bos-update-version strong{font-size:18px;font-family:var(--font-heading),serif}
+.bos-update-version small{color:var(--app-muted);font-size:8px}
+.bos-update-history{margin-top:32px;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line)}
+.bos-update-history>header{min-height:42px;border-bottom:1px solid var(--app-line);display:flex;align-items:center;justify-content:space-between;font-size:8px;letter-spacing:1px}
+.bos-update-row{min-height:78px;border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:86px 130px minmax(0,1fr) 72px;gap:14px;align-items:center}
+.bos-update-row:last-child{border-bottom:0}
+.bos-update-row time{color:#92999f;font-size:9px}
+.bos-update-product{font-size:8px;font-weight:700;letter-spacing:.5px}
+.bos-update-row div strong{font-size:11px}
+.bos-update-row div p{margin-top:5px;color:var(--app-muted);font-size:9px;line-height:1.45}
+.bos-update-row b{font-size:7px;letter-spacing:.7px;color:#536a54}
+@media(max-width:680px){.bos-update-versions{grid-template-columns:1fr}.bos-update-version{border-right:0;border-bottom:1px solid var(--app-line)}.bos-update-version:last-child{border-bottom:0}.bos-update-row{padding:14px 0;grid-template-columns:70px minmax(0,1fr)}.bos-update-product{grid-column:2}.bos-update-row div{grid-column:2}.bos-update-row b{grid-column:2}}
