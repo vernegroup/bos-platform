@@ -2,12 +2,14 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProcess, getProcessProgress, getStandard } from "@/lib/bos/onboardingRepository";
+import { requireBOSAccess } from "@/lib/bos/access";
 
 export default async function CloseProcessPage({ params }: { params: Promise<{ processId: string }> }) {
+  const access = await requireBOSAccess();
   const { processId } = await params;
-  const process = await getProcess(processId);
+  const process = await getProcess(processId, access.organization.id);
   if (!process) notFound();
-  const standard = await getStandard(process.standardId);
+  const standard = await getStandard(process.standardId, access.organization.id);
   if (!standard) notFound();
   const progress = getProcessProgress(process);
   const ready = progress.percent === 100;
@@ -26,7 +28,7 @@ export default async function CloseProcessPage({ params }: { params: Promise<{ p
         <div><span>04</span><strong>Karta Zakończenia</strong><b>{ready ? "DO UTWORZENIA" : "ZABLOKOWANA"}</b></div>
       </section>
       <section className="bos-process-new-lock">
-        <span>WYNIK</span><div><strong>{ready ? "ZAMKNIJ I UTWÓRZ REKORD HISTORYCZNY" : "ZAMKNIĘCIE NIEDOSTĘPNE"}</strong><p>{ready ? "Warstwa persistence potrafi utworzyć Kartę Zakończenia transakcyjnie. Interaktywny formularz zostanie podłączony po wdrożeniu użytkowników i uprawnień." : "Najpierw wszystkie wymagane czynności muszą otrzymać status GOTOWE."}</p></div>
+        <span>WYNIK</span><div><strong>{ready ? "ZAMKNIJ I UTWÓRZ REKORD HISTORYCZNY" : "ZAMKNIĘCIE NIEDOSTĘPNE"}</strong><p>{ready ? "Warstwa persistence potrafi utworzyć Kartę Zakończenia transakcyjnie. Warstwa danych i uprawnień jest gotowa; interaktywne zamknięcie pozostaje wyłączone do czasu aktywacji formularza." : "Najpierw wszystkie wymagane czynności muszą otrzymać status GOTOWE."}</p></div>
       </section>
     </>
   );
