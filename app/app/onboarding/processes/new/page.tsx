@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { listStandards } from "@/lib/bos/onboardingRepository";
+import { requireBOSAccess } from "@/lib/bos/access";
 
 export const dynamic = "force-dynamic";
 export default async function NewProcessPage() {
-  const onboardingStandards = await listStandards();
+  const access = await requireBOSAccess();
+  const onboardingStandards = await listStandards(access.organization.id);
   return (
     <>
       <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
@@ -19,7 +21,7 @@ export default async function NewProcessPage() {
         <div className="bos-process-new-field"><span>01 / PRACOWNIK</span><strong>Wybierz lub dodaj pracownika</strong><small>Docelowo źródło: użytkownicy / dane organizacji</small></div>
         <div className="bos-process-new-field"><span>02 / STANDARD</span><strong>Wybierz Standard Stanowiska</strong><div className="bos-process-standard-options">{onboardingStandards.map((s)=><div key={s.id}><b>{s.name}</b><em>{s.currentVersion}</em><small>{s.area}</small></div>)}</div></div>
         <div className="bos-process-new-field"><span>03 / TERMIN I PROWADZĄCY</span><strong>Ustal ramy procesu</strong><small>Data startu, termin docelowy i osoba odpowiedzialna.</small></div>
-        <div className="bos-process-new-lock"><span>04</span><div><strong>UTWÓRZ KARTĘ POSTĘPU</strong><p>Warstwa persistence obsługuje utworzenie procesu i jego czynności. Formularz zostanie aktywowany po wdrożeniu tożsamości użytkowników w punkcie 12–13.</p></div></div>
+        <div className="bos-process-new-lock"><span>04</span><div><strong>UTWÓRZ KARTĘ POSTĘPU</strong><p>Warstwa persistence obsługuje utworzenie procesu i jego czynności. Formularz zapisu wymaga jeszcze aktywacji warstwy interakcji; dane i tożsamość organizacji są już rozdzielone.</p></div></div>
       </section>
     </>
   );
