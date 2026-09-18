@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -6,13 +9,25 @@ type AppShellProps = {
 
 const navigation = [
   { label: "Strona główna", href: "/app", marker: "01" },
-  { label: "Produkty", href: "/app#produkty", marker: "02" },
-  { label: "Wyszukiwarka", href: "/app#wyszukiwarka", marker: "03" },
-  { label: "Użytkownicy", href: "/app#uzytkownicy", marker: "04" },
-  { label: "Firma", href: "/app#firma", marker: "05" },
+  { label: "Produkty", href: "/app/products", marker: "02" },
+  { label: "Wyszukiwarka", href: "/app/search", marker: "03" },
+  { label: "Użytkownicy", href: "/app/users", marker: "04" },
+  { label: "Firma", href: "/app/organization", marker: "05" },
 ];
 
+const utilityNavigation = [
+  { label: "Aktualizacje", href: "/app/updates" },
+  { label: "Ustawienia", href: "/app/settings" },
+];
+
+function isCurrentPath(pathname: string, href: string) {
+  if (href === "/app") return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function AppShell({ children }: AppShellProps) {
+  const pathname = usePathname();
+
   return (
     <div className="bos-app-shell">
       <aside className="bos-app-sidebar">
@@ -24,11 +39,11 @@ export default function AppShell({ children }: AppShellProps) {
         <div className="bos-app-sidebar-label">Platforma</div>
 
         <nav className="bos-app-nav" aria-label="Nawigacja aplikacji BOS">
-          {navigation.map((item, index) => (
+          {navigation.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className={`bos-app-nav-link${index === 0 ? " is-active" : ""}`}
+              className={`bos-app-nav-link${isCurrentPath(pathname, item.href) ? " is-active" : ""}`}
             >
               <span className="bos-app-nav-marker" aria-hidden="true">
                 {item.marker}
@@ -39,12 +54,15 @@ export default function AppShell({ children }: AppShellProps) {
         </nav>
 
         <div className="bos-app-sidebar-bottom">
-          <Link href="/app#aktualizacje" className="bos-app-utility-link">
-            Aktualizacje
-          </Link>
-          <Link href="/app#ustawienia" className="bos-app-utility-link">
-            Ustawienia
-          </Link>
+          {utilityNavigation.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`bos-app-utility-link${isCurrentPath(pathname, item.href) ? " is-active" : ""}`}
+            >
+              {item.label}
+            </Link>
+          ))}
           <Link href="/" className="bos-app-public-link">
             Przejdź do strony BOS
             <span aria-hidden="true">↗</span>
@@ -54,17 +72,11 @@ export default function AppShell({ children }: AppShellProps) {
 
       <div className="bos-app-main">
         <header className="bos-app-topbar">
-          <label className="bos-app-search" htmlFor="bos-app-search">
+          <Link className="bos-app-search" href="/app/search" aria-label="Przejdź do wyszukiwarki BOS">
             <span className="bos-app-search-label">Szukaj</span>
-            <input
-              id="bos-app-search"
-              type="search"
-              placeholder="Szukaj w BOS..."
-              disabled
-              aria-label="Wyszukiwarka BOS — funkcja demonstracyjna"
-            />
+            <span className="bos-app-search-placeholder">Szukaj w BOS...</span>
             <span className="bos-app-search-status">wkrótce</span>
-          </label>
+          </Link>
 
           <div className="bos-app-account">
             <div className="bos-app-account-copy">
