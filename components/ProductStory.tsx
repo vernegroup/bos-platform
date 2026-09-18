@@ -17,6 +17,7 @@ export default function ProductStory() {
     const story = storyRef.current;
 
     if (!story) return;
+    const storyElement = story;
 
     let frame = 0;
 
@@ -25,9 +26,9 @@ export default function ProductStory() {
 
       if (window.matchMedia("(max-width: 800px)").matches) return;
 
-      const rect = story.getBoundingClientRect();
+      const rect = storyElement.getBoundingClientRect();
       const scrollableDistance = Math.max(
-        story.offsetHeight - window.innerHeight,
+        storyElement.offsetHeight - window.innerHeight,
         1
       );
       const progress = Math.min(
