@@ -1,10 +1,7 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { onboardingStandards } from "@/data/onboardingStandards";
-
-export function generateStaticParams() {
-  return onboardingStandards.map((standard) => ({ standardId: standard.id }));
-}
+import { getStandard } from "@/lib/bos/onboardingRepository";
 
 export default async function StandardDetailPage({
   params,
@@ -12,7 +9,7 @@ export default async function StandardDetailPage({
   params: Promise<{ standardId: string }>;
 }) {
   const { standardId } = await params;
-  const standard = onboardingStandards.find((item) => item.id === standardId);
+  const standard = await getStandard(standardId);
   if (!standard) notFound();
 
   const current = standard.versions.find((version) => version.version === standard.currentVersion)!;
