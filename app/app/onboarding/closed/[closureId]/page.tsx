@@ -2,12 +2,14 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClosure, getStandard } from "@/lib/bos/onboardingRepository";
+import { requireBOSAccess } from "@/lib/bos/access";
 
 export default async function ClosureDetailPage({ params }: { params: Promise<{ closureId: string }> }) {
+  const access = await requireBOSAccess();
   const { closureId } = await params;
-  const closure = await getClosure(closureId);
+  const closure = await getClosure(closureId, access.organization.id);
   if (!closure) notFound();
-  const standard = await getStandard(closure.standardId);
+  const standard = await getStandard(closure.standardId, access.organization.id);
   const version = standard?.versions.find((item) => item.version === closure.standardVersion);
   if (!standard || !version) notFound();
   const progress = closure.totalTasks ? Math.round((closure.completedTasks / closure.totalTasks) * 100) : 0;
