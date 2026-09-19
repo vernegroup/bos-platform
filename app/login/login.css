@@ -1,133 +1,46 @@
-/* LOGIN-01 — split authentication shell */
-.bos-login{
-  min-height:100svh;
-  display:grid;
-  grid-template-columns:minmax(0,58%) minmax(360px,42%);
-  overflow:hidden;
-  color:var(--bos-text);
-  background:#eef2f4;
-}
-
-.bos-login-auth{
-  min-width:0;
-  min-height:100svh;
-  padding:48px clamp(28px,6vw,92px);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:
-    radial-gradient(circle at 50% 12%,rgba(255,255,255,.9),transparent 42%),
-    #edf1f3;
-}
-
-.bos-login-panel{
-  width:min(100%,470px);
-  padding:clamp(30px,4vw,46px);
-  background:rgba(253,252,248,.98);
-  border:1px solid rgba(225,221,212,.95);
-  border-radius:6px;
-  box-shadow:0 22px 58px rgba(7,24,43,.12);
-}
-
-.bos-login-brand-panel{
-  position:relative;
-  min-width:0;
-  min-height:100svh;
-  overflow:hidden;
-  background:#0b2038;
-  color:#f8f5ed;
-}
-
-.bos-login-brand-backdrop{
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(180deg,rgba(7,24,43,.10),rgba(7,24,43,.58)),
-    radial-gradient(circle at 52% 18%,rgba(207,170,105,.14),transparent 34%),
-    linear-gradient(145deg,#24455d 0%,#17354c 43%,#0b2038 100%);
-}
-
-.bos-login-brand-backdrop::before,
-.bos-login-brand-backdrop::after{
-  content:"";
-  position:absolute;
-  left:-12%;
-  right:-12%;
-  bottom:-8%;
-  height:48%;
-  opacity:.78;
-}
-
-.bos-login-brand-backdrop::before{
-  background:linear-gradient(145deg,transparent 8%,#29495c 8% 34%,transparent 34% 43%,#17364b 43% 69%,transparent 69%);
-  transform:skewY(-7deg);
-}
-
-.bos-login-brand-backdrop::after{
-  bottom:-18%;
-  background:linear-gradient(35deg,#0b2032 0 29%,transparent 29% 39%,#1b3b50 39% 62%,transparent 62%);
-  transform:skewY(5deg);
-}
-
-.bos-login-brand-message{
-  position:absolute;
-  z-index:1;
-  left:clamp(36px,5vw,78px);
-  right:36px;
-  bottom:clamp(58px,10vh,110px);
-}
-
-.bos-login-brand-message p{
-  margin:0;
-  font-family:var(--bos-font-heading);
-  font-size:clamp(2rem,3.1vw,3.3rem);
-  line-height:1.08;
-}
-
-.bos-login-brand-message span{
-  display:block;
-  width:42px;
-  height:3px;
-  margin-top:28px;
-  background:var(--bos-gold-500);
-}
-
-@media(max-width:900px){
-  .bos-login{
-    grid-template-columns:1fr;
-    overflow:visible;
-  }
-
-  .bos-login-auth{
-    min-height:auto;
-    padding:46px 24px;
-  }
-
-  .bos-login-brand-panel{
-    min-height:420px;
-  }
-}
-
-@media(max-width:600px){
-  .bos-login-auth{
-    padding:28px 16px;
-  }
-
-  .bos-login-panel{
-    padding:30px 22px;
-  }
-
-  .bos-login-brand-panel{
-    min-height:360px;
-  }
-
-  .bos-login-brand-message{
-    left:28px;
-    right:28px;
-    bottom:48px;
-  }
-
-  .bos-login-brand-message p{
-    font-size:2rem;
-  }
-}
+/* LOGIN-05 — complete authentication interface */
+.bos-login{min-height:100svh;display:grid;grid-template-columns:minmax(0,58%) minmax(360px,42%);overflow:hidden;color:#10253c;background:#eef2f4}
+.bos-login-auth{min-width:0;min-height:100svh;padding:48px clamp(28px,6vw,92px);display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 12%,rgba(255,255,255,.92),transparent 42%),#edf1f3}
+.bos-login-panel{width:min(100%,470px);padding:clamp(30px,4vw,46px);background:rgba(253,252,248,.99);border:1px solid rgba(225,221,212,.95);border-radius:6px;box-shadow:0 22px 58px rgba(7,24,43,.12)}
+.bos-login-brand{display:flex;flex-direction:column;align-items:center;gap:5px;color:#10253c;text-decoration:none}
+.bos-login-brand-name{font-family:var(--bos-font-heading);font-size:2.15rem;font-weight:700;line-height:1;letter-spacing:.08em}
+.bos-login-brand-subtitle{font-size:.62rem;font-weight:700;letter-spacing:.18em}
+.bos-login-rule{height:1px;margin:25px 0 28px;background:#dedbd3}
+.bos-login-copy{text-align:center;margin-bottom:28px}
+.bos-login-copy h1{margin:0 0 10px;font-family:var(--bos-font-heading);font-size:clamp(1.65rem,2.4vw,2.15rem);line-height:1.12;font-weight:600;color:#10253c}
+.bos-login-copy p{max-width:380px;margin:0 auto;color:#66717c;font-size:.92rem;line-height:1.55}
+.bos-login-form{display:grid;gap:18px}
+.bos-login-field{display:grid;gap:8px}
+.bos-login-field label{font-size:.82rem;font-weight:700;color:#1a2e43}
+.bos-login-field-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.bos-login-field-heading a{font-size:.78rem;color:#9a7134;text-decoration:none}
+.bos-login-field-heading a:hover{text-decoration:underline}
+.bos-login-field input{width:100%;height:48px;padding:0 14px;border:1px solid #d2d5d7;border-radius:3px;background:#fff;color:#10253c;font:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+.bos-login-field input::placeholder{color:#9ba2a8}
+.bos-login-field input:focus{border-color:#b58a49;box-shadow:0 0 0 3px rgba(181,138,73,.13)}
+.bos-login-password{position:relative}
+.bos-login-password input{padding-right:72px}
+.bos-login-password-toggle{position:absolute;top:50%;right:12px;transform:translateY(-50%);border:0;background:transparent;color:#68737d;font-size:.74rem;font-weight:700;cursor:pointer}
+.bos-login-password-toggle:focus-visible{outline:2px solid #b58a49;outline-offset:2px}
+.bos-login-error{margin:-4px 0 0;padding:10px 12px;border:1px solid #e3b8b3;border-radius:3px;background:#fff5f3;color:#8a3028;font-size:.8rem;line-height:1.4}
+.bos-login-submit{height:50px;border:1px solid #b48642;border-radius:3px;background:#b98b46;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px;font:inherit;font-size:.86rem;font-weight:800;letter-spacing:.03em;cursor:pointer;transition:background .15s,transform .15s}
+.bos-login-submit:hover:not(:disabled){background:#a77a39;transform:translateY(-1px)}
+.bos-login-submit:disabled,.bos-login-google:disabled,.bos-login-field input:disabled,.bos-login-password-toggle:disabled{cursor:not-allowed;opacity:.65}
+.bos-login-divider{display:flex;align-items:center;gap:12px;margin:23px 0;color:#90979c;font-size:.75rem}
+.bos-login-divider::before,.bos-login-divider::after{content:"";height:1px;flex:1;background:#dddcd7}
+.bos-login-google{width:100%;height:50px;border:1px solid #d2d5d7;border-radius:3px;background:#fff;color:#263849;display:flex;align-items:center;justify-content:center;gap:11px;font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;transition:border-color .15s,background .15s}
+.bos-login-google:hover{border-color:#aeb5ba;background:#fafafa}
+.bos-login-google-mark{width:19px;height:19px;flex:0 0 auto}
+.bos-login-register{margin:24px 0 0;text-align:center;color:#717b83;font-size:.8rem}
+.bos-login-register a{color:#9a7134;font-weight:700;text-decoration:none}
+.bos-login-register a:hover{text-decoration:underline}
+.bos-login-brand-panel{position:relative;min-width:0;min-height:100svh;overflow:hidden;background:#0b2038;color:#f8f5ed}
+.bos-login-brand-backdrop{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,24,43,.10),rgba(7,24,43,.58)),radial-gradient(circle at 52% 18%,rgba(207,170,105,.14),transparent 34%),linear-gradient(145deg,#24455d 0%,#17354c 43%,#0b2038 100%)}
+.bos-login-brand-backdrop::before,.bos-login-brand-backdrop::after{content:"";position:absolute;left:-12%;right:-12%;bottom:-8%;height:48%;opacity:.78}
+.bos-login-brand-backdrop::before{background:linear-gradient(145deg,transparent 8%,#29495c 8% 34%,transparent 34% 43%,#17364b 43% 69%,transparent 69%);transform:skewY(-7deg)}
+.bos-login-brand-backdrop::after{bottom:-18%;background:linear-gradient(35deg,#0b2032 0 29%,transparent 29% 39%,#1b3b50 39% 62%,transparent 62%);transform:skewY(5deg)}
+.bos-login-brand-message{position:absolute;z-index:1;left:clamp(36px,5vw,78px);right:36px;bottom:clamp(58px,10vh,110px)}
+.bos-login-brand-message p{margin:0;font-family:var(--bos-font-heading);font-size:clamp(2rem,3.1vw,3.3rem);line-height:1.08}
+.bos-login-brand-message span{display:block;width:42px;height:3px;margin-top:28px;background:#b98b46}
+@media(max-width:900px){.bos-login{grid-template-columns:1fr;overflow:visible}.bos-login-auth{min-height:auto;padding:46px 24px}.bos-login-brand-panel{min-height:420px}}
+@media(max-width:600px){.bos-login-auth{padding:20px 14px}.bos-login-panel{padding:28px 21px}.bos-login-copy{margin-bottom:24px}.bos-login-brand-panel{min-height:340px}.bos-login-brand-message{left:28px;right:28px;bottom:48px}.bos-login-brand-message p{font-size:2rem}}
