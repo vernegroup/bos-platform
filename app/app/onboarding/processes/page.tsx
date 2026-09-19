@@ -2,4 +2,26 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listProcesses,listStandards,getProcessProgress } from "@/lib/bos/onboardingRepository";
 export const dynamic="force-dynamic";
-export default async function ProcessesPage(){const access=await requireBOSAccess();const org=access.organization.id;const [processes,standards]=await Promise.all([listProcesses(org),listStandards(org)]);return <><section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / PRZEPROWADŹ</div><h1>Wdrożenia w toku</h1><p>Każde wdrożenie jest realizacją konkretnej, niezmiennej wersji Standardu Stanowiska.</p></div><div className="bos-app-build-state"><span>DANE</span><strong>ORGANIZACJA / POSTGRESQL</strong></div></section><div className="bos-standard-toolbar"><div><span>W TOKU</span><strong>{processes.length}</strong></div><div><span>STANDARDY W UŻYCIU</span><strong>{new Set(processes.map(p=>p.standardId)).size}</strong></div><Link href="/app/onboarding/processes/new" className="bos-standard-primary-action">+ NOWE WDROŻENIE</Link></div><section className="bos-process-list"><div className="bos-process-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>CEL</span><span>POSTĘP</span><span /></div>{processes.map(p=>{const s=standards.find(x=>x.id===p.standardId);const g=getProcessProgress(p);return <Link href={`/app/onboarding/processes/${p.id}`} className="bos-process-list-row" key={p.id}><strong>{p.employee}</strong><span>{s?.name??"Standard"}</span><b>{p.standardVersion}</b><span>{p.startedAt}</span><span>{p.targetDate}</span><div className="bos-process-list-progress"><div><i style={{width:`${g.percent}%`}} /></div><em>{g.completed}/{g.total} · {g.percent}%</em></div><i>→</i></Link>})}</section><div className="bos-standard-footnote"><span>POWIĄZANIE</span><p>Proces zachowuje wersję wybraną w chwili rozpoczęcia wdrożenia.</p></div></>}
+
+export default async function ProcessesPage(){
+ const access=await requireBOSAccess();const org=access.organization.id;
+ const [processes,standards]=await Promise.all([listProcesses(org),listStandards(org)]);
+ const ready=processes.filter(p=>getProcessProgress(p).percent===100).length;
+ return <>
+  <section className="bos-app-intro bos-onboarding-view-head">
+   <div><div className="bos-app-kicker">02 / PRZEPROWADŹ</div><h1>Wdrożenia</h1><p>Każdy proces realizuje konkretną wersję Standardu Stanowiska i zachowuje ją do momentu zamknięcia.</p></div>
+   <Link href="/app/onboarding/processes/new" className="bos-standard-primary-action">+ NOWE WDROŻENIE</Link>
+  </section>
+  <div className="bos-onboarding-commandbar">
+   <div><span>W TOKU</span><strong>{processes.length}</strong></div>
+   <div><span>GOTOWE DO ZAMKNIĘCIA</span><strong>{ready}</strong></div>
+   <div><span>STANDARDY W UŻYCIU</span><strong>{new Set(processes.map(p=>p.standardId)).size}</strong></div>
+  </div>
+  <section className="bos-process-list bos-operational-list">
+   <div className="bos-process-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>CEL</span><span>POSTĘP</span><span /></div>
+   {processes.map(p=>{const s=standards.find(x=>x.id===p.standardId);const g=getProcessProgress(p);return <Link href={`/app/onboarding/processes/${p.id}`} className="bos-process-list-row" key={p.id}><strong>{p.employee}</strong><span>{s?.name??"Standard"}</span><b>{p.standardVersion}</b><span>{p.startedAt}</span><span>{p.targetDate||"—"}</span><div className="bos-process-list-progress"><div><i style={{width:`${g.percent}%`}} /></div><em>{g.completed}/{g.total} · {g.percent}%</em></div><i>→</i></Link>})}
+   {!processes.length&&<div className="bos-operational-empty"><strong>Brak aktywnych wdrożeń</strong><p>Uruchom proces na podstawie opublikowanego Standardu Stanowiska.</p></div>}
+  </section>
+  <div className="bos-onboarding-rule-note"><span>POWIĄZANIE</span><p>Zmiana bieżącej wersji standardu nie zmienia wersji przypisanej do rozpoczętego procesu.</p></div>
+ </>;
+}
