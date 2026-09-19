@@ -95,20 +95,20 @@ export default function AppShell({children,account,organizationName}:AppShellPro
           <Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} aria-label="Szukaj w BOS" placeholder="Szukaj w BOS..." />
         </form>
         <div className="bos-app-topbar-actions">
-          <Link href="/app/updates" className="bos-app-notifications" aria-label="Aktualizacje i powiadomienia"><Icon name="bell"/><span aria-hidden="true"/></Link>
+          <Link href="/app/updates" className="bos-app-notifications" aria-label="Aktualizacje"><Icon name="bell"/></Link>
           <div className="bos-app-account" ref={accountRef}>
             <button className="bos-app-account-trigger" type="button" aria-expanded={accountOpen} aria-haspopup="menu" onClick={()=>setAccountOpen(v=>!v)}>
               <span className="bos-app-account-mark" aria-hidden="true">{initials(account.name)}</span>
               <span className="bos-app-account-copy"><strong>{account.name}</strong><span>{roleLabels[account.role]??account.role}</span></span>
               <span className="bos-app-account-chevron"><Icon name="chevron"/></span>
             </button>
-            {accountOpen&&<div className="bos-app-account-dropdown" role="menu">
+            {accountOpen&&<div className="bos-app-account-dropdown">
               <div className="bos-app-account-context"><strong>{account.name}</strong><span>{account.email}</span><small>{organizationName}</small></div>
-              <Link role="menuitem" href="/app/settings" onClick={()=>setAccountOpen(false)}>Ustawienia konta</Link>
-              <Link role="menuitem" href="/app/organization" onClick={()=>setAccountOpen(false)}>Firma</Link>
-              <Link role="menuitem" href="/app/help" onClick={()=>setAccountOpen(false)}>Pomoc</Link>
+              <Link href="/app/settings" onClick={()=>setAccountOpen(false)}>Ustawienia konta</Link>
+              <Link href="/app/organization" onClick={()=>setAccountOpen(false)}>Firma</Link>
+              <Link href="/app/help" onClick={()=>setAccountOpen(false)}>Pomoc</Link>
               <div className="bos-app-account-divider"/>
-              <Link role="menuitem" href="/api/auth/signout">Wyloguj</Link>
+              <Link href="/api/auth/signout">Wyloguj</Link>
             </div>}
           </div>
         </div>

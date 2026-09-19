@@ -3159,3 +3159,15 @@
 .bos-core-rule-note span{color:#8c6a31;font-size:7px;font-weight:800;letter-spacing:.07em}.bos-core-rule-note p{margin:4px 0 0;color:#687781;font-size:9px}
 @media(max-width:760px){.bos-core-commandbar{grid-template-columns:1fr 1fr}.bos-core-version-strip{grid-template-columns:1fr}.bos-core-update-history>header{display:none}.bos-core-update-history>article{grid-template-columns:1fr auto;gap:7px 14px}.bos-core-update-history>article>span{grid-column:1}.bos-core-update-history article div{grid-column:1/-1}.bos-core-update-history b{grid-column:2;grid-row:1/3}}
 @media(max-width:480px){.bos-core-commandbar{grid-template-columns:1fr}}
+
+
+/* PANEL-10 — final client panel quality pass */
+.bos-app-notifications span{display:none}
+.bos-app-shell :where(a,button,input,select,textarea):focus-visible{outline:2px solid #b98732;outline-offset:2px}
+.bos-app-shell button:disabled,.bos-app-shell [aria-disabled="true"]{cursor:not-allowed;opacity:.52}
+.bos-system-state{min-height:min(520px,65vh);padding:64px 0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;border-top:1px solid #e5e4df;border-bottom:1px solid #e5e4df}
+.bos-system-state-kicker{color:#9a722f;font-size:8px;font-weight:800;letter-spacing:.08em}.bos-system-state h1{max-width:680px;margin:10px 0 0;color:#10283b;font-family:var(--font-heading,Georgia,serif);font-size:clamp(27px,4vw,40px);font-weight:500}.bos-system-state p{max-width:620px;margin:10px 0 0;color:#78828a;font-size:10px;line-height:1.6}.bos-system-state>a,.bos-system-state>button{min-height:38px;margin-top:22px;padding:0 15px;border:0;border-radius:3px;background:#b78a3e;color:#fff;text-decoration:none;font:inherit;font-size:8px;font-weight:700;display:inline-flex;align-items:center}.bos-system-state>small{margin-top:12px;color:#8a9298;font-size:8px}.bos-system-loading-lines{width:min(620px,100%);margin-top:26px;display:grid;gap:8px}.bos-system-loading-lines i{height:8px;display:block;background:linear-gradient(90deg,#eceae4 25%,#faf9f6 50%,#eceae4 75%);background-size:200% 100%;animation:p10load 1.25s linear infinite}.bos-system-loading-lines i:nth-child(2){width:82%}.bos-system-loading-lines i:nth-child(3){width:58%}@keyframes p10load{to{background-position:-200% 0}}
+@media(max-width:800px){.bos-app-sidebar{visibility:hidden;pointer-events:none}.bos-app-sidebar.is-open{visibility:visible;pointer-events:auto}.bos-app-workspace{overflow-wrap:anywhere}.bos-system-state{min-height:calc(100dvh - 130px);padding:42px 0}}
+@media(max-width:420px){.bos-app-topbar{gap:8px;padding:0 10px}.bos-app-search{min-width:0}.bos-app-account-mark{width:32px;height:32px}.bos-system-state h1{font-size:28px}}
+@media(hover:none) and (pointer:coarse){.bos-app-shell button,.bos-app-shell select,.bos-app-shell input,.bos-app-nav-link{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.bos-app-shell *,.bos-app-shell *::before,.bos-app-shell *::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
