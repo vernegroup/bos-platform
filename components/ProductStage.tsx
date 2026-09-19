@@ -1,6 +1,7 @@
 "use client";
 
 import ProductVideo from "./ProductVideo";
+import Image from "next/image";
 import type { BOSProduct } from "@/data/products";
 
 type ProductStageProps = {
@@ -76,10 +77,13 @@ export default function ProductStage({
             </div>
 
             <div className="bos-product-stage-photo-wrap">
-              <img
+              <Image
                 src={product.image.src}
                 alt={product.image.alt}
                 className="bos-product-stage-photo"
+                width={product.id === "onboarding" ? 1023 : 685}
+                height={840}
+                sizes="(max-width: 800px) 100vw, 48vw"
               />
 
               <div className="bos-product-stage-index" aria-hidden="true">

@@ -3378,3 +3378,152 @@
   .bos-core-version-strip article{border-right:0;border-bottom:1px solid var(--bos-border)}
   .bos-core-version-strip article:last-child{border-bottom:0}
 }
+
+/* ===========================================================
+   BOS UI 1.0 — UI-10 QUALITY, STATES AND ACCESSIBILITY
+   =========================================================== */
+.bos-skip-link{
+  position:fixed;
+  z-index:100;
+  top:10px;
+  left:10px;
+  padding:10px 14px;
+  border:1px solid var(--bos-gold-500);
+  background:var(--bos-navy-950);
+  color:var(--bos-text-inverse);
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.06em;
+  transform:translateY(-150%);
+}
+.bos-skip-link:focus{transform:translateY(0)}
+
+.bos-app-shell :where(a,button,input,select,textarea):focus-visible{
+  outline:2px solid var(--bos-gold-500);
+  outline-offset:2px;
+}
+
+.bos-app-shell button:disabled,
+.bos-app-shell [aria-disabled="true"]{
+  cursor:not-allowed;
+  opacity:.52;
+}
+.bos-member-role-form button:disabled,
+.bos-member-invite button:disabled{
+  background:var(--bos-cream-200);
+  color:var(--bos-text-subtle);
+}
+
+.bos-system-state{
+  min-height:min(520px,65vh);
+  padding:72px 10px;
+  border-top:1px solid var(--bos-border);
+  border-bottom:1px solid var(--bos-border);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  background:rgba(253,252,248,.42);
+}
+.bos-system-state-kicker{
+  color:var(--bos-gold-600);
+  font-size:8px;
+  font-weight:750;
+  letter-spacing:.12em;
+}
+.bos-system-state h1{
+  max-width:680px;
+  margin:12px 0 0;
+  color:var(--bos-navy-950);
+  font-family:var(--bos-font-heading);
+  font-size:clamp(28px,4vw,44px);
+  font-weight:500;
+  line-height:1.08;
+}
+.bos-system-state p{
+  max-width:620px;
+  margin:12px 0 0;
+  color:var(--bos-text-muted);
+  font-size:11px;
+  line-height:1.65;
+}
+.bos-system-state>a,
+.bos-system-state>button{
+  min-height:40px;
+  margin-top:24px;
+  padding:0 18px;
+  border:1px solid var(--bos-navy-950);
+  display:inline-flex;
+  align-items:center;
+  background:var(--bos-navy-950);
+  color:var(--bos-text-inverse);
+  font:inherit;
+  font-size:8px;
+  font-weight:750;
+  letter-spacing:.08em;
+  cursor:pointer;
+}
+.bos-system-state>small{
+  margin-top:14px;
+  color:var(--bos-text-subtle);
+  font-size:8px;
+}
+.bos-system-error{border-top-color:#c8a7a7}
+
+.bos-system-loading-lines{
+  width:min(620px,100%);
+  margin-top:30px;
+  display:grid;
+  gap:9px;
+}
+.bos-system-loading-lines i{
+  width:100%;
+  height:9px;
+  display:block;
+  background:linear-gradient(90deg,var(--bos-cream-200) 25%,var(--bos-surface) 50%,var(--bos-cream-200) 75%);
+  background-size:200% 100%;
+  animation:bos-loading-sweep 1.25s linear infinite;
+}
+.bos-system-loading-lines i:nth-child(2){width:82%}
+.bos-system-loading-lines i:nth-child(3){width:58%}
+@keyframes bos-loading-sweep{to{background-position:-200% 0}}
+
+@media(max-width:680px){
+  .bos-app-sidebar{
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .bos-app-sidebar.is-open{
+    visibility:visible;
+    pointer-events:auto;
+  }
+  .bos-app-workspace{overflow-wrap:anywhere}
+  .bos-system-state{min-height:calc(100dvh - 142px);padding:44px 4px}
+  .bos-system-state h1{font-size:30px}
+}
+
+@media(max-width:420px){
+  .bos-app-topbar{padding:0 12px}
+  .bos-app-search{width:calc(100vw - 116px)}
+  .bos-app-search-placeholder{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bos-app-account{gap:0}
+}
+
+@media(hover:none) and (pointer:coarse){
+  .bos-app-shell button,
+  .bos-app-shell select,
+  .bos-app-shell input,
+  .bos-app-nav-link,
+  .bos-app-utility-link{min-height:44px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .bos-app-shell *,
+  .bos-app-shell *::before,
+  .bos-app-shell *::after{
+    scroll-behavior:auto!important;
+    transition-duration:.01ms!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+  }
+}

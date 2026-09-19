@@ -68,7 +68,7 @@ export default async function PromotionsEntryPage() {
                 <Link href={`/app/promotions/processes/${process.id}`} key={process.id}>
                   <div><strong>{process.employee}</strong><span>{process.fromRole} → {process.toRole}</span></div>
                   <b>{process.type}</b>
-                  <div className="bos-promotions-mini-progress"><i style={{ width: `${percent}%` }} /></div>
+                  <div className="bos-promotions-mini-progress" role="progressbar" aria-label={`Postęp zmiany stanowiska ${process.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><i style={{ width: `${percent}%` }} /></div>
                   <em>{percent}%</em>
                 </Link>
               );

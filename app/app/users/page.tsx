@@ -1,5 +1,6 @@
 import { canManageMembers, requireBOSAccess } from "@/lib/bos/access";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
+import SubmitButton from "@/components/app-shell/SubmitButton";
 import { inviteMemberAction, updateMemberRoleAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -57,7 +58,7 @@ export default async function UsersPage() {
                     <option value="MANAGER">Manager</option>
                     <option value="USER">Użytkownik</option>
                   </select>
-                  <button type="submit">ZAPISZ</button>
+                  <SubmitButton idleLabel="ZAPISZ" pendingLabel="ZAPIS…" />
                 </form>
               ) : <b>{roleLabels[member.role as keyof typeof roleLabels]}</b>}
             </div>
@@ -78,7 +79,7 @@ export default async function UsersPage() {
             <label><span>IMIĘ I NAZWISKO</span><input name="displayName" placeholder="np. Anna Kowalska" required /></label>
             <label><span>ADRES E-MAIL</span><input name="email" type="email" placeholder="anna@firma.pl" required /></label>
             <label><span>ROLA</span><select name="role" defaultValue="USER"><option value="ADMIN">Administrator</option><option value="MANAGER">Manager</option><option value="USER">Użytkownik</option></select></label>
-            <button type="submit">DODAJ UŻYTKOWNIKA →</button>
+            <SubmitButton idleLabel="DODAJ UŻYTKOWNIKA →" pendingLabel="DODAWANIE…" />
           </form>
         </section>
       )}

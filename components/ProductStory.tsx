@@ -12,7 +12,7 @@ export default function ProductStory() {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [displayIndex, setDisplayIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const isTransitioning = activeIndex !== displayIndex;
 
   useEffect(() => {
     const story = storyRef.current;
@@ -68,11 +68,8 @@ export default function ProductStory() {
       clearTimeout(transitionTimerRef.current);
     }
 
-    setIsTransitioning(true);
-
     transitionTimerRef.current = setTimeout(() => {
       setDisplayIndex(activeIndex);
-      setIsTransitioning(false);
       transitionTimerRef.current = null;
     }, 180);
 

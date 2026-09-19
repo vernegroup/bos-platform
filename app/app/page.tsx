@@ -140,7 +140,7 @@ export default async function BOSAppPage() {
                     <span>Onboarding · standard v{process.standardVersion}</span>
                   </div>
                   <div className="bos-dashboard-process-owner"><span>ODPOWIEDZIALNY</span><strong>{process.owner}</strong></div>
-                  <div className="bos-dashboard-process-progress">
+                  <div className="bos-dashboard-process-progress" role="progressbar" aria-label={`Postęp wdrożenia ${process.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}>
                     <div><i style={{ width: `${progress.percent}%` }} /></div>
                     <strong>{progress.percent}%</strong>
                   </div>

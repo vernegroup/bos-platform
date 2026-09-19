@@ -1,7 +1,7 @@
 import "server-only";
 import { db, hasDatabase } from "@/lib/db";
 import { onboardingStandards } from "@/data/onboardingStandards";
-import { onboardingProcesses, getProcessProgress as demoProgress } from "@/data/onboardingProcesses";
+import { onboardingProcesses } from "@/data/onboardingProcesses";
 import { onboardingClosures } from "@/data/onboardingClosures";
 
 export const DEMO_ORGANIZATION_ID = "00000000-0000-0000-0000-000000000001";
@@ -16,6 +16,17 @@ const datePL = (value: string | Date | null) => {
   const d = new Date(value);
   return new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
 };
+
+type PersistedTaskProgress = {
+  standardTaskId?: string;
+  status?: string;
+  completedAt?: string | Date | null;
+  note?: string | null;
+};
+
+function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskProgress & { standardTaskId: string } {
+  return Boolean(task.standardTaskId);
+}
 
 export async function listStandards(organizationId?:string) {
   if (!hasDatabase()) return onboardingStandards;
@@ -56,7 +67,7 @@ export async function listProcesses(organizationId?:string) {
     LEFT JOIN onboarding_task_progress tp ON tp.onboarding_process_id=p.id
     WHERE p.organization_id=${orgId} AND p.status IN ('PLANNED','IN_PROGRESS','READY_TO_CLOSE')
     GROUP BY p.id,sv.version_label,u.display_name ORDER BY p.started_on DESC`;
-  return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,startedAt:datePL(r.started_on),targetDate:datePL(r.target_on),owner:r.owner,status:"W TOKU" as const,tasks:(r.tasks??[]).filter((x:any)=>x.standardTaskId).map((x:any)=>({standardTaskId:x.standardTaskId,status:x.status==="DONE"?"GOTOWE":x.status==="IN_PROGRESS"?"W TOKU":"DO WYKONANIA",completedAt:x.completedAt?datePL(x.completedAt):undefined,note:x.note??undefined}))}));
+  return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,startedAt:datePL(r.started_on),targetDate:datePL(r.target_on),owner:r.owner,status:"W TOKU" as const,tasks:((r.tasks??[]) as PersistedTaskProgress[]).filter(hasStandardTaskId).map(x=>({standardTaskId:x.standardTaskId,status:x.status==="DONE"?"GOTOWE" as const:x.status==="IN_PROGRESS"?"W TOKU" as const:"DO WYKONANIA" as const,completedAt:x.completedAt?datePL(x.completedAt):undefined,note:x.note??undefined}))}));
 }
 
 export async function getProcess(processId:string, organizationId?:string) {
@@ -64,7 +75,6 @@ export async function getProcess(processId:string, organizationId?:string) {
 }
 
 export function getProcessProgress(process: Awaited<ReturnType<typeof listProcesses>>[number]) {
-  if (!hasDatabase()) return demoProgress(process as any);
   const completed=process.tasks.filter((t: { status: string })=>t.status==="GOTOWE").length;
   return {completed,total:process.tasks.length,percent:process.tasks.length?Math.round(completed/process.tasks.length*100):0};
 }

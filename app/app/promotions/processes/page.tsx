@@ -38,7 +38,7 @@ export default async function PromotionProcessesPage() {
               <b>{row.type}</b>
               <span>{row.effectiveOn}</span>
               <span>{row.owner}</span>
-              <div className="bos-promotion-row-progress"><i style={{ width: `${percent}%` }} /><em>{row.done}/{row.total} · {percent}%</em></div>
+              <div className="bos-promotion-row-progress" role="progressbar" aria-label={`Postęp zmiany stanowiska ${row.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><i style={{ width: `${percent}%` }} /><em>{row.done}/{row.total} · {percent}%</em></div>
               <i>→</i>
             </Link>
           );

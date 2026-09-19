@@ -34,7 +34,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         <div><span>START</span><strong>{process.startedAt}</strong></div>
         <div><span>CEL</span><strong>{process.targetDate}</strong></div>
         <div><span>POSTĘP</span><strong>{progress.percent}%</strong></div>
-        <div className="bos-process-summary-progress"><i style={{ width: `${progress.percent}%` }} /></div>
+        <div className="bos-process-summary-progress" role="progressbar" aria-label="Postęp wdrożenia" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}><i style={{ width: `${progress.percent}%` }} /></div>
       </section>
 
       <section className="bos-process-card">

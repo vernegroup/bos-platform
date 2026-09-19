@@ -34,7 +34,7 @@ export default async function PromotionProcessPage({ params }: { params: Promise
         <div><span>WEJŚCIE</span><strong>{process.effectiveOn}</strong></div>
         <div><span>PROWADZĄCY</span><strong>{process.owner}</strong></div>
         <div><span>KONTROLA</span><strong>{done}/{process.checks.length}</strong></div>
-        <div className="bos-promotion-summary-progress"><i style={{ width: `${percent}%` }} /></div>
+        <div className="bos-promotion-summary-progress" role="progressbar" aria-label="Postęp zmiany stanowiska" aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><i style={{ width: `${percent}%` }} /></div>
       </section>
 
       <section className="bos-promotion-gate-strip" aria-label="Etapy procesu zmiany stanowiska">

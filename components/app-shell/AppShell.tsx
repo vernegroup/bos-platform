@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -35,22 +35,65 @@ function initials(name: string) {
 export default function AppShell({ children, account, organizationName }: AppShellProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+        return;
+      }
+
+      if (event.key === "Tab") {
+        const focusable = Array.from(
+          sidebarRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? []
+        );
+        const first = focusable[0];
+        const last = focusable.at(-1);
+        if (!first || !last) return;
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileOpen]);
 
   return (
     <div className="bos-app-shell">
-      <aside className={"bos-app-sidebar" + (mobileOpen ? " is-open" : "")}>
+      <a className="bos-skip-link" href="#bos-main-content">Przejdź do treści</a>
+      <aside ref={sidebarRef} id="bos-app-navigation" className={"bos-app-sidebar" + (mobileOpen ? " is-open" : "")} aria-label="Menu aplikacji">
         <div className="bos-app-sidebar-head">
           <Link href="/app" className="bos-app-brand" aria-label="BOS — panel główny" onClick={() => setMobileOpen(false)}>
             <span className="bos-app-brand-mark">BOS</span>
             <span className="bos-app-brand-name">Business Operating Standards</span>
           </Link>
-          <button className="bos-app-sidebar-close" type="button" aria-label="Zamknij menu" onClick={() => setMobileOpen(false)}>×</button>
+          <button ref={closeButtonRef} className="bos-app-sidebar-close" type="button" aria-label="Zamknij menu" onClick={() => setMobileOpen(false)}>×</button>
         </div>
 
         <div className="bos-app-sidebar-label">BOS Core</div>
         <nav className="bos-app-nav" aria-label="Nawigacja aplikacji BOS">
           {navigation.map((item) => (
-            <Link key={item.label} href={item.href} className={"bos-app-nav-link" + (isCurrentPath(pathname, item.href) ? " is-active" : "")} onClick={() => setMobileOpen(false)}>
+            <Link key={item.label} href={item.href} className={"bos-app-nav-link" + (isCurrentPath(pathname, item.href) ? " is-active" : "")} aria-current={isCurrentPath(pathname, item.href) ? "page" : undefined} onClick={() => setMobileOpen(false)}>
               <span>{item.label}</span>
             </Link>
           ))}
@@ -58,7 +101,7 @@ export default function AppShell({ children, account, organizationName }: AppShe
 
         <div className="bos-app-sidebar-bottom">
           {utilityNavigation.map((item) => (
-            <Link key={item.label} href={item.href} className={"bos-app-utility-link" + (isCurrentPath(pathname, item.href) ? " is-active" : "")} onClick={() => setMobileOpen(false)}>{item.label}</Link>
+            <Link key={item.label} href={item.href} className={"bos-app-utility-link" + (isCurrentPath(pathname, item.href) ? " is-active" : "")} aria-current={isCurrentPath(pathname, item.href) ? "page" : undefined} onClick={() => setMobileOpen(false)}>{item.label}</Link>
           ))}
           <Link href="/api/auth/signout" className="bos-app-utility-link">Wyloguj</Link>
           <Link href="/" className="bos-app-public-link">Strona publiczna <span aria-hidden="true">↗</span></Link>
@@ -70,7 +113,7 @@ export default function AppShell({ children, account, organizationName }: AppShe
       <div className="bos-app-main">
         <header className="bos-app-topbar">
           <div className="bos-app-topbar-start">
-            <button className="bos-app-menu-button" type="button" aria-label="Otwórz menu" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}>
+            <button ref={menuButtonRef} className="bos-app-menu-button" type="button" aria-label="Otwórz menu" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={() => setMobileOpen(true)}>
               <span /><span /><span />
             </button>
             <Link className="bos-app-search" href="/app/search" aria-label="Przejdź do wyszukiwarki BOS">
@@ -87,7 +130,7 @@ export default function AppShell({ children, account, organizationName }: AppShe
             <div className="bos-app-account-mark" aria-hidden="true">{initials(account.name)}</div>
           </div>
         </header>
-        <main className="bos-app-workspace">{children}</main>
+        <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
       </div>
     </div>
   );
