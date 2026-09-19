@@ -15,25 +15,67 @@ export async function resolveBOSAccess(): Promise<BOSAccess | null> {
   const session = await auth();
   const provider = session?.user?.provider;
   const providerAccountId = session?.user?.providerAccountId;
+  const sessionUserId = session?.user?.id;
   const email = session?.user?.email?.trim().toLowerCase();
-  if (!session?.user || !provider || !providerAccountId || !email) return null;
+
+  if (!session?.user || !provider || !email) return null;
 
   const sql = db();
   return sql.begin(async (tx) => {
-    let identity = await tx.unsafe("SELECT u.id, u.display_name, u.email FROM auth_identities ai JOIN users u ON u.id = ai.user_id WHERE ai.provider = $1 AND ai.provider_account_id = $2 AND u.status = 'ACTIVE' LIMIT 1", [provider, providerAccountId]);
-    if (!identity.length) {
-      const invited = await tx.unsafe("SELECT id, display_name, email FROM users WHERE lower(email) = $1 AND status IN ('ACTIVE','INVITED') LIMIT 1", [email]);
-      if (!invited.length) return null;
-      await tx.unsafe("INSERT INTO auth_identities (user_id, provider, provider_account_id) VALUES ($1,$2,$3) ON CONFLICT (provider,provider_account_id) DO NOTHING", [invited[0].id, provider, providerAccountId]);
-      await tx.unsafe("UPDATE users SET status='ACTIVE', updated_at=now() WHERE id=$1", [invited[0].id]);
-      identity = invited;
+    let identity;
+
+    if (provider === "credentials" && sessionUserId) {
+      identity = await tx.unsafe(
+        "SELECT id,display_name,email FROM users WHERE id=$1 AND lower(email)=$2 AND status='ACTIVE' AND email_verified_at IS NOT NULL LIMIT 1",
+        [sessionUserId, email],
+      );
+    } else if (providerAccountId) {
+      identity = await tx.unsafe(
+        "SELECT u.id,u.display_name,u.email FROM auth_identities ai JOIN users u ON u.id=ai.user_id WHERE ai.provider=$1 AND ai.provider_account_id=$2 AND u.status='ACTIVE' LIMIT 1",
+        [provider, providerAccountId],
+      );
+
+      if (!identity.length) {
+        const invited = await tx.unsafe(
+          "SELECT id,display_name,email FROM users WHERE lower(email)=$1 AND status IN ('ACTIVE','INVITED') LIMIT 1",
+          [email],
+        );
+        if (!invited.length) return null;
+
+        await tx.unsafe(
+          "INSERT INTO auth_identities(user_id,provider,provider_account_id) VALUES($1,$2,$3) ON CONFLICT(provider,provider_account_id) DO NOTHING",
+          [invited[0].id, provider, providerAccountId],
+        );
+        await tx.unsafe(
+          "UPDATE users SET status='ACTIVE',email_verified_at=COALESCE(email_verified_at,now()),updated_at=now() WHERE id=$1",
+          [invited[0].id],
+        );
+        identity = invited;
+      }
+    } else {
+      return null;
     }
-    const rows = await tx.unsafe("SELECT m.id AS membership_id,m.role,o.id AS organization_id,o.name AS organization_name,o.slug AS organization_slug FROM memberships m JOIN organizations o ON o.id=m.organization_id WHERE m.user_id=$1 AND m.status='ACTIVE' AND o.status='ACTIVE' ORDER BY m.joined_at NULLS LAST,m.created_at LIMIT 1", [identity[0].id]);
+
+    if (!identity.length) return null;
+
+    const rows = await tx.unsafe(
+      "SELECT m.id AS membership_id,m.role,o.id AS organization_id,o.name AS organization_name,o.slug AS organization_slug FROM memberships m JOIN organizations o ON o.id=m.organization_id WHERE m.user_id=$1 AND m.status='ACTIVE' AND o.status='ACTIVE' ORDER BY m.joined_at NULLS LAST,m.created_at LIMIT 1",
+      [identity[0].id],
+    );
     if (!rows.length) return null;
+
     return {
-      user: { id: identity[0].id, displayName: identity[0].display_name, email: identity[0].email },
+      user: {
+        id: identity[0].id,
+        displayName: identity[0].display_name,
+        email: identity[0].email,
+      },
       membership: { id: rows[0].membership_id, role: rows[0].role as BOSRole },
-      organization: { id: rows[0].organization_id, name: rows[0].organization_name, slug: rows[0].organization_slug },
+      organization: {
+        id: rows[0].organization_id,
+        name: rows[0].organization_name,
+        slug: rows[0].organization_slug,
+      },
     };
   });
 }
@@ -43,4 +85,7 @@ export async function requireBOSAccess() {
   if (!access) redirect("/no-access");
   return access;
 }
-export function canManageMembers(role: BOSRole) { return role === "OWNER" || role === "ADMIN"; }
+
+export function canManageMembers(role: BOSRole) {
+  return role === "OWNER" || role === "ADMIN";
+}
