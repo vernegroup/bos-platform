@@ -10,7 +10,6 @@ import "./mobile.css";
 import "./product-alignment.css";
 
 import TopBar from "../components/TopBar";
-import FeatureCards from "../components/FeatureCards";
 import BottomBar from "../components/BottomBar";
 import BOSSupport from "../components/BOSSupport/BOSSupport";
 
@@ -125,8 +124,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        <FeatureCards />
       </main>
 
       <BottomBar />
