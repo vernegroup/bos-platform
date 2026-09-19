@@ -28,9 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main className="bos-login">
-      <div className="bos-login-backdrop" aria-hidden="true" />
-
-      <section className="bos-login-panel" aria-labelledby="bos-login-title">
+      <section className="bos-login-auth" aria-label="Logowanie do platformy BOS">\n        <section className="bos-login-panel" aria-labelledby="bos-login-title">
         <Link href="/" className="bos-login-brand" aria-label="BOS — strona publiczna">
           <span className="bos-login-brand-name">BOS</span>
           <span className="bos-login-brand-rule" aria-hidden="true" />
@@ -65,9 +63,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             Wróć do standardybiznesu.pl
           </Link>
         </div>
-      </section>
-
-      <p className="bos-login-footer">BOS · BUSINESS OPERATING STANDARDS</p>
+        </section>\n      </section>\n\n      <aside className="bos-login-brand-panel" aria-label="Business Operating Standards">\n        <div className="bos-login-brand-backdrop" aria-hidden="true" />\n        <div className="bos-login-brand-message">\n          <p>Uporządkowana praca.<br />Silniejsze organizacje.</p>\n          <span aria-hidden="true" />\n        </div>\n      </aside>
     </main>
   );
 }
