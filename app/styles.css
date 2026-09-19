@@ -1970,3 +1970,72 @@ a{
   .bos-home-section-head h2{font-size:38px}
   .bos-home-platform h2{font-size:40px}
 }
+
+
+/* ===========================================================
+   BOS LAYOUT 01 — REFERENCE FRAME
+   Desktop shell rebuilt around the approved sales-page reference.
+   =========================================================== */
+:root{
+  --bos-shell-max:1480px;
+  --bos-shell-gutter:48px;
+}
+
+.bos-page-width,
+.bos-topbar-container{
+  width:100%;
+  max-width:var(--bos-shell-max);
+  margin-left:auto;
+  margin-right:auto;
+  padding-left:var(--bos-shell-gutter);
+  padding-right:var(--bos-shell-gutter);
+}
+
+.bos-home{
+  width:100%;
+  overflow:clip;
+}
+
+.bos-home > section{
+  width:100%;
+}
+
+/* LAYOUT-02 — compact editorial header */
+.bos-topbar{
+  padding-top:0;
+  background:var(--background);
+}
+
+.bos-topbar-container{
+  min-height:84px;
+}
+
+.bos-topbar-line{
+  margin-top:0;
+}
+
+.bos-logo-bos{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:31px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+
+.bos-logo-divider{
+  display:none;
+}
+
+.bos-logo-title{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.7px;
+}
+
+@media(max-width:800px){
+  :root{--bos-shell-gutter:28px}
+  .bos-topbar-container{min-height:72px}
+}
+
+@media(max-width:560px){
+  :root{--bos-shell-gutter:22px}
+}
