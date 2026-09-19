@@ -7,7 +7,20 @@ type VerificationEmailInput = {
 };
 
 function appUrl() {
-  return (process.env.AUTH_URL || process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+  const explicitUrl =
+    process.env.AUTH_URL ||
+    process.env.NEXTAUTH_URL ||
+    process.env.NEXT_PUBLIC_APP_URL;
+
+  if (explicitUrl) return explicitUrl.replace(/\/$/, "");
+
+  const vercelUrl =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL;
+
+  if (vercelUrl) return `https://${vercelUrl}`.replace(/\/$/, "");
+
+  return "http://localhost:3000";
 }
 
 export async function sendVerificationEmail(input: VerificationEmailInput) {
@@ -15,6 +28,10 @@ export async function sendVerificationEmail(input: VerificationEmailInput) {
   const from = process.env.BOS_EMAIL_FROM;
 
   if (!apiKey || !from) {
+    console.error("[email.verify] configuration missing", {
+      hasApiKey: Boolean(apiKey),
+      hasFrom: Boolean(from),
+    });
     throw new Error("EMAIL_NOT_CONFIGURED");
   }
 
@@ -42,9 +59,29 @@ export async function sendVerificationEmail(input: VerificationEmailInput) {
     }),
   });
 
+  const responseBody = await response.text();
+
   if (!response.ok) {
+    console.error("[email.verify] Resend rejected message", {
+      status: response.status,
+      response: responseBody.slice(0, 1000),
+    });
     throw new Error(`EMAIL_SEND_FAILED:${response.status}`);
   }
+
+  let messageId: string | null = null;
+  try {
+    messageId = (JSON.parse(responseBody) as { id?: string }).id ?? null;
+  } catch {
+    // A successful response without JSON is still a successful delivery request.
+  }
+
+  console.info("[email.verify] accepted by Resend", {
+    status: response.status,
+    messageId,
+  });
+
+  return { messageId };
 }
 
 function escapeHtml(value: string) {
