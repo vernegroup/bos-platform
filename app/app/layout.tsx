@@ -15,6 +15,7 @@ export default async function BOSAppLayout({ children }: { children: React.React
     name: access.user.displayName,
     email: access.user.email,
     image: null,
+    role: access.membership.role,
   };
 
   return (
