@@ -10,7 +10,6 @@ import "./mobile.css";
 import "./product-alignment.css";
 
 import TopBar from "../components/TopBar";
-import ProductStory from "../components/ProductStory";
 import FeatureCards from "../components/FeatureCards";
 import BottomBar from "../components/BottomBar";
 import BOSSupport from "../components/BOSSupport/BOSSupport";
@@ -64,20 +63,42 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bos-home-products-intro">
-          <div className="bos-page-width bos-home-section-head">
-            <div>
-              <span>PRODUKTY BOS</span>
-              <h2>Systemy do konkretnych procesów.</h2>
+        <section id="produkty" className="bos-home-products" aria-labelledby="bos-products-title">
+          <div className="bos-page-width">
+            <h2 id="bos-products-title">Dwa produkty. Jeden standard.</h2>
+
+            <div className="bos-home-product-cards">
+              <article className="bos-home-product-card">
+                <div className="bos-home-product-icon" aria-hidden="true">○</div>
+                <div>
+                  <h3>BOS Onboarding</h3>
+                  <span className="bos-home-product-type">System wdrożenia pracownika</span>
+                </div>
+                <p>
+                  Przygotuj, przeprowadź i zamknij wdrożenie w oparciu o jeden
+                  standard.
+                </p>
+                <a href="#onboarding">
+                  Dowiedz się więcej <span aria-hidden="true">→</span>
+                </a>
+              </article>
+
+              <article className="bos-home-product-card">
+                <div className="bos-home-product-icon bos-home-product-icon-promotions" aria-hidden="true">↗</div>
+                <div>
+                  <h3>BOS Promotions</h3>
+                  <span className="bos-home-product-type">System awansów wewnętrznych</span>
+                </div>
+                <p>
+                  Rozwijaj kompetencje i buduj ścieżki rozwoju w organizacji.
+                </p>
+                <a href="#promotions">
+                  Dowiedz się więcej <span aria-hidden="true">→</span>
+                </a>
+              </article>
             </div>
-            <p>
-              Nie zaczynasz od pustego narzędzia. Każdy moduł BOS dostarcza
-              strukturę pracy, kontrolę wykonania i zapis rezultatu.
-            </p>
           </div>
         </section>
-
-        <ProductStory />
 
         <section className="bos-home-platform">
           <div className="bos-page-width bos-home-platform-grid">
