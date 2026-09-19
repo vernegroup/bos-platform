@@ -1,6 +1,7 @@
 "use server";
 
 import { registerCompanyAccount } from "@/lib/bos/registrationRepository";
+import { sendVerificationEmail } from "@/lib/bos/email";
 
 export type RegisterState = {
   status: "idle" | "error" | "success";
@@ -38,13 +39,7 @@ export async function registerCompanyAction(
   }
 
   const result = await registerCompanyAccount({
-    firstName,
-    lastName,
-    email,
-    password,
-    companyName,
-    taxId,
-    country,
+    firstName, lastName, email, password, companyName, taxId, country,
   });
 
   if (!result.ok) {
@@ -57,9 +52,21 @@ export async function registerCompanyAction(
     return { status: "error", message: "Nie udało się utworzyć konta." };
   }
 
-  // LOGIN-08 will send this token by e-mail. Never expose it in the browser.
+  try {
+    await sendVerificationEmail({
+      to: email,
+      displayName: `${firstName} ${lastName}`,
+      token: result.verificationToken,
+    });
+  } catch {
+    return {
+      status: "success",
+      message: "Konto zostało utworzone, ale wiadomość weryfikacyjna nie mogła zostać wysłana. Po skonfigurowaniu poczty będzie można ponowić wysyłkę.",
+    };
+  }
+
   return {
     status: "success",
-    message: "Konto firmowe zostało utworzone. W kolejnym etapie podłączymy weryfikację adresu e-mail.",
+    message: "Konto firmowe zostało utworzone. Sprawdź pocztę i potwierdź adres e-mail, aby aktywować konto.",
   };
 }
