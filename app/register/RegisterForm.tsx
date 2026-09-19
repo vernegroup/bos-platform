@@ -2,9 +2,33 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { registerCompanyAction, type RegisterState } from "./actions";
+import {
+  registerCompanyAction,
+  resendVerificationAction,
+  type RegisterState,
+  type ResendVerificationState,
+} from "./actions";
 
 const initialState: RegisterState = { status: "idle" };
+const initialResendState: ResendVerificationState = { status: "idle" };
+
+function VerificationResend({ email }: { email: string }) {
+  const [state, action, pending] = useActionState(resendVerificationAction, initialResendState);
+
+  return (
+    <form action={action}>
+      <input type="hidden" name="email" value={email} />
+      <button className="bos-register-submit" type="submit" disabled={pending}>
+        {pending ? "Wysyłanie…" : "Wyślij ponownie e-mail weryfikacyjny"}
+      </button>
+      {state.message ? (
+        <p className={state.status === "error" ? "bos-register-error" : undefined} role="status">
+          {state.message}
+        </p>
+      ) : null}
+    </form>
+  );
+}
 
 export default function RegisterForm() {
   const [state, action, pending] = useActionState(registerCompanyAction, initialState);
@@ -15,6 +39,7 @@ export default function RegisterForm() {
       <div className="bos-register-success" role="status">
         <h2>Konto utworzone</h2>
         <p>{state.message}</p>
+        {state.email ? <VerificationResend email={state.email} /> : null}
         <Link href="/login">Wróć do logowania →</Link>
       </div>
     );
