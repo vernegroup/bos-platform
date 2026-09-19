@@ -41,6 +41,15 @@ export async function findUserForEmailVerification(email: string) {
   return rows[0] ?? null;
 }
 
+export async function findUserForPasswordReset(email: string) {
+  const sql = db();
+  const rows = await sql.unsafe(
+    "SELECT id,display_name,email,status,email_verified_at FROM users WHERE lower(email)=$1 AND status='ACTIVE' AND email_verified_at IS NOT NULL LIMIT 1",
+    [normalizeEmail(email)],
+  );
+  return rows[0] ?? null;
+}
+
 export async function setUserPasswordHash(userId: string, passwordHash: string) {
   const sql = db();
   await sql.unsafe(
