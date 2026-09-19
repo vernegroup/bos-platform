@@ -3132,3 +3132,30 @@
 .bos-products-empty strong{color:#243d50;font-size:12px}.bos-products-empty p{margin:7px 0 0;color:#7c858c;font-size:10px}
 @media(max-width:760px){.bos-products-grid{grid-template-columns:1fr}.bos-products-header{align-items:flex-start}.bos-product-card{min-height:270px}}
 @media(max-width:480px){.bos-products-header{display:block}.bos-products-header>span{display:inline-block;margin-top:13px}.bos-product-card{padding:17px}}
+
+
+/* PANEL-06 — UPDATES */
+.bos-core-workspace{padding:0!important}
+.bos-core-view-head{padding:18px 0 22px;border-bottom:1px solid #e8e7e2}
+.bos-core-view-head h1{margin:0;color:#10283b;font-family:var(--font-heading,Georgia,serif);font-size:27px;font-weight:500;letter-spacing:-.02em}
+.bos-core-view-head p{margin:7px 0 0;color:#78828a;font-size:11px}
+.bos-core-commandbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0 14px}
+.bos-core-commandbar>div{padding:15px 17px;background:#fff;border:1px solid #e5e4df;border-radius:5px}
+.bos-core-commandbar span{display:block;color:#8a9298;font-size:7px;font-weight:700;letter-spacing:.07em}
+.bos-core-commandbar strong{display:block;margin-top:7px;color:#173146;font-family:var(--font-heading,Georgia,serif);font-size:19px;font-weight:500}
+.bos-core-version-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:30px}
+.bos-core-version-strip article{padding:15px 17px;background:#f6f4ee;border:1px solid #e5e1d7;border-radius:5px}
+.bos-core-version-strip span{color:#9a722f;font-size:7px;font-weight:800;letter-spacing:.08em}
+.bos-core-version-strip strong{display:block;margin:5px 0;color:#263e50;font-size:11px}.bos-core-version-strip small{color:#858d92;font-size:7px}
+.bos-core-update-history{background:#fff;border:1px solid #e3e2dd;border-radius:6px;overflow:hidden}
+.bos-core-update-history>header,.bos-core-update-history>article{display:grid;grid-template-columns:100px 145px minmax(0,1fr) 85px;gap:16px;align-items:start}
+.bos-core-update-history>header{padding:10px 15px;background:#f7f6f2;color:#8b9297;font-size:7px;font-weight:800;letter-spacing:.07em}
+.bos-core-update-history>article{padding:15px;border-top:1px solid #ecebe7}
+.bos-core-update-history time,.bos-core-update-history>article>span{color:#687781;font-size:9px}
+.bos-core-update-history article div strong{display:block;color:#2b4253;font-size:10px}.bos-core-update-history article div p{margin:5px 0 0;color:#7e878e;font-size:9px;line-height:1.5}
+.bos-core-update-history b{justify-self:end;padding:5px 7px;border-radius:999px;background:#f0f1ef;color:#7a8388;font-size:7px}
+.bos-core-update-history b[data-current="true"]{background:#edf6ef;color:#3f7650}
+.bos-core-rule-note{margin-top:14px;padding:13px 16px;border-left:2px solid #b78a3e;background:#f7f5ef}
+.bos-core-rule-note span{color:#8c6a31;font-size:7px;font-weight:800;letter-spacing:.07em}.bos-core-rule-note p{margin:4px 0 0;color:#687781;font-size:9px}
+@media(max-width:760px){.bos-core-commandbar{grid-template-columns:1fr 1fr}.bos-core-version-strip{grid-template-columns:1fr}.bos-core-update-history>header{display:none}.bos-core-update-history>article{grid-template-columns:1fr auto;gap:7px 14px}.bos-core-update-history>article>span{grid-column:1}.bos-core-update-history article div{grid-column:1/-1}.bos-core-update-history b{grid-column:2;grid-row:1/3}}
+@media(max-width:480px){.bos-core-commandbar{grid-template-columns:1fr}}
