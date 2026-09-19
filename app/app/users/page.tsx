@@ -1,10 +1,1 @@
-import { canManageMembers,requireBOSAccess } from "@/lib/bos/access";
-import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
-import { inviteMemberAction,updateMemberRoleAction } from "./actions";
-export const dynamic="force-dynamic";
-export default async function UsersPage(){
- const access=await requireBOSAccess(),members=await listOrganizationMembers(access),canManage=canManageMembers(access.membership.role);
- return <section><div className="bos-app-page-heading"><span className="bos-app-eyebrow">BOS / UÅ»YTKOWNICY</span><h1>UÅ¼ytkownicy</h1><p>{access.organization.name} Â· role i czÅ‚onkostwa sÄ… kontrolowane po stronie BOS.</p></div>
- <div className="bos-app-panel"><div className="bos-app-panel-head"><strong>CzÅ‚onkowie organizacji</strong><span>{members.length}</span></div><div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}><thead><tr><th align="left">Osoba</th><th align="left">E-mail</th><th align="left">Rola</th><th align="left">Status</th></tr></thead><tbody>{members.map((m)=><tr key={m.id}><td>{m.display_name}</td><td>{m.email}</td><td>{canManage&&m.role!=="OWNER"?<form action={updateMemberRoleAction}><input type="hidden" name="membershipId" value={m.id}/><select name="role" defaultValue={m.role}><option>ADMIN</option><option>MANAGER</option><option>USER</option></select><button type="submit">Zapisz</button></form>:m.role}</td><td>{m.status}</td></tr>)}</tbody></table></div></div>
- {canManage&&<div className="bos-app-panel" style={{marginTop:18}}><div className="bos-app-panel-head"><strong>Dodaj uÅ¼ytkownika</strong><span>zaproszenie</span></div><form action={inviteMemberAction} style={{display:"grid",gridTemplateColumns:"1fr 1fr 160px auto",gap:10}}><input name="displayName" placeholder="ImiÄ™ i nazwisko" required/><input name="email" type="email" placeholder="E-mail" required/><select name="role" defaultValue="USER"><option>ADMIN</option><option>MANAGER</option><option>USER</option></select><button type="submit">Dodaj</button></form></div>}</section>
-}
+m«ë†©§ö©§û¬z»?¥¨¶ÌM¢Ëœ…ø¥zŠÝŠ·œ¶Šò

@@ -1,30 +1,1 @@
-import Link from "next/link";
-import { requireBOSAccess } from "@/lib/bos/access";
-import { searchOrganization } from "@/lib/bos/searchRepository";
-
-export const dynamic = "force-dynamic";
-type SearchPageProps={searchParams:Promise<{q?:string}>};
-const labels={STANDARD:"STANDARD",TASK:"CZYNNOÅšÄ†",ONBOARDING:"WDROÅ»ENIE",CLOSURE:"ZAMKNIÄ˜CIE",PROMOTION:"ZMIANA ROLI",PROMOTION_CLOSURE:"ZAMKNIÄ˜CIE ZMIANY",USER:"UÅ»YTKOWNIK",FILE:"PLIK",ACTIVITY:"HISTORIA"};
-
-export default async function SearchPage({searchParams}:SearchPageProps){
- const access=await requireBOSAccess();
- const {q=""}=await searchParams;
- const results=await searchOrganization(access,q);
- return <div className="bos-app-workspace">
-  <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / WYSZUKIWARKA</div><h1>Wyszukiwarka</h1><p>Przeszukuje dane zapisane w bieÅ¼Ä…cej organizacji. Wyniki z innych firm nie sÄ… dostÄ™pne.</p></div></section>
-  <form className="bos-global-search-form" action="/app/search" method="get">
-   <input name="q" defaultValue={q} autoFocus placeholder="np. magazynier, Anna, sprzÄ™t, reklamacjaâ€¦" aria-label="Szukaj w BOS"/>
-   <button type="submit">SZUKAJ</button>
-  </form>
-  {q.trim().length<2?<p className="bos-global-search-note">Wpisz co najmniej 2 znaki.</p>:
-   <section className="bos-global-search-results">
-    <header><span>WYNIKI</span><strong>{results.length}</strong></header>
-    {results.length===0?<p className="bos-global-search-empty">Brak wynikÃ³w dla â€{q}â€.</p>:results.map((r,i)=><Link className="bos-global-search-row" href={r.href} key={r.type+":"+r.id}>
-      <span className="bos-global-search-index">{String(i+1).padStart(2,"0")}</span>
-      <span className="bos-global-search-type">{labels[r.type]}</span>
-      <span className="bos-global-search-copy"><strong>{r.title}</strong><small>{r.context||"â€”"}</small></span>
-      <span className="bos-global-search-open">OTWÃ“RZ â†’</span>
-    </Link>)}
-   </section>}
- </div>;
-}
+m«ë†©§ö©§ûj·!ş– zÛ16‹.râ•ê+v*ŞrÚ+

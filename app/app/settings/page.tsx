@@ -1,2 +1,1 @@
-import AppPlaceholder from "@/components/app-shell/AppPlaceholder";
-export default function SettingsPage(){return <AppPlaceholder kicker="BOS / USTAWIENIA" title="Ustawienia" description="Ustawienia konta i Å›rodowiska aplikacyjnego, niezaleÅ¼ne od ustawieÅ„ konkretnych produktÃ³w." scope={["Konto uÅ¼ytkownika","Preferencje interfejsu","Powiadomienia","BezpieczeÅ„stwo konta"]}/>;}
+m«ë†©§ö©§û¶Ø§‚Ïéj­³h²ç!~)^¢·b­ç-¢¼
