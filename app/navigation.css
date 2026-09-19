@@ -183,3 +183,56 @@
     display:none;
   }
 }
+
+
+/* ===========================================================
+   LAYOUT-02 — reference header
+   =========================================================== */
+.bos-topbar-right{
+  gap:28px;
+}
+
+.bos-topbar-link{
+  min-height:34px;
+  color:#25344a;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.65px;
+}
+
+.bos-topbar-contact{
+  padding:0;
+  border:0;
+}
+
+.bos-topbar-contact:hover,
+.bos-topbar-contact:focus-visible{
+  border-color:transparent;
+}
+
+.bos-topbar-login{
+  min-height:38px;
+  padding:0 19px;
+  border-color:var(--gold);
+  border-radius:3px;
+  gap:0;
+  font-size:9px;
+  letter-spacing:.7px;
+}
+
+.bos-topbar-login span{
+  display:none;
+}
+
+@media(max-width:700px){
+  .bos-topbar-container{
+    align-items:center;
+  }
+}
+
+@media(max-width:460px){
+  .bos-topbar-container{
+    padding-left:var(--bos-shell-gutter);
+    padding-right:var(--bos-shell-gutter);
+  }
+}
