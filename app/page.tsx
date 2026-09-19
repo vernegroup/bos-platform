@@ -39,7 +39,7 @@ export default function HomePage() {
 
               <div className="bos-home-hero-actions">
                 <a href="#produkty" className="bos-home-primary-action">
-                  KUP BOS ONBOARDING <span aria-hidden="true">→</span>
+                  POZNAJ PRODUKTY <span aria-hidden="true">→</span>
                 </a>
               </div>
 
@@ -64,13 +64,13 @@ export default function HomePage() {
 
         <section id="produkty" className="bos-home-products" aria-labelledby="bos-products-title">
           <div className="bos-page-width">
-            <h2 id="bos-products-title">Dwa produkty. Jeden standard.</h2>
+            <h2 id="bos-products-title">Dwa produkty. Jeden system działania.</h2>
 
             <div className="bos-home-product-cards">
               <article className="bos-home-product-card">
                 <div className="bos-home-product-icon" aria-hidden="true">○</div>
                 <div>
-                  <h3>BOS Onboarding</h3>
+                  <h3>BOS Wdrożenia</h3>
                   <span className="bos-home-product-type">System wdrożenia pracownika</span>
                 </div>
                 <p>
@@ -85,7 +85,7 @@ export default function HomePage() {
               <article className="bos-home-product-card">
                 <div className="bos-home-product-icon bos-home-product-icon-promotions" aria-hidden="true">↗</div>
                 <div>
-                  <h3>BOS Promotions</h3>
+                  <h3>BOS Awanse</h3>
                   <span className="bos-home-product-type">System awansów wewnętrznych</span>
                 </div>
                 <p>

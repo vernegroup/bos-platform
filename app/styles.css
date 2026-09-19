@@ -2381,3 +2381,11 @@ a{
   .bos-home-why h2{font-size:32px}
   .bos-home-why-item h3{font-size:18px}
 }
+
+
+/* HOME-01 / KROK 1 — większe karty produktów */
+.bos-home-product-cards{max-width:1120px;gap:34px}
+.bos-home-product-card{min-height:310px;padding:38px 40px;background:#fff;border-color:#e0ddd5;box-shadow:0 16px 42px rgba(13,20,34,.08);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.bos-home-product-card:hover,.bos-home-product-card:focus-within{transform:translateY(-6px);border-color:#cfbd9e;box-shadow:0 26px 60px rgba(13,20,34,.14)}
+.bos-home-product-card h3{font-size:27px}.bos-home-product-card p{font-size:14px;line-height:1.7}.bos-home-product-card>a{font-size:11px;padding:8px 0}
+@media(max-width:800px){.bos-home-product-card{min-height:270px;padding:30px}}
