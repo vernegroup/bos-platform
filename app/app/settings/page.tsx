@@ -1,1 +1,53 @@
-m´ÎÜ©ßˆ©ß˚∂ÿßÇœÈj≠≥h≤Á!~)^¢∑b≠Á-¢º
+import { requireBOSAccess } from "@/lib/bos/access";
+
+export const dynamic = "force-dynamic";
+
+export default async function SettingsPage() {
+  const access = await requireBOSAccess();
+
+  return (
+    <div className="bos-app-workspace bos-core-workspace">
+      <section className="bos-app-intro bos-core-view-head">
+        <div>
+          <div className="bos-app-kicker">BOS CORE / USTAWIENIA</div>
+          <h1>Ustawienia</h1>
+          <p>Parametry konta i ≈õrodowiska BOS wsp√≥lne dla wszystkich produkt√≥w przypisanych do organizacji.</p>
+        </div>
+        <div className="bos-app-build-state"><span>KONTO</span><strong>AKTYWNE</strong></div>
+      </section>
+
+      <section className="bos-settings-sections">
+        <article>
+          <span>01</span>
+          <div><strong>Konto u≈ºytkownika</strong><p>Dane to≈ºsamo≈õci u≈ºywane podczas logowania i pracy w BOS.</p></div>
+          <dl><dt>U≈ªYTKOWNIK</dt><dd>{access.user.displayName}</dd><dt>E-MAIL</dt><dd>{access.user.email}</dd></dl>
+          <b>GOOGLE OAUTH</b>
+        </article>
+        <article>
+          <span>02</span>
+          <div><strong>Organizacja</strong><p>Domy≈õlny kontekst danych dla bie≈ºƒÖcej sesji aplikacji.</p></div>
+          <dl><dt>FIRMA</dt><dd>{access.organization.name}</dd><dt>ROLA</dt><dd>{access.membership.role}</dd></dl>
+          <b>AKTYWNA</b>
+        </article>
+        <article>
+          <span>03</span>
+          <div><strong>Powiadomienia</strong><p>Komunikaty o aktualizacjach produkt√≥w i istotnych zdarzeniach organizacji.</p></div>
+          <dl><dt>KANA≈Å</dt><dd>W aplikacji</dd><dt>E-MAIL</dt><dd>Nieaktywny</dd></dl>
+          <b>USTAWIENIE SYSTEMOWE</b>
+        </article>
+        <article>
+          <span>04</span>
+          <div><strong>Bezpiecze≈Ñstwo konta</strong><p>Logowanie i sesja sƒÖ obs≈Çugiwane przez zewnƒôtrznego dostawcƒô to≈ºsamo≈õci.</p></div>
+          <dl><dt>METODA</dt><dd>Google</dd><dt>HAS≈ÅO BOS</dt><dd>Nie jest przechowywane</dd></dl>
+          <b>ZARZƒÑDZANE PRZEZ GOOGLE</b>
+        </article>
+      </section>
+
+      <section className="bos-settings-boundary">
+        <span className="bos-dashboard-section-kicker">GRANICA USTAWIE≈É</span>
+        <strong>Ustawienia produkt√≥w pozostajƒÖ wewnƒÖtrz odpowiednich modu≈Ç√≥w.</strong>
+        <p>Ten ekran obejmuje wy≈ÇƒÖcznie konto i wsp√≥lne ≈õrodowisko BOS Core. Konfiguracja Onboardingu i Promotions nie jest tutaj duplikowana.</p>
+      </section>
+    </div>
+  );
+}
