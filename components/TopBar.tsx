@@ -12,7 +12,7 @@ export default function TopBar() {
           </span>
 
           <span className="bos-logo-title">
-            BUSINESS OPERATING STANDARDS
+            STANDARDY OPERACYJNE BIZNESU
           </span>
         </Link>
 
