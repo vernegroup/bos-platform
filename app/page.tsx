@@ -100,19 +100,28 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bos-home-platform">
-          <div className="bos-page-width bos-home-platform-grid">
-            <div>
-              <span className="bos-home-platform-kicker">BOS PLATFORM</span>
-              <h2>Nie dokument. Środowisko pracy.</h2>
-            </div>
-            <div className="bos-home-platform-copy">
-              <p>
-                Standard jest punktem wyjścia. Dalej BOS prowadzi przez realny
-                proces, zapisuje postęp i pozostawia historię tego, co faktycznie
-                wydarzyło się w organizacji.
-              </p>
-              <Link href="/login">PRZEJDŹ DO PANELU KLIENTA <span aria-hidden="true">→</span></Link>
+        <section className="bos-home-why" aria-labelledby="bos-why-title">
+          <div className="bos-page-width">
+            <h2 id="bos-why-title">Dlaczego BOS?</h2>
+
+            <div className="bos-home-why-grid">
+              <article className="bos-home-why-item">
+                <span className="bos-home-why-icon" aria-hidden="true">↗</span>
+                <h3>Oszczędność czasu</h3>
+                <p>Gotowe narzędzia i jasny proces.</p>
+              </article>
+
+              <article className="bos-home-why-item">
+                <span className="bos-home-why-icon" aria-hidden="true">◎</span>
+                <h3>Większa jakość</h3>
+                <p>Powtarzalne standardy.</p>
+              </article>
+
+              <article className="bos-home-why-item">
+                <span className="bos-home-why-icon" aria-hidden="true">◇</span>
+                <h3>Trwały efekt</h3>
+                <p>Wiedza zostaje w organizacji.</p>
+              </article>
             </div>
           </div>
         </section>
