@@ -1,64 +1,71 @@
 /* ===========================================================
-   BOS FOOTER
-   Footer belongs to the document flow and never overlays content.
+   LAYOUT-06 — BOS FOOTER
    =========================================================== */
 
 .bos-bottom-bar{
   position:relative;
-  left:auto;
-  right:auto;
-  bottom:auto;
   width:100%;
-  height:auto;
-  min-height:150px;
-  background:var(--background);
-  backdrop-filter:none;
+  background:#f6f3ed;
   border-top:1px solid var(--line);
-  z-index:2;
 }
 
 .bos-bottom-bar-inner{
-  min-height:150px;
-  height:auto;
-  padding-top:30px;
-  padding-bottom:30px;
+  min-height:138px;
+  padding:34px 0 28px;
   display:grid;
-  grid-template-columns:1.35fr 1fr .8fr;
-  gap:48px;
+  grid-template-columns:1.5fr .9fr .7fr;
+  gap:56px;
   align-items:start;
 }
 
-.bos-footer-company,
-.bos-footer-platform,
-.bos-footer-contact{
-  min-width:0;
+.bos-footer-brand-mark{
+  color:var(--gold);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:27px;
+  font-weight:700;
+  line-height:1;
+}
+
+.bos-footer-brand-name{
+  margin-top:8px;
+  color:var(--text);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1.2px;
 }
 
 .bos-footer-title{
-  margin-bottom:10px;
+  margin-bottom:9px;
   color:var(--text);
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:1.6px;
-  line-height:1.4;
-  text-transform:uppercase;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:1.2px;
 }
 
 .bos-footer-row{
   margin-top:4px;
   color:var(--text-light);
-  font-size:11px;
+  font-size:10px;
   line-height:1.55;
 }
 
+.bos-footer-legal{
+  min-height:48px;
+  padding:14px 0 18px;
+  border-top:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  color:#7a8797;
+  font-size:9px;
+}
+
 .bos-footer-links{
-  margin-top:12px;
   display:flex;
   flex-wrap:wrap;
+  align-items:center;
   gap:7px;
-  color:#7A8797;
-  font-size:10px;
-  line-height:1.5;
 }
 
 .bos-footer-links a{
@@ -70,30 +77,31 @@
   color:var(--gold);
 }
 
-.bos-footer-page{
-  display:none;
-}
-
-@media (max-width:800px){
+@media(max-width:800px){
   .bos-bottom-bar-inner{
     grid-template-columns:1fr 1fr;
     gap:28px 36px;
-    padding-top:28px;
-    padding-bottom:32px;
+    padding-top:30px;
   }
 
-  .bos-footer-company{
+  .bos-footer-brand{
     grid-column:1 / -1;
+  }
+
+  .bos-footer-legal{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:8px;
   }
 }
 
-@media (max-width:560px){
+@media(max-width:560px){
   .bos-bottom-bar-inner{
     grid-template-columns:1fr;
     gap:24px;
   }
 
-  .bos-footer-company{
+  .bos-footer-brand{
     grid-column:auto;
   }
 }
