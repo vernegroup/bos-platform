@@ -2165,3 +2165,127 @@ a{
   .bos-home-hero-actions{align-items:stretch}
   .bos-home-primary-action{width:100%;justify-content:space-between}
 }
+
+
+/* ===========================================================
+   LAYOUT-04 — PRODUCT CARDS
+   =========================================================== */
+.bos-home-products{
+  padding:58px 0 64px;
+  border-top:1px solid var(--line);
+  background:#fbfaf7;
+}
+
+.bos-home-products h2{
+  margin:0 0 34px;
+  color:var(--text);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:38px;
+  font-weight:400;
+  line-height:1.05;
+  text-align:center;
+  letter-spacing:-1px;
+}
+
+.bos-home-product-cards{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:28px;
+  max-width:980px;
+  margin:0 auto;
+}
+
+.bos-home-product-card{
+  min-height:250px;
+  padding:30px 34px;
+  border:1px solid #ddd9d0;
+  background:rgba(255,255,255,.32);
+  display:grid;
+  grid-template-columns:54px 1fr;
+  grid-template-rows:auto 1fr auto;
+  column-gap:20px;
+  transition:border-color .18s ease,transform .18s ease;
+}
+
+.bos-home-product-card:hover{
+  border-color:#c7bda9;
+  transform:translateY(-2px);
+}
+
+.bos-home-product-icon{
+  grid-column:1;
+  grid-row:1;
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#b8781f;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:40px;
+  line-height:1;
+}
+
+.bos-home-product-icon-promotions{
+  font-size:32px;
+}
+
+.bos-home-product-card>div:nth-child(2){
+  grid-column:2;
+  grid-row:1;
+}
+
+.bos-home-product-card h3{
+  margin:1px 0 5px;
+  color:var(--text);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:23px;
+  font-weight:400;
+}
+
+.bos-home-product-type{
+  color:#516075;
+  font-size:11px;
+}
+
+.bos-home-product-card p{
+  grid-column:1 / -1;
+  grid-row:2;
+  max-width:380px;
+  margin:26px 0 24px;
+  color:var(--text-light);
+  font-size:13px;
+  line-height:1.65;
+}
+
+.bos-home-product-card>a{
+  grid-column:1 / -1;
+  grid-row:3;
+  width:max-content;
+  color:var(--text);
+  font-size:11px;
+  font-weight:700;
+}
+
+.bos-home-product-card>a span{
+  display:inline-block;
+  margin-left:8px;
+  transition:transform .18s ease;
+}
+
+.bos-home-product-card>a:hover span{
+  transform:translateX(3px);
+}
+
+@media(max-width:800px){
+  .bos-home-products{padding:48px 0 54px}
+  .bos-home-products h2{font-size:34px;text-align:left}
+  .bos-home-product-cards{grid-template-columns:1fr;max-width:none}
+}
+
+@media(max-width:560px){
+  .bos-home-products h2{font-size:31px}
+  .bos-home-product-card{padding:25px 24px;grid-template-columns:46px 1fr;column-gap:14px}
+  .bos-home-product-icon{width:42px;height:42px;font-size:35px}
+  .bos-home-product-card h3{font-size:21px}
+}
