@@ -1,5 +1,7 @@
 "use client";
 
+// PANEL-03: functional client header
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
