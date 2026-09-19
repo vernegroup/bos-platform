@@ -12,6 +12,12 @@ export async function listPromotionClosures(access:BOSAccess){
  const rows=await db().unsafe("SELECT pc.id,pp.employee_name_snapshot,pp.from_role,pp.to_role,pp.change_type,pc.result,pc.summary,pc.recommendations,pc.verified_at,u.display_name verifier FROM promotion_closures pc JOIN promotion_processes pp ON pp.id=pc.promotion_process_id JOIN users u ON u.id=pc.verified_by_user_id WHERE pc.organization_id=$1 ORDER BY pc.verified_at DESC",[access.organization.id]);
  return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,fromRole:r.from_role,toRole:r.to_role,type:r.change_type==="PROMOTION"?"AWANS":"PRZESUNIĘCIE",result:r.result,summary:r.summary,recommendations:r.recommendations,verifiedAt:datePL(r.verified_at),verifier:r.verifier}));
 }
+export async function getPromotionClosure(access:BOSAccess,id:string){
+ const rows=await db().unsafe("SELECT pc.id,pc.promotion_process_id,pp.employee_name_snapshot,pp.from_role,pp.to_role,pp.change_type,pp.started_on,pp.effective_on,pc.result,pc.summary,pc.recommendations,pc.verified_at,owner.display_name owner,verifier.display_name verifier FROM promotion_closures pc JOIN promotion_processes pp ON pp.id=pc.promotion_process_id JOIN users owner ON owner.id=pp.owner_user_id JOIN users verifier ON verifier.id=pc.verified_by_user_id WHERE pc.id=$1 AND pc.organization_id=$2 LIMIT 1",[id,access.organization.id]);
+ if(!rows[0])return null;
+ const r=rows[0];
+ return{id:r.id,processId:r.promotion_process_id,employee:r.employee_name_snapshot,fromRole:r.from_role,toRole:r.to_role,type:r.change_type==="PROMOTION"?"AWANS":"PRZESUNIĘCIE",startedOn:datePL(r.started_on),effectiveOn:datePL(r.effective_on),result:r.result,summary:r.summary,recommendations:r.recommendations,verifiedAt:datePL(r.verified_at),owner:r.owner,verifier:r.verifier};
+}
 export async function getPromotionProcess(access:BOSAccess,id:string){
  const rows=await db().unsafe("SELECT pp.id,pp.employee_name_snapshot,pp.from_role,pp.to_role,pp.change_type,pp.status,pp.started_on,pp.effective_on,u.display_name owner FROM promotion_processes pp JOIN users u ON u.id=pp.owner_user_id WHERE pp.id=$1 AND pp.organization_id=$2 LIMIT 1",[id,access.organization.id]);
  if(!rows[0])return null;
