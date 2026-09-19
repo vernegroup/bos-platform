@@ -1,167 +1,351 @@
-# BOS Onboarding Web 1.0 — model freeze
+# BOS Onboarding Web 1.0 — technical architecture freeze
 
-Status: **FROZEN after architecture review (point 9)**  
-Date: 2026-09-18
+Status: **FROZEN — pre-migration architecture contract**  
+Date: 2026-09-19
 
-This document freezes the product model built in points 5–8 before BOS Core/database work begins.
+This document supersedes the earlier product-only freeze from point 9. It freezes the technical domain contract that future database migrations, repositories and UI must implement without silently changing the meaning of an onboarding record.
 
-## 1. Core process
+## 1. Invariant
 
-BOS Onboarding Web 1.0 uses one invariant operational path:
+BOS Onboarding keeps one invariant:
 
-**STANDARD → REALIZATION → VERIFICATION**
+**STANDARD → REALIZATION → VERIFICATION → HISTORICAL DECISION**
 
-In the product UI this is:
+In the product UI:
 
-1. **PRZYGOTUJ** → Standard Stanowiska
-2. **PRZEPROWADŹ** → Karta Postępu
-3. **ZAMKNIJ** → Karta Zakończenia
+1. **PRZYGOTUJ** — Standard Stanowiska
+2. **PRZEPROWADŹ** — concrete onboarding pinned to one StandardVersion
+3. **ZAMKNIJ** — verification and historical decision
 
-The application must not collapse these into one mutable record.
+UI may simplify the presentation, but it must not collapse these into one mutable record.
 
-## 2. Core records
+## 2. Canonical entity chain
 
-### Standard Stanowiska
-Reusable role/work pattern owned by an organization.
+The canonical core is:
 
-Required concepts:
-- role/name
-- organizational area
-- status
-- versions
-- ordered tasks
-- correct execution description
-- readiness criterion
+`Standard → StandardVersion → StandardTask → OnboardingProcess → OnboardingTaskProgress → OnboardingClosure`
+
+A future extension may add supporting records around this chain, but may not bypass it.
+
+### Standard
+
+Reusable organizational definition of a role/work pattern.
+
+Lifecycle:
+- DRAFT
+- ACTIVE
+- ARCHIVED
+
+A Standard is an identity/container. Operational content belongs to its versions.
 
 ### StandardVersion
-Published snapshot of a Standard Stanowiska.
 
-Rule: a new version never overwrites a version already referenced by an onboarding process.
+Immutable published snapshot used by an onboarding process.
 
-### OnboardingProcess / Karta Postępu
-A concrete realization for one employee.
+A published version contains the complete operational definition needed to execute onboarding, including:
 
-Required concepts:
-- employee
-- exact standard ID
-- exact standard version
-- start date
-- target date
-- responsible manager
-- task progress
-- task state
-- completion date / operational note
+- role / position identity,
+- organizational area,
+- expected duration or timing where applicable,
+- ordered tasks,
+- what must be done,
+- how correct execution looks,
+- practical guidance/instructions,
+- **K** control/critical flag where used,
+- task order,
+- conditions required before work may start,
+- readiness criterion,
+- method of verification.
 
-### OnboardingClosure / Karta Zakończenia
-Immutable historical outcome created after verification.
+Publishing v2 never modifies v1.
 
-Required concepts:
-- employee
-- exact standard and version
-- process dates
-- responsible manager
-- verifier
-- result
-- summary
-- recommendations
-- verified task/readiness result
+Starting an onboarding binds the process to exactly one StandardVersion. Web 1.0 does **not** silently migrate an active process from v1 to v2.
 
-## 3. Version invariant
+### StandardTask
 
-Starting an onboarding process binds it to the selected StandardVersion.
+Ordered task inside one immutable StandardVersion.
 
-Example:
+The task definition describes the expected work. Employee-specific execution state does not belong to StandardTask.
 
-Magazynier v1.2 → Anna Nowak onboarding
+## 3. OnboardingProcess
 
-Publishing Magazynier v1.3 later must not silently migrate Anna's process and must not rewrite its historical result.
+One concrete onboarding realization for one employee.
 
-## 4. Supporting Onboarding 0.x material mapping
+It must retain at least:
 
-The previous PDF/XLSX package contained more material than the new core workflow. The review does **not** treat those files as separate core process stages.
+- organization,
+- employee / employee snapshot,
+- exact Standard,
+- exact StandardVersion,
+- responsible manager/owner,
+- optional trainer/buddy assignments,
+- start/target dates,
+- lifecycle status,
+- creation/update audit information.
 
-| Previous material | Web 1.0 destination |
+Multiple onboarding processes may exist in one organization. Records must never depend on a singleton/current-process assumption.
+
+### Process lifecycle
+
+Lifecycle is separate from the final readiness decision.
+
+Frozen lifecycle vocabulary:
+
+- NOT_STARTED
+- ACTIVE
+- PAUSED
+- COMPLETED
+- CANCELLED
+
+A database implementation may require a compatibility migration from older status names. That migration must preserve meaning and history.
+
+## 4. Five-stage task progress
+
+Each onboarding task is executed as an operational learning/verification sequence:
+
+1. **WYJAŚNIJ** — explanation completed
+2. **POKAŻ** — correct execution demonstrated
+3. **RAZEM** — task performed together
+4. **SAM** — employee performed independently
+5. **SPRAWDŹ** — independent performance verified
+
+The persisted progress record must be able to represent the five stages independently.
+
+Minimum technical audit fields for a task progress record:
+
+- `explained_at`
+- `shown_at`
+- `together_at`
+- `independent_at`
+- `verified_at`
+- `verified_by_user_id`
+- `note`
+- `updated_by_user_id`
+
+A task is considered operationally passed only after **SAM + SPRAWDŹ** are satisfied. Earlier stages are progress, not proof of readiness.
+
+The implementation may additionally keep derived status/progress values for efficient UI, but a derived value must not replace the five-stage evidence.
+
+## 5. K — control / critical condition
+
+`K` remains part of the onboarding control model.
+
+It is not a decorative UI label. It is a persisted property used by readiness logic.
+
+A task/condition marked K must be satisfied before a process can receive READY.
+
+The exact visual treatment may change without changing this rule.
+
+## 6. Readiness gate
+
+The system must fail safe.
+
+A process may receive **READY** only when all required conditions are true:
+
+- all required tasks are operationally passed,
+- every required K condition is satisfied,
+- StandardVersion readiness criteria are satisfied,
+- required verification exists,
+- the decision is made by an authorized user.
+
+Missing evidence must never be interpreted as readiness.
+
+The UI may calculate and explain what remains incomplete, but it must not allow presentation logic to override the gate.
+
+## 7. Decision model
+
+Final readiness is a decision, not the same field as process lifecycle.
+
+Frozen decision vocabulary:
+
+- READY
+- NOT_YET
+- STOP
+
+The decision record must preserve:
+
+- decision,
+- timestamp,
+- deciding/verifying user,
+- exact process,
+- exact StandardVersion,
+- supporting summary,
+- recommendations/reason where applicable.
+
+A historical decision must not be overwritten in place.
+
+## 8. Closure and history
+
+OnboardingClosure is a historical record of verification and decision.
+
+Once created, its historical meaning is immutable.
+
+Later changes to:
+- Standard,
+- StandardVersion,
+- employee profile,
+- current manager,
+- product UI
+
+must not rewrite what was verified and decided at closure time.
+
+Snapshots are used where necessary to preserve historical meaning.
+
+## 9. Reopen / reassessment
+
+A closed onboarding may require reassessment.
+
+Reassessment must not delete or mutate the original historical decision.
+
+A reopen/reassessment operation requires:
+
+- reason,
+- actor,
+- timestamp,
+- reference to the previous closure/decision,
+- new verification evidence as applicable,
+- a new decision/closure record.
+
+History therefore forms an auditable sequence rather than one editable final state.
+
+## 10. Permissions and responsibility
+
+BOS Core roles remain:
+
+- OWNER
+- ADMIN
+- MANAGER
+- USER
+
+Frozen Onboarding authorization principles:
+
+- OWNER / ADMIN / MANAGER may create and manage onboarding work according to organization permissions,
+- publishing/changing a Standard requires an authorized management role,
+- an assigned manager/trainer may conduct progress steps permitted to that assignment,
+- independent execution (**SAM**) and its verification (**SPRAWDŹ**) must remain attributable,
+- READY / NOT_YET / STOP must be attributable to an authorized decision maker,
+- ordinary USER access must never implicitly grant management/publishing/decision rights.
+
+Exact permission middleware/API implementation may evolve, but these responsibility boundaries may not be weakened accidentally by UI changes.
+
+## 11. Tenant isolation
+
+Every customer-owned onboarding record is scoped by `organization_id`.
+
+This includes, directly or through an enforced parent relation:
+
+- Standards,
+- StandardVersions,
+- StandardTasks,
+- OnboardingProcesses,
+- task progress/evidence,
+- closures/decisions,
+- reassessments,
+- linked resources and activity history.
+
+Repository/API operations must resolve the authenticated organization and fail closed when tenant context is missing.
+
+Knowing another record UUID must never be sufficient to access or mutate it.
+
+Active product access additionally requires the organization's active BOS Onboarding license.
+
+## 12. Version and snapshot rules
+
+The following rules are frozen:
+
+1. Standard is versioned.
+2. Published StandardVersion is immutable in operational meaning.
+3. Starting a process pins the exact version.
+4. A later StandardVersion does not migrate an active process automatically.
+5. Historical closures retain the version/snapshot needed to interpret the decision.
+6. Reassessment creates history; it does not rewrite history.
+
+## 13. Supporting concepts
+
+The architecture must leave room for supporting data without redesigning the core:
+
+- resources/files,
+- reusable task/template groups,
+- milestones/checkpoints,
+- manager/trainer/buddy assignments,
+- evidence,
+- reviews/tests,
+- process notes/activity,
+- post-process evaluation,
+- communication templates/automation.
+
+These are extensions around the canonical chain, not additional core stages.
+
+## 14. Mapping of Onboarding 0.x material
+
+| Previous material | Web destination |
 | --- | --- |
-| Master Control | product/dashboard overview + process status; not a separate business record |
-| Instrukcja Managera | contextual guidance attached to Onboarding/product stages |
-| Preboarding i Sprzęt | optional preparation task group before/inside process start |
-| Karta Stanowiska | absorbed into Standard Stanowiska |
-| Plan 30/60/90 | optional schedule/milestones attached to OnboardingProcess |
-| Księga Firmy | organization-level reference/resource, not copied into every process |
-| Checklista D1/T1 | reusable task/template group attached to a StandardVersion/process |
-| Rola Buddy | optional process assignment/responsibility |
-| SOP Template | supporting resource linked from a Standard/task |
-| Formularz 1:1 Review | optional checkpoint/evidence attached to a process |
-| Test Wiedzy | optional verification/evidence attached to task/process/closure |
-| Ankieta Ewaluacji | optional post-process evaluation attached after closure |
-| welcome emails | communication template/automation, not core record |
-| stanowiskowe tests | verification/evidence extension |
-| Skill Matrix | future capability extension; not required for Onboarding Core 1.0 |
-| Tooling Guide | resource attached to Standard/organization |
-| Handover Plan | optional process template/checklist |
+| Master Control | dashboard/process status; not a separate business record |
+| Instrukcja Managera | contextual product/stage guidance |
+| Preboarding i Sprzęt | preparation tasks/template group |
+| Karta Stanowiska | Standard / StandardVersion |
+| Plan 30/60/90 | process milestones/schedule |
+| Księga Firmy | organization resource |
+| Checklista D1/T1 | reusable tasks/template group |
+| Rola Buddy | process assignment |
+| SOP Template | resource linked to Standard/task |
+| Formularz 1:1 Review | checkpoint/evidence |
+| Test Wiedzy | verification/evidence |
+| Ankieta Ewaluacji | post-process evaluation |
+| welcome emails | communication template/automation |
+| stanowiskowe tests | verification/evidence |
+| Skill Matrix | future capability extension |
+| Tooling Guide | Standard/organization resource |
+| Handover Plan | process template/checklist |
 | presentation | resource |
-| gamification | out of core |
-| Weekly Journal | optional process evidence/log |
-| Offboarding | separate future process/product, not Onboarding stage |
+| gamification | outside core |
+| Weekly Journal | process evidence/log |
+| Offboarding | separate future process/product |
 
-## 5. Review finding
+## 15. Migration boundary
 
-The current points 5–8 model preserves the essential operational architecture of the former product:
+This freeze is intentionally completed **before** changing the production schema.
 
-- reusable definition of expected work,
-- ordered execution,
-- criteria for correct/readied work,
-- concrete employee realization,
-- control of progress,
-- verification,
-- immutable historical outcome.
+The current database/repository may still use an older, simpler representation such as aggregate task statuses and older process status names. That is implementation debt to migrate deliberately; it is not permission to reinterpret the frozen model.
 
-The old package's supporting documents are **not yet implemented in UI/data**. They have now been assigned explicit destinations so they are not lost when the database model is designed.
+Any migration following this document must:
 
-## 6. Freeze boundary
+- be additive or explicitly data-preserving,
+- preserve existing BOS Test Company records,
+- preserve StandardVersion pinning,
+- preserve tenant isolation,
+- preserve existing historical closures,
+- define compatibility/backfill for existing progress,
+- be tested on a temporary database branch before production completion.
 
-Before database implementation, the following are frozen as Onboarding Core 1.0:
+Production schema migration is a separate step and requires explicit approval.
 
-- Standard
-- StandardVersion
-- StandardTask
-- OnboardingProcess
-- OnboardingTaskProgress
-- OnboardingClosure
+## 16. Change rule after freeze
 
-Supporting concepts that the BOS Core schema must leave room for:
+For every proposed Onboarding change ask:
 
-- resources/files
-- reusable task/template groups
-- milestones/checkpoints
-- process assignments (manager/buddy)
-- evidence/reviews/tests
-- process notes/activity
-- post-process evaluation
+**Does this alter Standard → immutable StandardVersion → five-stage realization → verification → historical decision?**
 
-These supporting concepts may be implemented incrementally. They must not force a redesign of the three-stage core.
+If no, implement it as supporting functionality.
 
-## 7. Explicit non-goals of the freeze
+If yes, treat it as a deliberate domain-model migration, document the reason and migration path, and do not introduce it incidentally through UI or repository refactoring.
 
-This freeze does not define:
-- authentication,
-- organizations/tenant security,
-- database technology,
-- Stripe licensing,
-- permissions,
-- file storage provider,
-- notification delivery,
-- final UI copy,
-- legal/compliance rules.
+## 17. Freeze result
 
-Those belong to later BOS Core/platform points.
+The technical model is now frozen for the next implementation phase:
 
-## 8. Change rule after freeze
+- immutable StandardVersion,
+- complete StandardTask operational definition,
+- five-stage task progress,
+- K as a readiness condition,
+- fail-safe READY gate,
+- lifecycle separate from decision,
+- READY / NOT_YET / STOP decisions,
+- immutable history,
+- reopen/reassessment without history loss,
+- explicit responsibility/audit,
+- multi-onboarding,
+- strict `organization_id` isolation,
+- license-gated module access.
 
-A future change to Onboarding Core should answer one question:
-
-**Does this require changing the Standard → Realization → Verification invariant?**
-
-If no, implement it as supporting data/functionality around the frozen records.
-
-If yes, treat it as a deliberate product-model migration rather than an incidental UI/database change.
+No production database migration is performed by this freeze.
