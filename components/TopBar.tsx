@@ -28,6 +28,11 @@ export default function TopBar() {
           <a className="bos-topbar-link bos-topbar-contact" href="#kontakt">
             Kontakt
           </a>
+
+          <Link className="bos-topbar-login" href="/login">
+            Zaloguj się
+            <span aria-hidden="true">→</span>
+          </Link>
         </nav>
       </div>
 

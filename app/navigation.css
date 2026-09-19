@@ -66,6 +66,48 @@
   border-color:var(--gold);
 }
 
+.bos-topbar-login{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:38px;
+  padding:0 17px;
+  border:1px solid var(--gold);
+  background:var(--gold);
+  color:#0D1422;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1.35px;
+  line-height:1;
+  text-decoration:none;
+  text-transform:uppercase;
+  transition:background .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.bos-topbar-login span{
+  font-size:14px;
+  line-height:1;
+  transition:transform .18s ease;
+}
+
+.bos-topbar-login:hover,
+.bos-topbar-login:focus-visible{
+  border-color:#A86C18;
+  background:#A86C18;
+  color:#FFFFFF;
+}
+
+.bos-topbar-login:focus-visible{
+  outline:2px solid #0D1422;
+  outline-offset:3px;
+}
+
+.bos-topbar-login:hover span,
+.bos-topbar-login:focus-visible span{
+  transform:translateX(2px);
+}
+
 .bos-product-story-root{
   display:block;
   width:100%;
@@ -84,7 +126,7 @@
   }
 
   .bos-topbar-right{
-    gap:18px;
+    gap:14px;
   }
 }
 
@@ -113,6 +155,14 @@
   .bos-topbar-contact{
     padding:0 10px;
   }
+
+  .bos-topbar-login{
+    min-height:32px;
+    padding:0 11px;
+    gap:7px;
+    font-size:9px;
+    letter-spacing:1px;
+  }
 }
 
 @media (max-width:460px){
@@ -122,10 +172,14 @@
   }
 
   .bos-topbar-right{
-    gap:8px 12px;
+    gap:8px 10px;
   }
 
   .bos-topbar-link{
     letter-spacing:.8px;
+  }
+
+  .bos-topbar-contact{
+    display:none;
   }
 }
