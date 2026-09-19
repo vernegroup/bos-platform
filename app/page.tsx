@@ -24,26 +24,29 @@ export default function HomePage() {
         <section className="bos-home-hero" aria-labelledby="bos-home-title">
           <div className="bos-page-width bos-home-hero-grid">
             <div className="bos-home-hero-copy">
-              <span className="bos-home-hero-kicker">BUSINESS OPERATING STANDARDS</span>
-              <h1 id="bos-home-title">
-                Firma działa lepiej,
-                <br />
-                gdy sposób pracy
-                <br />
-                nie jest przypadkiem.
-              </h1>
-              <p>
-                Gotowe systemy operacyjne dla małych i średnich firm. Porządkują
-                powtarzalne procesy, prowadzą użytkownika przez wykonanie i
-                zachowują wiedzę w organizacji.
+              <span className="bos-home-hero-kicker">
+                SYSTEM WDRAŻANIA NOWYCH PRACOWNIKÓW
+              </span>
+
+              <h1 id="bos-home-title">Gotowe rozwiązanie</h1>
+
+              <p className="bos-home-hero-lead">
+                konkretne, praktyczne i pozostające w organizacji na stałe.
               </p>
+
+              <p className="bos-home-hero-description">
+                Porządkuje cały proces wdrożenia pracownika — od przygotowania
+                stanowiska, przez pierwszy dzień, aż po samodzielną pracę.
+              </p>
+
               <div className="bos-home-hero-actions">
                 <a href="#produkty" className="bos-home-primary-action">
-                  ZOBACZ PRODUKTY <span aria-hidden="true">→</span>
+                  KUP BOS ONBOARDING <span aria-hidden="true">→</span>
                 </a>
-                <Link href="/login" className="bos-home-secondary-action">
-                  ZALOGUJ SIĘ
-                </Link>
+              </div>
+
+              <div className="bos-home-hero-reference">
+                STRUKTURA · KONTROLA · POWTARZALNOŚĆ
               </div>
             </div>
 
@@ -57,21 +60,6 @@ export default function HomePage() {
                 className="bos-home-hero-image"
                 sizes="(max-width: 800px) 100vw, 55vw"
               />
-              <div className="bos-home-hero-note">
-                <span>01</span>
-                <div>
-                  <strong>OD STANDARDU DO WYKONANIA</strong>
-                  <p>Jedna platforma. Powtarzalny sposób pracy. Historia procesu.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bos-page-width">
-            <div className="bos-home-principles" aria-label="Założenia platformy BOS">
-              <span>GOTOWA ARCHITEKTURA PROCESU</span>
-              <span>DOŻYWOTNIA LICENCJA</span>
-              <span>AKTUALIZACJE W RAMACH PRODUKTU</span>
             </div>
           </div>
         </section>
