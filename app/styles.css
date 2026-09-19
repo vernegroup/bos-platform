@@ -2289,3 +2289,95 @@ a{
   .bos-home-product-icon{width:42px;height:42px;font-size:35px}
   .bos-home-product-card h3{font-size:21px}
 }
+
+
+/* ===========================================================
+   LAYOUT-05 — WHY BOS
+   =========================================================== */
+.bos-home-why{
+  padding:58px 0 64px;
+  background:#0b263b;
+  color:#f8f5ed;
+}
+
+.bos-home-why h2{
+  margin:0 0 42px;
+  color:#f8f5ed;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:39px;
+  font-weight:400;
+  line-height:1;
+  text-align:center;
+  letter-spacing:-.8px;
+}
+
+.bos-home-why-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  max-width:1120px;
+  margin:0 auto;
+}
+
+.bos-home-why-item{
+  min-height:150px;
+  padding:0 42px;
+  border-right:1px solid rgba(255,255,255,.09);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+.bos-home-why-item:first-child{
+  padding-left:0;
+}
+
+.bos-home-why-item:last-child{
+  padding-right:0;
+  border-right:0;
+}
+
+.bos-home-why-icon{
+  min-height:38px;
+  margin-bottom:13px;
+  color:#d08a25;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:31px;
+  line-height:1;
+}
+
+.bos-home-why-item h3{
+  margin:0 0 7px;
+  color:#fff;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:19px;
+  font-weight:600;
+  line-height:1.2;
+}
+
+.bos-home-why-item p{
+  margin:0;
+  color:rgba(248,245,237,.72);
+  font-size:12px;
+  line-height:1.6;
+}
+
+@media(max-width:800px){
+  .bos-home-why{padding:48px 0 52px}
+  .bos-home-why h2{text-align:left;font-size:35px;margin-bottom:32px}
+  .bos-home-why-grid{grid-template-columns:1fr}
+  .bos-home-why-item,
+  .bos-home-why-item:first-child,
+  .bos-home-why-item:last-child{
+    min-height:0;
+    padding:24px 0;
+    border-right:0;
+    border-bottom:1px solid rgba(255,255,255,.09);
+  }
+  .bos-home-why-item:first-child{padding-top:0}
+  .bos-home-why-item:last-child{padding-bottom:0;border-bottom:0}
+}
+
+@media(max-width:560px){
+  .bos-home-why h2{font-size:32px}
+  .bos-home-why-item h3{font-size:18px}
+}
