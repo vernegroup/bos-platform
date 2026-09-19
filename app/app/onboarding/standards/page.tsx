@@ -2,4 +2,26 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listStandards } from "@/lib/bos/onboardingRepository";
 export const dynamic="force-dynamic";
-export default async function StandardsPage(){const access=await requireBOSAccess();const standards=await listStandards(access.organization.id);return <><section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / PRZYGOTUJ</div><h1>Standardy stanowisk</h1><p>Standard jest wzorcem pracy używanym później do prowadzenia konkretnych wdrożeń. Zmiana opublikowanego standardu tworzy nową wersję.</p></div><div className="bos-app-build-state"><span>DANE</span><strong>ORGANIZACJA / POSTGRESQL</strong></div></section><div className="bos-standard-toolbar"><div><span>STANDARDY</span><strong>{standards.length}</strong></div><div><span>AKTYWNE</span><strong>{standards.filter(s=>s.status==="AKTYWNY").length}</strong></div><Link href="/app/onboarding/standards/new" className="bos-standard-primary-action">+ NOWY STANDARD</Link></div><section className="bos-standard-list"><div className="bos-standard-list-head"><span>STANOWISKO</span><span>OBSZAR</span><span>WERSJA</span><span>CZYNNOŚCI</span><span>AKTUALIZACJA</span><span>STATUS</span><span /></div>{standards.map(s=>{const v=s.versions.find(x=>x.version===s.currentVersion)!;return <Link href={`/app/onboarding/standards/${s.id}`} className="bos-standard-list-row" key={s.id}><strong>{s.name}</strong><span>{s.area}</span><b>{s.currentVersion}</b><span>{v.tasks.length}</span><span>{s.updatedAt}</span><em>{s.status}</em><i>→</i></Link>})}</section><div className="bos-standard-footnote"><span>MODEL WERSJI</span><p>Wdrożenie pozostaje powiązane z wersją standardu, na której zostało rozpoczęte. Nowa wersja nie nadpisuje historii wcześniejszych procesów.</p></div></>}
+
+export default async function StandardsPage(){
+ const access=await requireBOSAccess();
+ const standards=await listStandards(access.organization.id);
+ const active=standards.filter(s=>s.status==="AKTYWNY").length;
+ return <>
+  <section className="bos-app-intro bos-onboarding-view-head">
+   <div><div className="bos-app-kicker">01 / PRZYGOTUJ</div><h1>Standardy stanowisk</h1><p>Wzorce pracy używane do uruchamiania kolejnych wdrożeń. Opublikowana wersja pozostaje niezmienna dla procesów, które już z niej korzystają.</p></div>
+   <Link href="/app/onboarding/standards/new" className="bos-standard-primary-action">+ NOWY STANDARD</Link>
+  </section>
+  <div className="bos-onboarding-commandbar">
+   <div><span>WSZYSTKIE</span><strong>{standards.length}</strong></div>
+   <div><span>AKTYWNE</span><strong>{active}</strong></div>
+   <div><span>ARCHIWALNE / ROBOCZE</span><strong>{standards.length-active}</strong></div>
+  </div>
+  <section className="bos-standard-list bos-operational-list">
+   <div className="bos-standard-list-head"><span>STANOWISKO</span><span>OBSZAR</span><span>WERSJA</span><span>CZYNNOŚCI</span><span>AKTUALIZACJA</span><span>STATUS</span><span /></div>
+   {standards.map(s=>{const v=s.versions.find(x=>x.version===s.currentVersion);return <Link href={`/app/onboarding/standards/${s.id}`} className="bos-standard-list-row" key={s.id}><strong>{s.name}</strong><span>{s.area||"—"}</span><b>{s.currentVersion}</b><span>{v?.tasks.length??0}</span><span>{s.updatedAt}</span><em data-status={s.status}>{s.status}</em><i>→</i></Link>})}
+   {!standards.length&&<div className="bos-operational-empty"><strong>Brak standardów</strong><p>Utwórz pierwszy Standard Stanowiska, aby przygotować wzorzec dla wdrożeń.</p></div>}
+  </section>
+  <div className="bos-onboarding-rule-note"><span>ZASADA WERSJONOWANIA</span><p>Nowa wersja standardu nie zmienia historycznych ani trwających wdrożeń rozpoczętych na wcześniejszej wersji.</p></div>
+ </>;
+}
