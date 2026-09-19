@@ -69,7 +69,7 @@ export default function AppShell({children,account,organizationName}:AppShellPro
         {navigation.map(item=><Link key={item.href} href={item.href} className={"bos-app-nav-link"+(isCurrentPath(pathname,item.href)?" is-active":"")} aria-current={isCurrentPath(pathname,item.href)?"page":undefined} onClick={()=>setMobileOpen(false)}><Icon name={item.icon}/><span>{item.label}</span></Link>)}
       </nav>
       <div className="bos-app-sidebar-bottom">
-        <Link href="/app/help" className="bos-app-nav-link"><Icon name="help"/><span>Pomoc</span></Link>
+        <Link href="/app/help" className={"bos-app-nav-link"+(isCurrentPath(pathname,"/app/help")?" is-active":"")} aria-current={isCurrentPath(pathname,"/app/help")?"page":undefined} onClick={()=>setMobileOpen(false)}><Icon name="help"/><span>Pomoc</span></Link>
         <Link href="/api/auth/signout" className="bos-app-nav-link"><Icon name="logout"/><span>Wyloguj</span></Link>
       </div>
     </aside>
