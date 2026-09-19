@@ -23,18 +23,17 @@ export default function HomePage() {
           <div className="bos-page-width bos-home-hero-grid">
             <div className="bos-home-hero-copy">
               <span className="bos-home-hero-kicker">
-                SYSTEM WDRAŻANIA NOWYCH PRACOWNIKÓW
+                SYSTEMY OPERACYJNE DLA MŚP
               </span>
 
-              <h1 id="bos-home-title">Gotowe rozwiązanie</h1>
+              <h1 id="bos-home-title">Uporządkowana firma</h1>
 
               <p className="bos-home-hero-lead">
-                konkretne, praktyczne i pozostające w organizacji na stałe.
+                gotowe rozwiązania do codziennej pracy organizacji.
               </p>
 
               <p className="bos-home-hero-description">
-                Porządkuje cały proces wdrożenia pracownika — od przygotowania
-                stanowiska, przez pierwszy dzień, aż po samodzielną pracę.
+                BOS porządkuje powtarzalne procesy firmy i zamienia je w rozwiązania, z których zespół może korzystać w codziennej pracy.
               </p>
 
               <div className="bos-home-hero-actions">
@@ -44,7 +43,7 @@ export default function HomePage() {
               </div>
 
               <div className="bos-home-hero-reference">
-                STRUKTURA · KONTROLA · POWTARZALNOŚĆ
+                PORZĄDEK · POWTARZALNOŚĆ · TRWAŁY EFEKT
               </div>
             </div>
 
