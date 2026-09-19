@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 type AppShellProps = {
   children: React.ReactNode;
-  account: { name: string; email: string; image: string | null };
+  account: { name: string; email: string; image: string | null; role: string };
   organizationName: string;
 };
 
@@ -21,6 +21,7 @@ const navigation:{label:string;href:string;icon:IconName}[] = [
   { label:"Aktualizacje", href:"/app/updates", icon:"updates" },
   { label:"Ustawienia", href:"/app/settings", icon:"settings" },
 ];
+const roleLabels:Record<string,string>={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",USER:"Użytkownik"};
 
 function Icon({name}:{name:IconName}) {
   const common={width:18,height:18,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.7,strokeLinecap:"round" as const,strokeLinejoin:"round" as const,"aria-hidden":true};
@@ -42,14 +43,16 @@ function Icon({name}:{name:IconName}) {
 
 function isCurrentPath(pathname:string,href:string){return href==="/app"?pathname===href:pathname===href||pathname.startsWith(href+"/");}
 function initials(name:string){return name.split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]?.toUpperCase()).join("")||"B";}
-function firstName(name:string){return name.trim().split(/\s+/)[0]||name;}
 
 export default function AppShell({children,account,organizationName}:AppShellProps){
   const pathname=usePathname();
+  const router=useRouter();
   const [mobileOpen,setMobileOpen]=useState(false);
-  const sidebarRef=useRef<HTMLElement>(null);
+  const [accountOpen,setAccountOpen]=useState(false);
+  const [search,setSearch]=useState("");
   const closeButtonRef=useRef<HTMLButtonElement>(null);
   const menuButtonRef=useRef<HTMLButtonElement>(null);
+  const accountRef=useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
     if(!mobileOpen)return;
@@ -58,9 +61,18 @@ export default function AppShell({children,account,organizationName}:AppShellPro
     document.addEventListener("keydown",onKey); return()=>{document.body.style.overflow=previous;document.removeEventListener("keydown",onKey);};
   },[mobileOpen]);
 
+  useEffect(()=>{
+    const close=(event:MouseEvent)=>{if(accountRef.current&&!accountRef.current.contains(event.target as Node))setAccountOpen(false);};
+    const key=(event:KeyboardEvent)=>{if(event.key==="Escape")setAccountOpen(false);};
+    document.addEventListener("mousedown",close);document.addEventListener("keydown",key);
+    return()=>{document.removeEventListener("mousedown",close);document.removeEventListener("keydown",key);};
+  },[]);
+
+  function submitSearch(event:FormEvent<HTMLFormElement>){event.preventDefault();const q=search.trim();router.push(q?"/app/search?q="+encodeURIComponent(q):"/app/search");}
+
   return <div className="bos-app-shell">
     <a className="bos-skip-link" href="#bos-main-content">Przejdź do treści</a>
-    <aside ref={sidebarRef} id="bos-app-navigation" className={"bos-app-sidebar"+(mobileOpen?" is-open":"")} aria-label="Menu aplikacji">
+    <aside id="bos-app-navigation" className={"bos-app-sidebar"+(mobileOpen?" is-open":"")} aria-label="Menu aplikacji">
       <div className="bos-app-sidebar-head">
         <Link href="/app" className="bos-app-brand" aria-label="BOS — panel główny" onClick={()=>setMobileOpen(false)}><span>BOS</span></Link>
         <button ref={closeButtonRef} className="bos-app-sidebar-close" type="button" aria-label="Zamknij menu" onClick={()=>setMobileOpen(false)}>×</button>
@@ -77,12 +89,26 @@ export default function AppShell({children,account,organizationName}:AppShellPro
     <div className="bos-app-main">
       <header className="bos-app-topbar">
         <button ref={menuButtonRef} className="bos-app-menu-button" type="button" aria-label="Otwórz menu" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><span/><span/><span/></button>
-        <Link className="bos-app-search" href="/app/search"><Icon name="search"/><span>Szukaj w BOS...</span></Link>
+        <form className="bos-app-search" role="search" onSubmit={submitSearch}>
+          <Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} aria-label="Szukaj w BOS" placeholder="Szukaj w BOS..." />
+        </form>
         <div className="bos-app-topbar-actions">
           <Link href="/app/updates" className="bos-app-notifications" aria-label="Aktualizacje i powiadomienia"><Icon name="bell"/><span aria-hidden="true"/></Link>
-          <div className="bos-app-account-mark" aria-hidden="true">{initials(account.name)}</div>
-          <div className="bos-app-account-copy"><strong>{account.name}</strong><span>{organizationName}</span></div>
-          <button className="bos-app-account-menu" type="button" aria-label={"Menu konta "+firstName(account.name)}><Icon name="chevron"/></button>
+          <div className="bos-app-account" ref={accountRef}>
+            <button className="bos-app-account-trigger" type="button" aria-expanded={accountOpen} aria-haspopup="menu" onClick={()=>setAccountOpen(v=>!v)}>
+              <span className="bos-app-account-mark" aria-hidden="true">{initials(account.name)}</span>
+              <span className="bos-app-account-copy"><strong>{account.name}</strong><span>{roleLabels[account.role]??account.role}</span></span>
+              <span className="bos-app-account-chevron"><Icon name="chevron"/></span>
+            </button>
+            {accountOpen&&<div className="bos-app-account-dropdown" role="menu">
+              <div className="bos-app-account-context"><strong>{account.name}</strong><span>{account.email}</span><small>{organizationName}</small></div>
+              <Link role="menuitem" href="/app/settings" onClick={()=>setAccountOpen(false)}>Ustawienia konta</Link>
+              <Link role="menuitem" href="/app/organization" onClick={()=>setAccountOpen(false)}>Firma</Link>
+              <Link role="menuitem" href="/app/help" onClick={()=>setAccountOpen(false)}>Pomoc</Link>
+              <div className="bos-app-account-divider"/>
+              <Link role="menuitem" href="/api/auth/signout">Wyloguj</Link>
+            </div>}
+          </div>
         </div>
       </header>
       <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
