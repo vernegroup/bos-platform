@@ -3,86 +3,32 @@ import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
 import SubmitButton from "@/components/app-shell/SubmitButton";
 import { inviteMemberAction, updateMemberRoleAction } from "./actions";
 
-export const dynamic = "force-dynamic";
+export const dynamic="force-dynamic";
+const roleLabels={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",USER:"Użytkownik"} as const;
+const statusLabels={ACTIVE:"Aktywny",INVITED:"Zaproszony",SUSPENDED:"Zawieszony"} as const;
+const initials=(name:string)=>name.split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]?.toUpperCase()).join("")||"U";
 
-const roleLabels = {
-  OWNER: "WŁAŚCICIEL",
-  ADMIN: "ADMINISTRATOR",
-  MANAGER: "MANAGER",
-  USER: "UŻYTKOWNIK",
-} as const;
-const statusLabels = {
-  ACTIVE: "AKTYWNY",
-  INVITED: "ZAPROSZONY",
-  SUSPENDED: "ZAWIESZONY",
-} as const;
-
-export default async function UsersPage() {
-  const access = await requireBOSAccess();
-  const members = await listOrganizationMembers(access);
-  const canManage = canManageMembers(access.membership.role);
-  const active = members.filter((member) => member.status === "ACTIVE").length;
-  const invited = members.filter((member) => member.status === "INVITED").length;
-  const managers = members.filter((member) => member.role === "OWNER" || member.role === "ADMIN" || member.role === "MANAGER").length;
-
-  return (
-    <div className="bos-app-workspace bos-core-workspace">
-      <section className="bos-app-intro bos-core-view-head">
-        <div>
-          <div className="bos-app-kicker">BOS CORE / UŻYTKOWNICY</div>
-          <h1>Użytkownicy</h1>
-          <p>Role i członkostwa przypisane do organizacji {access.organization.name}. Uprawnienia są egzekwowane po stronie BOS.</p>
-        </div>
-        <div className="bos-app-build-state"><span>TWOJA ROLA</span><strong>{roleLabels[access.membership.role]}</strong></div>
-      </section>
-
-      <section className="bos-core-commandbar">
-        <div><span>WSZYSCY</span><strong>{members.length}</strong></div>
-        <div><span>AKTYWNI</span><strong>{active}</strong></div>
-        <div><span>ZAPROSZENI</span><strong>{invited}</strong></div>
-        <div><span>ZARZĄDZAJĄCY</span><strong>{managers}</strong></div>
-      </section>
-
-      <section className="bos-members-list">
-        <header><span>OSOBA</span><span>E-MAIL</span><span>ROLA</span><span>STATUS</span><span>CZŁONKOSTWO</span></header>
-        {members.map((member) => (
-          <article key={member.id}>
-            <div className="bos-member-identity"><span>{member.display_name.slice(0, 1).toUpperCase()}</span><strong>{member.display_name}</strong></div>
-            <span>{member.email}</span>
-            <div>
-              {canManage && member.role !== "OWNER" ? (
-                <form action={updateMemberRoleAction} className="bos-member-role-form">
-                  <input type="hidden" name="membershipId" value={member.id} />
-                  <select name="role" defaultValue={member.role} aria-label={`Rola użytkownika ${member.display_name}`}>
-                    <option value="ADMIN">Administrator</option>
-                    <option value="MANAGER">Manager</option>
-                    <option value="USER">Użytkownik</option>
-                  </select>
-                  <SubmitButton idleLabel="ZAPISZ" pendingLabel="ZAPIS…" />
-                </form>
-              ) : <b>{roleLabels[member.role as keyof typeof roleLabels]}</b>}
-            </div>
-            <em data-status={member.status}>{statusLabels[member.status as keyof typeof statusLabels]}</em>
-            <small>{member.joined_at ? "DOŁĄCZONO" : "OCZEKUJE NA AKTYWACJĘ"}</small>
-          </article>
-        ))}
-      </section>
-
-      {canManage && (
-        <section className="bos-member-invite">
-          <div>
-            <span className="bos-dashboard-section-kicker">NOWE CZŁONKOSTWO</span>
-            <h2>Dodaj użytkownika</h2>
-            <p>Użytkownik otrzyma członkostwo wyłącznie w bieżącej organizacji. Roli właściciela nie można nadać z tego formularza.</p>
-          </div>
-          <form action={inviteMemberAction}>
-            <label><span>IMIĘ I NAZWISKO</span><input name="displayName" placeholder="np. Anna Kowalska" required /></label>
-            <label><span>ADRES E-MAIL</span><input name="email" type="email" placeholder="anna@firma.pl" required /></label>
-            <label><span>ROLA</span><select name="role" defaultValue="USER"><option value="ADMIN">Administrator</option><option value="MANAGER">Manager</option><option value="USER">Użytkownik</option></select></label>
-            <SubmitButton idleLabel="DODAJ UŻYTKOWNIKA →" pendingLabel="DODAWANIE…" />
-          </form>
-        </section>
-      )}
-    </div>
-  );
+export default async function UsersPage(){
+ const access=await requireBOSAccess(),members=await listOrganizationMembers(access),canManage=canManageMembers(access.membership.role);
+ const active=members.filter(m=>m.status==="ACTIVE").length,invited=members.filter(m=>m.status==="INVITED").length;
+ return <>
+  <section className="p7-head"><div><h1>Użytkownicy</h1><p>Zarządzaj członkami i rolami w organizacji {access.organization.name}.</p></div><span>{members.length} użytkowników</span></section>
+  <section className="p7-summary"><article><span>Wszyscy</span><strong>{members.length}</strong></article><article><span>Aktywni</span><strong>{active}</strong></article><article><span>Zaproszeni</span><strong>{invited}</strong></article><article><span>Twoja rola</span><strong className="role">{roleLabels[access.membership.role]}</strong></article></section>
+  <section className="p7-section"><div className="p7-title"><h2>Członkowie organizacji</h2><p>Role określają zakres dostępu użytkownika w BOS.</p></div>
+   <div className="p7-table"><header><span>Użytkownik</span><span>Rola</span><span>Status</span><span>Członkostwo</span></header>
+   {members.map(m=><article key={m.id}><div className="person"><i>{initials(m.display_name)}</i><div><strong>{m.display_name}</strong><span>{m.email}</span></div></div>
+    <div className="member-role">{canManage&&m.role!=="OWNER"?<form action={updateMemberRoleAction}><input type="hidden" name="membershipId" value={m.id}/><select name="role" defaultValue={m.role} aria-label={`Rola użytkownika ${m.display_name}`}><option value="ADMIN">Administrator</option><option value="MANAGER">Manager</option><option value="USER">Użytkownik</option></select><SubmitButton idleLabel="Zapisz" pendingLabel="Zapis…"/></form>:<strong>{roleLabels[m.role as keyof typeof roleLabels]}</strong>}</div>
+    <span className="status" data-status={m.status}><i/>{statusLabels[m.status as keyof typeof statusLabels]}</span><small>{m.joined_at?"Aktywowane":"Oczekuje na aktywację"}</small></article>)}
+   {!members.length&&<div className="empty">Brak użytkowników przypisanych do organizacji.</div>}</div>
+  </section>
+  {canManage&&<section className="p7-invite"><div><h2>Dodaj użytkownika</h2><p>Utwórz członkostwo w bieżącej organizacji i przypisz rolę. Rola właściciela nie jest dostępna w tym formularzu.</p></div><form action={inviteMemberAction}><label><span>Imię i nazwisko</span><input name="displayName" placeholder="np. Anna Kowalska" required/></label><label><span>Adres e-mail</span><input name="email" type="email" placeholder="anna@firma.pl" required/></label><label><span>Rola</span><select name="role" defaultValue="USER"><option value="ADMIN">Administrator</option><option value="MANAGER">Manager</option><option value="USER">Użytkownik</option></select></label><SubmitButton idleLabel="Dodaj użytkownika →" pendingLabel="Dodawanie…"/></form></section>}
+  <style>{`
+   .p7-head{padding:18px 0 22px;border-bottom:1px solid #e8e7e2;display:flex;align-items:flex-end;justify-content:space-between;gap:24px}.p7-head h1{margin:0;color:#10283b;font-family:Georgia,serif;font-size:27px;font-weight:500}.p7-head p{margin:7px 0 0;color:#78828a;font-size:11px}.p7-head>span{padding:6px 9px;border-radius:999px;background:#f2f0e9;color:#78633d;font-size:8px;font-weight:700;white-space:nowrap}
+   .p7-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0 31px}.p7-summary article{padding:15px 17px;background:#fff;border:1px solid #e5e4df;border-radius:5px}.p7-summary span{display:block;color:#8a9298;font-size:7px;font-weight:700;text-transform:uppercase}.p7-summary strong{display:block;margin-top:7px;color:#173146;font-family:Georgia,serif;font-size:20px;font-weight:500}.p7-summary strong.role{font-family:inherit;font-size:10px;font-weight:700}
+   .p7-title{margin-bottom:12px}.p7-title h2,.p7-invite h2{margin:0;color:#183146;font-family:Georgia,serif;font-size:17px;font-weight:500}.p7-title p,.p7-invite>div>p{margin:6px 0 0;color:#7b858c;font-size:9px}.p7-table{background:#fff;border:1px solid #e3e2dd;border-radius:6px;overflow:hidden}.p7-table>header,.p7-table>article{display:grid;grid-template-columns:minmax(240px,1.5fr) minmax(210px,1fr) 105px 120px;gap:16px;align-items:center}.p7-table>header{padding:10px 15px;background:#f7f6f2;color:#8b9297;font-size:7px;font-weight:800;text-transform:uppercase}.p7-table>article{min-height:67px;padding:11px 15px;border-top:1px solid #ecebe7}
+   .person{display:flex;align-items:center;gap:10px;min-width:0}.person>i{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#112b3f;color:#fff;font-size:8px;font-style:normal}.person strong{display:block;color:#2a4152;font-size:10px}.person span{display:block;margin-top:3px;color:#858d93;font-size:8px}.member-role form{display:flex;gap:6px}.member-role select{height:31px;min-width:120px;border:1px solid #dddeda;background:#fff;font-size:8px}.member-role button{height:31px;padding:0 9px;border:0;background:#183146;color:#fff;font-size:7px}.member-role>strong{font-size:9px}.status{justify-self:start;display:flex;align-items:center;gap:5px;padding:5px 7px;border-radius:999px;background:#f0f1ef;color:#747e84;font-size:7px;font-weight:700}.status>i{width:5px;height:5px;border-radius:50%;background:currentColor}.status[data-status="ACTIVE"]{background:#edf6ef;color:#3f7650}.status[data-status="INVITED"]{background:#f7f1e5;color:#9a722f}.status[data-status="SUSPENDED"]{background:#f5ecec;color:#8b5555}.p7-table small{color:#7f898f;font-size:8px}.empty{padding:25px;text-align:center;color:#7b858c;font-size:9px}
+   .p7-invite{margin-top:28px;padding:20px;background:#fff;border:1px solid #e3e2dd;border-radius:6px}.p7-invite>div{margin-bottom:17px}.p7-invite form{display:grid;grid-template-columns:1fr 1fr 170px auto;gap:10px;align-items:end}.p7-invite label{display:flex;flex-direction:column;gap:6px}.p7-invite label>span{color:#78828a;font-size:7px;font-weight:700;text-transform:uppercase}.p7-invite input,.p7-invite select{height:36px;padding:0 10px;border:1px solid #dddeda;background:#fff;font-size:9px}.p7-invite button{height:36px;padding:0 14px;border:0;background:#b78a3e;color:#fff;font-size:8px;font-weight:700;white-space:nowrap}
+   @media(max-width:900px){.p7-summary{grid-template-columns:repeat(2,1fr)}.p7-table>header{display:none}.p7-table>article{grid-template-columns:1fr 1fr 100px}.p7-table small{display:none}.p7-invite form{grid-template-columns:1fr 1fr}}@media(max-width:650px){.p7-table>article,.p7-invite form{grid-template-columns:1fr}.p7-table>article{gap:10px}.p7-head{align-items:flex-start}}@media(max-width:480px){.p7-head{display:block}.p7-head>span{display:inline-block;margin-top:13px}}
+  `}</style>
+ </>;
 }
