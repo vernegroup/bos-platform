@@ -2236,3 +2236,178 @@
     border-top:1px solid var(--bos-border);
   }
 }
+
+
+/* ===========================================================
+   BOS UI 1.0 — UI-06 ONBOARDING OPERATIONAL VIEWS
+   =========================================================== */
+.bos-onboarding-view-head{
+  min-height:126px;
+  padding-bottom:24px;
+  align-items:flex-end;
+}
+.bos-onboarding-view-head h1{font-size:32px}
+.bos-onboarding-view-head .bos-standard-primary-action{flex:none}
+
+.bos-onboarding-commandbar{
+  min-height:68px;
+  border-bottom:1px solid var(--bos-border);
+  display:flex;
+  align-items:stretch;
+}
+.bos-onboarding-commandbar>div{
+  min-width:150px;
+  padding:14px 24px 14px 0;
+  border-right:1px solid var(--bos-border);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+}
+.bos-onboarding-commandbar>div+div{padding-left:24px}
+.bos-onboarding-commandbar span{
+  color:var(--bos-text-subtle);
+  font-size:7px;
+  font-weight:750;
+  letter-spacing:.1em;
+}
+.bos-onboarding-commandbar strong{
+  color:var(--bos-navy-950);
+  font-size:15px;
+  font-weight:700;
+}
+
+.bos-operational-list{
+  margin-top:26px;
+  border-top:1px solid var(--bos-border);
+  border-bottom:1px solid var(--bos-border);
+  background:rgba(253,252,248,.45);
+}
+.bos-operational-list .bos-standard-list-head,
+.bos-operational-list .bos-process-list-head,
+.bos-operational-list .bos-closure-list-head{
+  min-height:38px;
+  padding:0 10px;
+  background:var(--bos-cream-100);
+}
+.bos-operational-list .bos-standard-list-row,
+.bos-operational-list .bos-process-list-row,
+.bos-operational-list .bos-closure-list-row{
+  padding-left:10px;
+  padding-right:10px;
+  transition:background-color .12s ease;
+}
+.bos-operational-list .bos-standard-list-row:hover,
+.bos-operational-list .bos-process-list-row:hover,
+.bos-operational-list .bos-closure-list-row:hover{
+  background:var(--bos-surface);
+}
+.bos-operational-list em{
+  width:max-content;
+  border-radius:999px;
+}
+.bos-standard-list-row em[data-status="AKTYWNY"]{
+  border-color:#b8cbbf;
+  background:var(--bos-green-100);
+  color:var(--bos-green-700);
+}
+
+.bos-operational-empty{
+  padding:28px 12px;
+}
+.bos-operational-empty strong{font-size:10px}
+.bos-operational-empty p{margin-top:5px;font-size:9px}
+
+.bos-onboarding-rule-note{
+  margin-top:22px;
+  padding:14px 0;
+  border-bottom:1px solid var(--bos-border);
+  display:grid;
+  grid-template-columns:180px minmax(0,680px);
+  gap:22px;
+}
+.bos-onboarding-rule-note span{
+  color:var(--bos-gold-600);
+  font-size:7px;
+  font-weight:750;
+  letter-spacing:.1em;
+}
+.bos-onboarding-rule-note p{
+  color:var(--bos-text-muted);
+  font-size:8px;
+  line-height:1.55;
+}
+
+/* Detail screens: turn legacy prototype blocks into a denser work surface. */
+.bos-onboarding-shell .bos-standard-back{
+  margin-bottom:18px;
+}
+.bos-onboarding-shell .bos-standard-back a{
+  color:var(--bos-text-muted);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.06em;
+}
+.bos-onboarding-shell .bos-standard-tabs{
+  margin-top:0;
+  border-bottom:1px solid var(--bos-border);
+}
+.bos-onboarding-shell .bos-standard-detail-head,
+.bos-onboarding-shell .bos-process-summary,
+.bos-onboarding-shell .bos-closure-summary{
+  background:rgba(253,252,248,.45);
+}
+.bos-onboarding-shell .bos-standard-task-table,
+.bos-onboarding-shell .bos-process-card,
+.bos-onboarding-shell .bos-closure-checks{
+  background:var(--bos-surface-soft);
+}
+.bos-onboarding-shell .bos-standard-task-head,
+.bos-onboarding-shell .bos-process-task-head,
+.bos-onboarding-shell .bos-closure-check-head{
+  padding-left:10px;
+  padding-right:10px;
+  background:var(--bos-cream-100);
+}
+.bos-onboarding-shell .bos-standard-task-row,
+.bos-onboarding-shell .bos-process-task-row,
+.bos-onboarding-shell .bos-closure-check-row{
+  padding-left:10px;
+  padding-right:10px;
+}
+.bos-onboarding-shell .bos-process-next,
+.bos-onboarding-shell .bos-closure-result,
+.bos-onboarding-shell .bos-closure-recommendation,
+.bos-onboarding-shell .bos-closure-record{
+  background:rgba(253,252,248,.4);
+}
+
+/* Forms/procedural screens keep their current behavior but share the workbench geometry. */
+.bos-onboarding-shell .bos-process-new{
+  background:rgba(253,252,248,.4);
+}
+.bos-onboarding-shell .bos-process-new-field,
+.bos-onboarding-shell .bos-process-new-lock{
+  padding-left:12px;
+  padding-right:12px;
+}
+.bos-onboarding-shell .bos-process-standard-options{
+  background:var(--bos-surface-soft);
+}
+
+@media(max-width:760px){
+  .bos-onboarding-view-head{min-height:0;align-items:flex-start}
+  .bos-onboarding-view-head .bos-standard-primary-action{width:100%}
+  .bos-onboarding-commandbar{overflow-x:auto}
+  .bos-onboarding-commandbar>div{min-width:128px}
+  .bos-onboarding-rule-note{grid-template-columns:1fr;gap:6px}
+}
+
+@media(max-width:560px){
+  .bos-onboarding-view-head h1{font-size:28px}
+  .bos-onboarding-commandbar>div{min-width:112px;padding-right:14px}
+  .bos-onboarding-commandbar>div+div{padding-left:14px}
+  .bos-operational-list .bos-standard-list-row,
+  .bos-operational-list .bos-process-list-row,
+  .bos-operational-list .bos-closure-list-row{padding-left:8px;padding-right:8px}
+}
