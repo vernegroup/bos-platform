@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, signIn } from "@/auth";
+import LoginForm from "./LoginForm";
 import "./login.css";
 
 type LoginPageProps = { searchParams: Promise<{ callbackUrl?: string }> };
@@ -28,42 +29,49 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <main className="bos-login">
-      <section className="bos-login-auth" aria-label="Logowanie do platformy BOS">\n        <section className="bos-login-panel" aria-labelledby="bos-login-title">
-        <Link href="/" className="bos-login-brand" aria-label="BOS — strona publiczna">
-          <span className="bos-login-brand-name">BOS</span>
-          <span className="bos-login-brand-rule" aria-hidden="true" />
-          <span className="bos-login-brand-subtitle">BUSINESS OPERATING STANDARDS</span>
-        </Link>
-
-        <div className="bos-login-copy">
-          <span className="bos-login-kicker">PLATFORMA BOS</span>
-          <h1 id="bos-login-title">Zaloguj się do swojego konta</h1>
-          <p>
-            Uzyskaj dostęp do produktów, standardów i procesów przypisanych do
-            Twojej organizacji.
-          </p>
-        </div>
-
-        <form
-          className="bos-login-actions"
-          action={async () => {
-            "use server";
-            await signIn("google", { redirectTo: callbackUrl });
-          }}
-        >
-          <button type="submit" className="bos-login-google">
-            <GoogleMark />
-            <span>Kontynuuj z Google</span>
-          </button>
-        </form>
-
-        <div className="bos-login-meta">
-          <p>Dostęp do BOS wymaga aktywnego konta organizacji.</p>
-          <Link href="/" className="bos-login-return">
-            Wróć do standardybiznesu.pl
+      <section className="bos-login-auth" aria-label="Logowanie do platformy BOS">
+        <section className="bos-login-panel" aria-labelledby="bos-login-title">
+          <Link href="/" className="bos-login-brand" aria-label="BOS — strona publiczna">
+            <span className="bos-login-brand-name">BOS</span>
+            <span className="bos-login-brand-subtitle">BUSINESS OPERATING STANDARDS</span>
           </Link>
+
+          <div className="bos-login-rule" aria-hidden="true" />
+
+          <div className="bos-login-copy">
+            <h1 id="bos-login-title">Zaloguj się do swojego konta</h1>
+            <p>Zarządzaj produktami, zespołem i standardami w swojej organizacji.</p>
+          </div>
+
+          <LoginForm callbackUrl={callbackUrl} />
+
+          <div className="bos-login-divider"><span>lub</span></div>
+
+          <form
+            action={async () => {
+              "use server";
+              await signIn("google", { redirectTo: callbackUrl });
+            }}
+          >
+            <button type="submit" className="bos-login-google">
+              <GoogleMark />
+              <span>Zaloguj się przez Google</span>
+            </button>
+          </form>
+
+          <p className="bos-login-register">
+            Nie masz jeszcze konta? <Link href="/register">Utwórz konto firmowe</Link>
+          </p>
+        </section>
+      </section>
+
+      <aside className="bos-login-brand-panel" aria-label="Business Operating Standards">
+        <div className="bos-login-brand-backdrop" aria-hidden="true" />
+        <div className="bos-login-brand-message">
+          <p>Uporządkowana praca.<br />Silniejsze organizacje.</p>
+          <span aria-hidden="true" />
         </div>
-        </section>\n      </section>\n\n      <aside className="bos-login-brand-panel" aria-label="Business Operating Standards">\n        <div className="bos-login-brand-backdrop" aria-hidden="true" />\n        <div className="bos-login-brand-message">\n          <p>Uporządkowana praca.<br />Silniejsze organizacje.</p>\n          <span aria-hidden="true" />\n        </div>\n      </aside>
+      </aside>
     </main>
   );
 }
