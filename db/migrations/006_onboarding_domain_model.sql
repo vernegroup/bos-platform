@@ -1,5 +1,3 @@
-BEGIN;
-
 -- BOS Onboarding corrective domain migration.
 -- Implements the 2026-09-19 technical freeze additively and preserves existing records.
 
@@ -194,4 +192,3 @@ SELECT
   recommendations
 FROM onboarding_closures;
 
-COMMIT;
