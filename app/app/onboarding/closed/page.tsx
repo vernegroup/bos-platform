@@ -2,4 +2,26 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listClosures,listStandards } from "@/lib/bos/onboardingRepository";
 export const dynamic="force-dynamic";
-export default async function ClosedPage(){const access=await requireBOSAccess();const org=access.organization.id;const [closures,standards]=await Promise.all([listClosures(org),listStandards(org)]);return <><section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / ZAMKNIJ</div><h1>Zakończone wdrożenia</h1><p>Historia wyników procesów. Każdy rekord zachowuje pracownika, użyty Standard Stanowiska, jego wersję oraz wynik weryfikacji.</p></div><div className="bos-app-build-state"><span>REKORDY</span><strong>ORGANIZACJA / HISTORIA</strong></div></section><div className="bos-standard-toolbar"><div><span>ZAKOŃCZONE</span><strong>{closures.length}</strong></div><div><span>Z ZALECENIAMI</span><strong>{closures.filter(c=>c.result==="ZAKOŃCZONE Z ZALECENIAMI").length}</strong></div><Link href="/app/onboarding/processes" className="bos-onboarding-text-link">WDROŻENIA W TOKU →</Link></div><section className="bos-closure-list"><div className="bos-closure-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>ZAMKNIĘCIE</span><span>WYNIK</span><span /></div>{closures.map(c=>{const s=standards.find(x=>x.id===c.standardId);return <Link href={`/app/onboarding/closed/${c.id}`} className="bos-closure-list-row" key={c.id}><strong>{c.employee}</strong><span>{s?.name??"Standard"}</span><b>{c.standardVersion}</b><span>{c.startedAt}</span><span>{c.closedAt}</span><em data-result={c.result}>{c.result}</em><i>→</i></Link>})}</section><div className="bos-standard-footnote"><span>HISTORIA</span><p>Zamknięcie zachowuje wynik procesu oraz dokładną wersję standardu używaną podczas realizacji.</p></div></>}
+
+export default async function ClosedPage(){
+ const access=await requireBOSAccess();const org=access.organization.id;
+ const [closures,standards]=await Promise.all([listClosures(org),listStandards(org)]);
+ const recommendations=closures.filter(c=>c.result==="ZAKOŃCZONE Z ZALECENIAMI").length;
+ return <>
+  <section className="bos-app-intro bos-onboarding-view-head">
+   <div><div className="bos-app-kicker">03 / ZAMKNIJ</div><h1>Historia wdrożeń</h1><p>Zamknięte wyniki procesów wraz z pracownikiem, wersją Standardu Stanowiska i rezultatem weryfikacji.</p></div>
+   <Link href="/app/onboarding/processes" className="bos-dashboard-text-link">WDROŻENIA W TOKU →</Link>
+  </section>
+  <div className="bos-onboarding-commandbar">
+   <div><span>ZAKOŃCZONE</span><strong>{closures.length}</strong></div>
+   <div><span>Z ZALECENIAMI</span><strong>{recommendations}</strong></div>
+   <div><span>BEZ ZALECEŃ</span><strong>{closures.length-recommendations}</strong></div>
+  </div>
+  <section className="bos-closure-list bos-operational-list">
+   <div className="bos-closure-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>ZAMKNIĘCIE</span><span>WYNIK</span><span /></div>
+   {closures.map(c=>{const s=standards.find(x=>x.id===c.standardId);return <Link href={`/app/onboarding/closed/${c.id}`} className="bos-closure-list-row" key={c.id}><strong>{c.employee}</strong><span>{s?.name??"Standard"}</span><b>{c.standardVersion}</b><span>{c.startedAt}</span><span>{c.closedAt}</span><em data-result={c.result}>{c.result}</em><i>→</i></Link>})}
+   {!closures.length&&<div className="bos-operational-empty"><strong>Brak historii</strong><p>Zamknięte wdrożenia pojawią się tutaj jako trwałe rekordy procesu.</p></div>}
+  </section>
+  <div className="bos-onboarding-rule-note"><span>REKORD HISTORYCZNY</span><p>Zamknięcie zachowuje wynik oraz dokładną wersję standardu użytą podczas realizacji.</p></div>
+ </>;
+}
