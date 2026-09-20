@@ -353,6 +353,83 @@ export async function moveDraftStartRequirement(input:{
 }
 
 
+export async function createDraftReadinessCriterion(input:{
+  organizationId:string; standardId:string; criterion:string; verificationMethod:ReadinessCriterionRecord["verificationMethod"]; verificationMethodOther?:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const criterion=input.criterion.trim();
+  const other=input.verificationMethodOther?.trim()||null;
+  if(!criterion) throw new Error("Kryterium gotowości jest wymagane.");
+  if(input.verificationMethod==="OTHER"&&!other) throw new Error("Dla metody INNA podaj sposób weryfikacji.");
+  return sql.begin(async tx=>{
+    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
+    if(!version) throw new Error("Kryteria gotowości można edytować wyłącznie w roboczej wersji Standardu.");
+    const [countRow]=await tx`SELECT count(*)::int count FROM standard_readiness_criteria WHERE organization_id=${organizationId} AND standard_version_id=${version.id}`;
+    if(countRow.count>=3) throw new Error("Standard może zawierać maksymalnie 3 kryteria gotowości.");
+    const [positionRow]=await tx`SELECT gs position FROM generate_series(1,3) gs WHERE NOT EXISTS
+      (SELECT 1 FROM standard_readiness_criteria rc WHERE rc.organization_id=${organizationId} AND rc.standard_version_id=${version.id} AND rc.position=gs)
+      ORDER BY gs LIMIT 1`;
+    const [row]=await tx`INSERT INTO standard_readiness_criteria(organization_id,standard_version_id,position,criterion,verification_method,verification_method_other)
+      VALUES(${organizationId},${version.id},${positionRow.position},${criterion},${input.verificationMethod}::onboarding_readiness_verification_method,
+        ${input.verificationMethod==="OTHER"?other:null}) RETURNING id`;
+    return row.id as string;
+  });
+}
+
+export async function updateDraftReadinessCriterion(input:{
+  organizationId:string; standardId:string; criterionId:string; criterion:string; verificationMethod:ReadinessCriterionRecord["verificationMethod"]; verificationMethodOther?:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const criterion=input.criterion.trim();
+  const other=input.verificationMethodOther?.trim()||null;
+  if(!criterion) throw new Error("Kryterium gotowości jest wymagane.");
+  if(input.verificationMethod==="OTHER"&&!other) throw new Error("Dla metody INNA podaj sposób weryfikacji.");
+  const rows=await sql`UPDATE standard_readiness_criteria rc
+    SET criterion=${criterion},verification_method=${input.verificationMethod}::onboarding_readiness_verification_method,
+      verification_method_other=${input.verificationMethod==="OTHER"?other:null},updated_at=now()
+    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
+      AND rc.id=${input.criterionId} AND rc.organization_id=${organizationId} AND rc.standard_version_id=sv.id RETURNING rc.id`;
+  if(!rows[0]) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
+}
+
+export async function deleteDraftReadinessCriterion(input:{organizationId:string;standardId:string;criterionId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  const rows=await sql`DELETE FROM standard_readiness_criteria rc USING standards s,standard_versions sv
+    WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
+      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND rc.id=${input.criterionId} AND rc.organization_id=${organizationId} AND rc.standard_version_id=sv.id RETURNING rc.id`;
+  if(!rows[0]) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
+}
+
+export async function moveDraftReadinessCriterion(input:{organizationId:string;standardId:string;criterionId:string;direction:"UP"|"DOWN"}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  return sql.begin(async tx=>{
+    const [row]=await tx`SELECT rc.id,rc.position,rc.standard_version_id FROM standard_readiness_criteria rc
+      JOIN standard_versions sv ON sv.id=rc.standard_version_id AND sv.organization_id=rc.organization_id
+      JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
+      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+        AND sv.status='DRAFT' AND rc.id=${input.criterionId} FOR UPDATE OF rc`;
+    if(!row) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
+    const [other]=input.direction==="UP"
+      ? await tx`SELECT id,position FROM standard_readiness_criteria WHERE organization_id=${organizationId}
+          AND standard_version_id=${row.standard_version_id} AND position<${row.position} ORDER BY position DESC LIMIT 1 FOR UPDATE`
+      : await tx`SELECT id,position FROM standard_readiness_criteria WHERE organization_id=${organizationId}
+          AND standard_version_id=${row.standard_version_id} AND position>${row.position} ORDER BY position ASC LIMIT 1 FOR UPDATE`;
+    if(!other) return;
+    const [moving]=await tx`DELETE FROM standard_readiness_criteria WHERE id=${row.id} AND organization_id=${organizationId}
+      RETURNING id,organization_id,standard_version_id,criterion,verification_method,verification_method_other,created_at`;
+    await tx`UPDATE standard_readiness_criteria SET position=${row.position},updated_at=now() WHERE id=${other.id} AND organization_id=${organizationId}`;
+    await tx`INSERT INTO standard_readiness_criteria(id,organization_id,standard_version_id,position,criterion,verification_method,verification_method_other,created_at,updated_at)
+      VALUES(${moving.id},${moving.organization_id},${moving.standard_version_id},${other.position},${moving.criterion},${moving.verification_method},
+        ${moving.verification_method_other},${moving.created_at},now())`;
+  });
+}
+
+
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{

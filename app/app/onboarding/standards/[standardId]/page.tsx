@@ -2,8 +2,9 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {
-  createDraftStartRequirement, createDraftTask, deleteDraftStartRequirement, deleteDraftTask, getStandard,
-  moveDraftStartRequirement, moveDraftTask, updateDraftStandard, updateDraftStartRequirement, updateDraftTask,
+  createDraftReadinessCriterion, createDraftStartRequirement, createDraftTask, deleteDraftReadinessCriterion,
+  deleteDraftStartRequirement, deleteDraftTask, getStandard, moveDraftReadinessCriterion, moveDraftStartRequirement,
+  moveDraftTask, updateDraftReadinessCriterion, updateDraftStandard, updateDraftStartRequirement, updateDraftTask,
 } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
@@ -74,11 +75,40 @@ async function reorderStartRequirement(formData: FormData) {
   redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
 }
 
+
+async function addReadinessCriterion(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  const verificationMethod=text(formData,"verificationMethod") as "OBSERVATION"|"INDEPENDENT_TASK"|"WORK_SAMPLE"|"CONTROL_QUESTIONS"|"KNOWLEDGE_TEST"|"OTHER";
+  await createDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterion:text(formData,"criterion"),verificationMethod,verificationMethodOther:text(formData,"verificationMethodOther")});
+  redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
+}
+async function editReadinessCriterion(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  const verificationMethod=text(formData,"verificationMethod") as "OBSERVATION"|"INDEPENDENT_TASK"|"WORK_SAMPLE"|"CONTROL_QUESTIONS"|"KNOWLEDGE_TEST"|"OTHER";
+  await updateDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId"),criterion:text(formData,"criterion"),verificationMethod,verificationMethodOther:text(formData,"verificationMethodOther")});
+  redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
+}
+async function removeReadinessCriterion(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  await deleteDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId")});
+  redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
+}
+async function reorderReadinessCriterion(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId"); const direction=text(formData,"direction");
+  if(direction!=="UP"&&direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
+  await moveDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId"),direction});
+  redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
+}
+
 export default async function StandardDetailPage({params}:{params:Promise<{standardId:string}>}) {
   const access=await requireBOSAccess(); const {standardId}=await params;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
-  const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18;
+  const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
@@ -159,6 +189,42 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
           <form action={reorderStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><input type="hidden" name="direction" value="UP"/><button type="submit" disabled={index===0}>↑ W GÓRĘ</button></form>
           <form action={reorderStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><input type="hidden" name="direction" value="DOWN"/><button type="submit" disabled={index===current.startRequirements.length-1}>↓ W DÓŁ</button></form>
           <form action={removeStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><button type="submit">USUŃ</button></form>
+        </div>}
+      </div>)}
+    </section>
+
+    <section id="kryteria-gotowosci" className="bos-standard-history">
+      <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">SPRAWDŹ</span><h2>Kryteria gotowości</h2>
+        <p>Od 1 do 3 kryteriów końcowych określających, jak potwierdzić gotowość pracownika.</p></div>
+        <span className="bos-dashboard-count">{current.readinessCriteria.length}/3</span></div>
+      {isDraft&&<div className="bos-standard-detail-head"><form action={addReadinessCriterion} style={{display:"grid",gap:10,width:"100%"}}>
+        <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWE KRYTERIUM</span>
+        <textarea name="criterion" required rows={2} placeholder="Co musi potrafić lub wykonać pracownik?" disabled={!canAddCriterion} style={{padding:10}}/>
+        <select name="verificationMethod" defaultValue="OBSERVATION" disabled={!canAddCriterion} style={{padding:10}}>
+          <option value="OBSERVATION">OBSERWACJA</option><option value="INDEPENDENT_TASK">SAMODZIELNE ZADANIE</option><option value="WORK_SAMPLE">PRÓBKA PRACY</option>
+          <option value="CONTROL_QUESTIONS">PYTANIA KONTROLNE</option><option value="KNOWLEDGE_TEST">TEST WIEDZY</option><option value="OTHER">INNA</option>
+        </select>
+        <input name="verificationMethodOther" placeholder="Jeśli INNA — opisz metodę weryfikacji" disabled={!canAddCriterion} style={{padding:10}}/>
+        <div><button type="submit" className="bos-standard-primary-action" disabled={!canAddCriterion}>{canAddCriterion?"DODAJ KRYTERIUM":"OSIĄGNIĘTO LIMIT 3"}</button></div>
+      </form></div>}
+      {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
+      current.readinessCriteria.map((criterion,index)=><div className="bos-standard-detail-head" key={criterion.id}>
+        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span>
+          {!isDraft&&<><p>{criterion.criterion}</p>{criterion.verificationMethodOther&&<p>{criterion.verificationMethodOther}</p>}</>}</div>
+        {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
+          <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/>
+          <textarea name="criterion" required rows={2} defaultValue={criterion.criterion} style={{padding:8}}/>
+          <select name="verificationMethod" defaultValue={criterion.verificationMethod} style={{padding:8}}>
+            <option value="OBSERVATION">OBSERWACJA</option><option value="INDEPENDENT_TASK">SAMODZIELNE ZADANIE</option><option value="WORK_SAMPLE">PRÓBKA PRACY</option>
+            <option value="CONTROL_QUESTIONS">PYTANIA KONTROLNE</option><option value="KNOWLEDGE_TEST">TEST WIEDZY</option><option value="OTHER">INNA</option>
+          </select>
+          <input name="verificationMethodOther" defaultValue={criterion.verificationMethodOther??""} placeholder="Wymagane tylko dla metody INNA" style={{padding:8}}/>
+          <div><button type="submit" className="bos-standard-primary-action">ZAPISZ KRYTERIUM</button></div>
+        </form>}
+        {isDraft&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <form action={reorderReadinessCriterion}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/><input type="hidden" name="direction" value="UP"/><button type="submit" disabled={index===0}>↑ W GÓRĘ</button></form>
+          <form action={reorderReadinessCriterion}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/><input type="hidden" name="direction" value="DOWN"/><button type="submit" disabled={index===current.readinessCriteria.length-1}>↓ W DÓŁ</button></form>
+          <form action={removeReadinessCriterion}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/><button type="submit">USUŃ</button></form>
         </div>}
       </div>)}
     </section>
