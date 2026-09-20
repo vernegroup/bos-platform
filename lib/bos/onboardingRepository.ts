@@ -38,6 +38,10 @@ export type ReadinessCriterionRecord = {
   verificationMethod: "OBSERVATION" | "INDEPENDENT_TASK" | "WORK_SAMPLE" | "CONTROL_QUESTIONS" | "KNOWLEDGE_TEST" | "OTHER";
   verificationMethodOther?: string;
 };
+export type StandardDetailRecord = {
+  id:string; name:string; area:string; status:"AKTYWNY"|"ROBOCZY"; currentVersion:string; updatedAt:string; versions:StandardVersionRecord[];
+};
+
 export type StandardVersionRecord = {
   id: string;
   version: string;
@@ -84,8 +88,14 @@ export async function listStandards(organizationId?: string) {
   }));
 }
 
-export async function getStandard(standardId: string, organizationId?: string) {
-  if (!hasDatabase()) return onboardingStandards.find(s=>s.id===standardId) ?? null;
+export async function getStandard(standardId: string, organizationId?: string): Promise<StandardDetailRecord|null> {
+  if (!hasDatabase()) {
+    const fallback=onboardingStandards.find(s=>s.id===standardId); if(!fallback) return null;
+    return {id:fallback.id,name:fallback.name,area:fallback.area,status:fallback.status,currentVersion:fallback.currentVersion,updatedAt:fallback.updatedAt,versions:fallback.versions.map((v,index)=>({
+      id:`fallback-${fallback.id}-${index}`,version:v.version,versionNumber:Number(v.version.replace(/^v/,""))||index+1,status:"PUBLISHED" as const,date:v.date,note:v.note,
+      tasks:v.tasks.map(t=>({...t,hint:"",isCritical:false})),startRequirements:[],readinessCriteria:[]
+    }))};
+  }
   const sql = db(); const orgId = tenantId(organizationId);
   const standards = await sql`SELECT id,name,area,status,current_version_id FROM standards WHERE id=${standardId} AND organization_id=${orgId} LIMIT 1`;
   if (!standards[0]) return null;
