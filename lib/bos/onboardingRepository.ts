@@ -430,6 +430,51 @@ export async function moveDraftReadinessCriterion(input:{organizationId:string;s
 }
 
 
+export type StandardCompletenessResult = { complete:boolean; reasons:string[] };
+
+export function validateStandardCompleteness(input:{
+  name:string; tasks:StandardTaskRecord[]; startRequirements:StartRequirementRecord[]; readinessCriteria:ReadinessCriterionRecord[];
+}): StandardCompletenessResult {
+  const reasons:string[]=[];
+  if(!input.name.trim()) reasons.push("Uzupełnij nazwę Standardu.");
+  if(input.tasks.length<1) reasons.push("Dodaj co najmniej 1 czynność.");
+  if(input.tasks.length>18) reasons.push("Standard może zawierać maksymalnie 18 czynności.");
+  const taskPositions=input.tasks.map(x=>x.order);
+  if(new Set(taskPositions).size!==taskPositions.length||taskPositions.some((position,index)=>position!==index+1))
+    reasons.push("Uporządkuj czynności w ciągłej kolejności od 1.");
+  input.tasks.forEach((task,index)=>{
+    if(!task.name.trim()||!task.execution.trim()||!task.readyWhen.trim())
+      reasons.push(`Czynność ${index+1}: uzupełnij nazwę, prawidłowe wykonanie i kryterium gotowości.`);
+  });
+  const requirementPositions=input.startRequirements.map(x=>x.order);
+  if(new Set(requirementPositions).size!==requirementPositions.length||requirementPositions.some((position,index)=>position!==index+1))
+    reasons.push("Uporządkuj warunki rozpoczęcia w ciągłej kolejności od 1.");
+  input.startRequirements.forEach((requirement,index)=>{
+    if(!requirement.requirement.trim()) reasons.push(`Warunek rozpoczęcia ${index+1}: uzupełnij treść.`);
+  });
+  if(input.readinessCriteria.length<1) reasons.push("Dodaj co najmniej 1 kryterium gotowości.");
+  if(input.readinessCriteria.length>3) reasons.push("Standard może zawierać maksymalnie 3 kryteria gotowości.");
+  const criterionPositions=input.readinessCriteria.map(x=>x.order);
+  if(new Set(criterionPositions).size!==criterionPositions.length||criterionPositions.some((position,index)=>position!==index+1))
+    reasons.push("Uporządkuj kryteria gotowości w ciągłej kolejności od 1.");
+  input.readinessCriteria.forEach((criterion,index)=>{
+    if(!criterion.criterion.trim()) reasons.push(`Kryterium gotowości ${index+1}: uzupełnij treść.`);
+    if(criterion.verificationMethod==="OTHER"&&!criterion.verificationMethodOther?.trim())
+      reasons.push(`Kryterium gotowości ${index+1}: opisz własną metodę weryfikacji.`);
+  });
+  return {complete:reasons.length===0,reasons};
+}
+
+export async function getDraftStandardCompleteness(input:{organizationId:string;standardId:string}) {
+  requirePersistedOnboarding();
+  const standard=await getStandard(input.standardId,tenantId(input.organizationId));
+  if(!standard) throw new Error("Nie znaleziono Standardu.");
+  const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0];
+  if(!current||current.status!=="DRAFT") throw new Error("Walidacja przed publikacją dotyczy wyłącznie roboczej wersji Standardu.");
+  return validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
+}
+
+
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{

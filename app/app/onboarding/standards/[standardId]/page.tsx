@@ -5,6 +5,7 @@ import {
   createDraftReadinessCriterion, createDraftStartRequirement, createDraftTask, deleteDraftReadinessCriterion,
   deleteDraftStartRequirement, deleteDraftTask, getStandard, moveDraftReadinessCriterion, moveDraftStartRequirement,
   moveDraftTask, updateDraftReadinessCriterion, updateDraftStandard, updateDraftStartRequirement, updateDraftTask,
+  validateStandardCompleteness,
 } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
@@ -109,6 +110,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
+  const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
@@ -228,6 +230,21 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         </div>}
       </div>)}
     </section>
+
+    {isDraft&&<section id="gotowosc-publikacji" className="bos-standard-history">
+      <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">KONTROLA KOMPLETNOŚCI</span><h2>Gotowość do publikacji</h2>
+        <p>System sprawdza dane Standardu przed udostępnieniem go do użycia w onboardingu.</p></div>
+        <span className="bos-dashboard-count">{completeness.complete?"GOTOWY":"BLOKADA"}</span></div>
+      <div className="bos-standard-detail-head">
+        {completeness.complete
+          ? <div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
+          : <div style={{width:"100%"}}><strong>Standard nie jest jeszcze gotowy do publikacji.</strong>
+              <ul style={{margin:"12px 0 0",paddingLeft:22,display:"grid",gap:6}}>
+                {completeness.reasons.map(reason=><li key={reason}>{reason}</li>)}
+              </ul>
+            </div>}
+      </div>
+    </section>}
 
     <section id="historia" className="bos-standard-history"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">WERSJONOWANIE</span><h2>Historia wersji</h2></div>
       <span className="bos-dashboard-count">{standard.versions.length} wersje</span></div>
