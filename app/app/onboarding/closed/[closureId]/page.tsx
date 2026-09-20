@@ -71,10 +71,10 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <strong>{closure.employee} / {standard.name} / {closure.standardVersion}</strong>
         <p>Ten rekord reprezentuje zamknięty wynik procesu i nie powinien zmieniać się po publikacji kolejnych wersji Standardu Stanowiska.</p>
       </section>
-      <section className="bos-process-card"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">HISTORIA DECYZJI</span><h2>Wznowienie procesu</h2></div><span className="bos-dashboard-count">DECYZJA #{closure.decisionSequence}</span></div>
+      {closure.isLatest&&<section className="bos-process-card"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">HISTORIA DECYZJI</span><h2>Wznowienie procesu</h2></div><span className="bos-dashboard-count">DECYZJA #{closure.decisionSequence}</span></div>
         <p>Wznowienie nie usuwa tej Karty Zakończenia. Rekord pozostaje w historii, a proces wraca do pracy z zachowanym postępem.</p>
         <form action={reopen} className="bos-reopen-form"><input type="hidden" name="processId" value={closure.processId}/><input type="hidden" name="closureId" value={closure.id}/><input name="reason" required maxLength={500} placeholder="Powód wznowienia procesu"/><button type="submit">WZNÓW PROCES</button></form>
-      </section>
+      </section>}
     </>
   );
 }
