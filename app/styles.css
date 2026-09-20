@@ -2389,3 +2389,18 @@ a{
 .bos-home-product-card:hover,.bos-home-product-card:focus-within{transform:translateY(-6px);border-color:#cfbd9e;box-shadow:0 26px 60px rgba(13,20,34,.14)}
 .bos-home-product-card h3{font-size:27px}.bos-home-product-card p{font-size:14px;line-height:1.7}.bos-home-product-card>a{font-size:11px;padding:8px 0}
 @media(max-width:800px){.bos-home-product-card{min-height:270px;padding:30px}}
+
+
+/* HOME-03 — registration CTA between product cards */
+.bos-home-product-cards{grid-template-columns:minmax(0,1fr) minmax(320px,.92fr) minmax(0,1fr);max-width:1380px;gap:28px;align-items:stretch}
+.bos-home-register-card{min-height:310px;padding:34px 36px 28px;border:1px solid #b8781f;border-radius:4px;background:linear-gradient(145deg,#d08a2a 0%,#b96f1e 100%);box-shadow:0 18px 45px rgba(91,54,13,.19);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.bos-home-register-icon{width:48px;height:48px;margin-bottom:12px;border:2px solid rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:27px;line-height:1}
+.bos-home-register-card h3{margin:0;color:#fff;font-family:Georgia,"Times New Roman",serif;font-size:28px;font-weight:600;line-height:1.08;text-transform:uppercase;letter-spacing:.6px}
+.bos-home-register-card p{max-width:330px;margin:18px auto 22px;color:rgba(255,255,255,.9);font-size:13px;line-height:1.55}
+.bos-home-register-action{width:min(280px,100%);min-height:48px;padding:0 22px;border-radius:4px;background:#fff;color:#10283b;box-shadow:0 8px 22px rgba(65,38,9,.14);display:flex;align-items:center;justify-content:center;gap:28px;text-decoration:none;font-size:12px;font-weight:800;transition:transform .18s ease,box-shadow .18s ease}
+.bos-home-register-action:hover,.bos-home-register-action:focus-visible{transform:translateY(-3px);box-shadow:0 13px 30px rgba(65,38,9,.22)}
+.bos-home-register-action span{font-size:17px}
+.bos-home-register-meta{margin-top:20px;color:rgba(255,255,255,.82);font-size:9px;letter-spacing:.25px}
+@media(max-width:1050px){.bos-home-product-cards{grid-template-columns:1fr 1fr}.bos-home-register-card{grid-column:1/-1;grid-row:2;min-height:270px}.bos-home-register-card p{max-width:520px}}
+@media(max-width:800px){.bos-home-product-cards{grid-template-columns:1fr}.bos-home-register-card{grid-column:auto;grid-row:2;min-height:280px}.bos-home-product-card:nth-of-type(2){grid-row:3}}
+@media(max-width:560px){.bos-home-register-card{padding:30px 24px}.bos-home-register-card h3{font-size:25px}.bos-home-register-action{width:100%}}
