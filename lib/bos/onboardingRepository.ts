@@ -74,7 +74,7 @@ export async function listStandards(organizationId?: string) {
       sv.version_label,sv.status version_status,sv.published_at,sv.created_at,
       (SELECT count(*)::int FROM standard_tasks st WHERE st.standard_version_id=sv.id AND st.organization_id=s.organization_id) task_count
     FROM standards s
-    LEFT JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    LEFT JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
     WHERE s.organization_id=${orgId}
     ORDER BY s.updated_at DESC,s.name`;
   return rows.map(r=>({
@@ -107,8 +107,10 @@ export async function getStandard(standardId: string, organizationId?: string) {
       readinessCriteria:criteria.map(r=>({id:r.id,order:r.position,criterion:r.criterion,verificationMethod:r.verification_method,verificationMethodOther:r.verification_method_other??undefined}))
     });
   }
-  const current=mapped.find(v=>v.id===standards[0].current_version_id);
-  return {id:standards[0].id,name:standards[0].name,area:standards[0].area??"",status:standards[0].status==="ACTIVE"?"AKTYWNY" as const:"ROBOCZY" as const,currentVersion:current?.version??"",updatedAt:current?.date??"",versions:mapped};
+  const publishedCurrent=mapped.find(v=>v.id===standards[0].current_version_id);
+  const draft=mapped.find(v=>v.status==="DRAFT");
+  const working=draft??publishedCurrent;
+  return {id:standards[0].id,name:standards[0].name,area:standards[0].area??"",status:draft?"ROBOCZY" as const:standards[0].status==="ACTIVE"?"AKTYWNY" as const:"ROBOCZY" as const,currentVersion:working?.version??"",updatedAt:working?.date??"",versions:mapped};
 }
 
 export async function listProcesses(organizationId?:string) {
@@ -117,14 +119,21 @@ export async function listProcesses(organizationId?:string) {
   const rows=await sql`
     SELECT p.id,p.employee_name_snapshot,p.standard_id,sv.version_label,p.started_on,p.target_on,
       u.display_name owner,p.status,
-      json_agg(json_build_object('standardTaskId',tp.standard_task_id,'status',tp.status,'completedAt',tp.completed_at,'note',tp.note)) tasks
+      COALESCE(json_agg(json_build_object('standardTaskId',tp.standard_task_id,'explainedAt',tp.explained_at,
+        'shownAt',tp.shown_at,'togetherAt',tp.together_at,'soloAt',tp.solo_at,'checkedAt',tp.checked_at,'note',tp.note))
+        FILTER (WHERE tp.id IS NOT NULL),'[]'::json) tasks
     FROM onboarding_processes p
-    JOIN standard_versions sv ON sv.id=p.standard_version_id
+    JOIN standard_versions sv ON sv.id=p.standard_version_id AND sv.organization_id=p.organization_id
     JOIN users u ON u.id=p.owner_user_id
-    LEFT JOIN onboarding_task_progress tp ON tp.onboarding_process_id=p.id
-    WHERE p.organization_id=${orgId} AND p.status IN ('PLANNED','IN_PROGRESS','READY_TO_CLOSE')
+    LEFT JOIN onboarding_task_progress tp ON tp.onboarding_process_id=p.id AND tp.organization_id=p.organization_id
+    WHERE p.organization_id=${orgId} AND p.status IN ('PLANNED','IN_PROGRESS','PAUSED','READY_TO_CLOSE')
     GROUP BY p.id,sv.version_label,u.display_name ORDER BY p.started_on DESC`;
-  return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,startedAt:datePL(r.started_on),targetDate:datePL(r.target_on),owner:r.owner,status:"W TOKU" as const,tasks:((r.tasks??[]) as PersistedTaskProgress[]).filter(hasStandardTaskId).map(x=>({standardTaskId:x.standardTaskId,status:x.status==="DONE"?"GOTOWE" as const:x.status==="IN_PROGRESS"?"W TOKU" as const:"DO WYKONANIA" as const,completedAt:x.completedAt?datePL(x.completedAt):undefined,note:x.note??undefined}))}));
+  return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
+    startedAt:datePL(r.started_on),targetDate:r.target_on?datePL(r.target_on):"",owner:r.owner,status:r.status==="PAUSED"?"WSTRZYMANE" as const:"W TOKU" as const,
+    tasks:((r.tasks??[]) as Array<{standardTaskId:string;explainedAt?:string;shownAt?:string;togetherAt?:string;soloAt?:string;checkedAt?:string;note?:string}>)
+      .filter(hasStandardTaskId).map(x=>({standardTaskId:x.standardTaskId,
+        status:x.checkedAt?"GOTOWE" as const:(x.explainedAt||x.shownAt||x.togetherAt||x.soloAt)?"W TOKU" as const:"DO WYKONANIA" as const,
+        completedAt:x.checkedAt?datePL(x.checkedAt):undefined,note:x.note??undefined}))}));
 }
 
 export async function getProcess(processId:string, organizationId?:string) {
@@ -219,7 +228,7 @@ export async function createDraftTask(input:{
   const name=input.name.trim(), execution=input.execution.trim(), readyWhen=input.readyWhen.trim();
   if(!name || !execution || !readyWhen) throw new Error("Czynność, prawidłowe wykonanie i kryterium gotowości są wymagane.");
   return sql.begin(async tx=>{
-    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
     if(!version) throw new Error("Czynności można edytować wyłącznie w roboczej wersji Standardu.");
     const [countRow]=await tx`SELECT count(*)::int count FROM standard_tasks WHERE organization_id=${organizationId} AND standard_version_id=${version.id}`;
@@ -242,7 +251,7 @@ export async function updateDraftTask(input:{
   if(!name || !execution || !readyWhen) throw new Error("Czynność, prawidłowe wykonanie i kryterium gotowości są wymagane.");
   const rows=await sql`UPDATE standard_tasks st SET name=${name},execution=${execution},ready_when=${readyWhen},
       hint=${input.hint?.trim()||null},is_critical=${Boolean(input.isCritical)}
-    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
       AND st.id=${input.taskId} AND st.organization_id=${organizationId} AND st.standard_version_id=sv.id RETURNING st.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnej czynności w roboczej wersji Standardu.");
@@ -255,7 +264,7 @@ export async function deleteDraftTask(input:{organizationId:string;standardId:st
     const [task]=await tx`SELECT st.id,st.position,st.standard_version_id FROM standard_tasks st
       JOIN standard_versions sv ON sv.id=st.standard_version_id AND sv.organization_id=st.organization_id
       JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
-      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
         AND sv.status='DRAFT' AND st.id=${input.taskId} FOR UPDATE OF st`;
     if(!task) throw new Error("Nie znaleziono edytowalnej czynności w roboczej wersji Standardu.");
     await tx`DELETE FROM standard_tasks WHERE id=${task.id} AND organization_id=${organizationId}`;
@@ -269,7 +278,7 @@ export async function moveDraftTask(input:{organizationId:string;standardId:stri
     const [task]=await tx`SELECT st.id,st.position,st.standard_version_id FROM standard_tasks st
       JOIN standard_versions sv ON sv.id=st.standard_version_id AND sv.organization_id=st.organization_id
       JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
-      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
         AND sv.status='DRAFT' AND st.id=${input.taskId} FOR UPDATE OF st`;
     if(!task) throw new Error("Nie znaleziono edytowalnej czynności w roboczej wersji Standardu.");
     const [other]=input.direction==="UP"
@@ -296,7 +305,7 @@ export async function createDraftStartRequirement(input:{
   const sql=db(); const organizationId=tenantId(input.organizationId); const requirement=input.requirement.trim();
   if(!requirement) throw new Error("Warunek rozpoczęcia jest wymagany.");
   return sql.begin(async tx=>{
-    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
     if(!version) throw new Error("Warunki rozpoczęcia można edytować wyłącznie w roboczej wersji Standardu.");
     const [positionRow]=await tx`SELECT COALESCE(max(position),0)::int + 1 position FROM standard_start_requirements
@@ -315,7 +324,7 @@ export async function updateDraftStartRequirement(input:{
   if(!requirement) throw new Error("Warunek rozpoczęcia jest wymagany.");
   const rows=await sql`UPDATE standard_start_requirements sr
     SET category=${input.category}::onboarding_start_requirement_category,requirement=${requirement},updated_at=now()
-    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
       AND sr.id=${input.requirementId} AND sr.organization_id=${organizationId} AND sr.standard_version_id=sv.id RETURNING sr.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
@@ -340,7 +349,7 @@ export async function moveDraftStartRequirement(input:{
     const [row]=await tx`SELECT sr.id,sr.position,sr.standard_version_id FROM standard_start_requirements sr
       JOIN standard_versions sv ON sv.id=sr.standard_version_id AND sv.organization_id=sr.organization_id
       JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
-      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
         AND sv.status='DRAFT' AND sr.id=${input.requirementId} FOR UPDATE OF sr`;
     if(!row) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
     const [other]=input.direction==="UP"
@@ -367,7 +376,7 @@ export async function createDraftReadinessCriterion(input:{
   if(!criterion) throw new Error("Kryterium gotowości jest wymagane.");
   if(input.verificationMethod==="OTHER"&&!other) throw new Error("Dla metody INNA podaj sposób weryfikacji.");
   return sql.begin(async tx=>{
-    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
     if(!version) throw new Error("Kryteria gotowości można edytować wyłącznie w roboczej wersji Standardu.");
     const [countRow]=await tx`SELECT count(*)::int count FROM standard_readiness_criteria WHERE organization_id=${organizationId} AND standard_version_id=${version.id}`;
@@ -393,7 +402,7 @@ export async function updateDraftReadinessCriterion(input:{
   const rows=await sql`UPDATE standard_readiness_criteria rc
     SET criterion=${criterion},verification_method=${input.verificationMethod}::onboarding_readiness_verification_method,
       verification_method_other=${input.verificationMethod==="OTHER"?other:null},updated_at=now()
-    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
       AND rc.id=${input.criterionId} AND rc.organization_id=${organizationId} AND rc.standard_version_id=sv.id RETURNING rc.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
@@ -416,7 +425,7 @@ export async function moveDraftReadinessCriterion(input:{organizationId:string;s
     const [row]=await tx`SELECT rc.id,rc.position,rc.standard_version_id FROM standard_readiness_criteria rc
       JOIN standard_versions sv ON sv.id=rc.standard_version_id AND sv.organization_id=rc.organization_id
       JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
-      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
         AND sv.status='DRAFT' AND rc.id=${input.criterionId} FOR UPDATE OF rc`;
     if(!row) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
     const [other]=input.direction==="UP"
@@ -487,11 +496,12 @@ export async function createDraftStandardVersion(input:{
   const sql=db(); const organizationId=tenantId(input.organizationId); const changeNote=input.changeNote.trim();
   if(!changeNote) throw new Error("Opis zmiany jest wymagany.");
   return sql.begin(async tx=>{
-    const [standard]=await tx`SELECT s.id,s.current_version_id,sv.id source_version_id,sv.version_number,sv.status
+    const [standard]=await tx`SELECT s.id,s.status standard_status,s.current_version_id,sv.id source_version_id,sv.version_number,sv.status version_status
       FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} FOR UPDATE OF s,sv`;
     if(!standard) throw new Error("Nie znaleziono Standardu.");
-    if(standard.status!=="PUBLISHED") throw new Error("Nową wersję można utworzyć wyłącznie z opublikowanej wersji Standardu.");
+    if(standard.standard_status!=="ACTIVE" || standard.version_status!=="PUBLISHED")
+      throw new Error("Nową wersję można utworzyć wyłącznie z bieżącej opublikowanej wersji Standardu.");
 
     const membership=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
       AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
@@ -520,8 +530,6 @@ export async function createDraftStandardVersion(input:{
       SELECT organization_id,${draft.id},position,criterion,verification_method,verification_method_other
       FROM standard_readiness_criteria WHERE organization_id=${organizationId} AND standard_version_id=${standard.source_version_id} ORDER BY position`;
 
-    await tx`UPDATE standards SET current_version_id=${draft.id},status='DRAFT',updated_at=now()
-      WHERE id=${standard.id} AND organization_id=${organizationId}`;
     return {id:draft.id as string,version:draft.version_label as string};
   });
 }
@@ -532,10 +540,10 @@ export async function publishDraftStandard(input:{organizationId:string;standard
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
     const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status
-      FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
-      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} FOR UPDATE OF s,sv`;
-    if(!standard) throw new Error("Nie znaleziono Standardu.");
-    if(standard.status!=="DRAFT") throw new Error("Publikować można wyłącznie roboczą wersję Standardu.");
+      FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
+      ORDER BY sv.version_number DESC LIMIT 1 FOR UPDATE OF s,sv`;
+    if(!standard) throw new Error("Nie znaleziono roboczej wersji Standardu.");
 
     const membership=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
       AND user_id=${input.publishedByUserId} AND status='ACTIVE' LIMIT 1`;
@@ -557,7 +565,8 @@ export async function publishDraftStandard(input:{organizationId:string;standard
 
     await tx`UPDATE standard_versions SET status='PUBLISHED',published_at=now(),published_by_user_id=${input.publishedByUserId},updated_at=now()
       WHERE id=${standard.version_id} AND standard_id=${standard.id} AND organization_id=${organizationId} AND status='DRAFT'`;
-    await tx`UPDATE standards SET status='ACTIVE',updated_at=now() WHERE id=${standard.id} AND organization_id=${organizationId}`;
+    await tx`UPDATE standards SET current_version_id=${standard.version_id},status='ACTIVE',updated_at=now()
+      WHERE id=${standard.id} AND organization_id=${organizationId}`;
     return standard.version_id as string;
   });
 }
