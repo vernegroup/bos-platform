@@ -203,7 +203,7 @@ export function getProcessProgress(process: ProcessRecord) {
 }
 
 export async function listClosures(organizationId?:string) {
-  if (!hasDatabase()) return onboardingClosures;
+  if (!hasDatabase()) return onboardingClosures.map(c=>({...c,decision:c.result==="GOTOWY"?"READY" as const:c.result==="JESZCZE NIE"?"NOT_YET" as const:"STOP" as const,decisionSequence:1,reopenReason:undefined}));
   const sql=db(); const orgId=tenantId(organizationId);
   const rows=await sql`
     SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,sv.version_label,p.started_on,c.verified_at,
