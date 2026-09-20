@@ -109,7 +109,9 @@ async function reorderReadinessCriterion(formData: FormData) {
 async function publishStandard(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
-  await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id});
+  const qualityCheckPassed=["observable","realWork","repeatable","coversCritical"].every(key=>formData.get(key)==="on");
+  if(!qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
+  await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed});
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 
@@ -142,7 +144,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWA CZYNNOŚĆ</span>
       <input name="name" required maxLength={240} placeholder="Nazwa czynności" disabled={!canAdd} style={{padding:10}}/>
       <textarea name="execution" required placeholder="Prawidłowe wykonanie" disabled={!canAdd} rows={3} style={{padding:10}}/>
-      <textarea name="readyWhen" required placeholder="Co sprawdzić przy SPRAWDŹ? — po czym wiadomo, że ta czynność została wykonana prawidłowo?" disabled={!canAdd} rows={2} style={{padding:10}}/>
+      <textarea name="readyWhen" placeholder="Co dodatkowo sprawdzić przy SPRAWDŹ? (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <textarea name="hint" placeholder="Podpowiedź / wskazówka (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <label><input type="checkbox" name="isCritical" disabled={!canAdd}/> K — czynność krytyczna</label><aside className="bos-context-guide is-compact"><strong>KIEDY OZNACZYĆ K?</strong><p>Zapytaj: co się stanie, jeśli pracownik zrobi tę czynność źle? K oznacza ryzyko poważnych konsekwencji, nie samo znaczenie czynności.</p></aside>
       <div><button type="submit" className="bos-standard-primary-action" disabled={!canAdd}>{canAdd?"DODAJ CZYNNOŚĆ":"OSIĄGNIĘTO LIMIT 18"}</button></div>
@@ -153,12 +155,12 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
     <section className="bos-standard-task-table" aria-label="Czynności Standardu Stanowiska">
       <div className="bos-standard-task-head"><span>LP.</span><span>CZYNNOŚĆ</span><span>PRAWIDŁOWE WYKONANIE</span><span>CO SPRAWDZIĆ PRZY SPRAWDŹ</span></div>
       {current.tasks.map((task,index)=><div key={task.id}>
-        <div className="bos-standard-task-row"><span>{String(index+1).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong><p>{task.execution}</p><p>{task.readyWhen}</p></div>
+        <div className="bos-standard-task-row"><span>{String(index+1).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong><p>{task.execution}</p><p>{task.readyWhen||"—"}</p></div>
         {task.hint&&<div className="bos-standard-detail-head" style={{paddingTop:10,paddingBottom:10}}><p><strong>Podpowiedź:</strong> {task.hint}</p></div>}
         {isDraft&&<div className="bos-standard-detail-head" style={{paddingTop:12,paddingBottom:18}}>
           <form action={editTask} style={{display:"grid",gap:8,width:"100%"}}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="taskId" value={task.id}/>
             <input name="name" required maxLength={240} defaultValue={task.name} style={{padding:8}}/><textarea name="execution" required defaultValue={task.execution} rows={2} style={{padding:8}}/>
-            <textarea name="readyWhen" required defaultValue={task.readyWhen} rows={2} style={{padding:8}}/><textarea name="hint" defaultValue={task.hint} rows={2} style={{padding:8}}/>
+            <textarea name="readyWhen" defaultValue={task.readyWhen} placeholder="Co dodatkowo sprawdzić przy SPRAWDŹ? (opcjonalnie)" rows={2} style={{padding:8}}/><textarea name="hint" defaultValue={task.hint} rows={2} style={{padding:8}}/>
             <label><input type="checkbox" name="isCritical" defaultChecked={task.isCritical}/> K — czynność krytyczna</label><div><button className="bos-standard-primary-action" type="submit">ZAPISZ CZYNNOŚĆ</button></div>
           </form>
           <div style={{display:"flex",gap:8,alignItems:"flex-start",flexWrap:"wrap"}}>
@@ -248,7 +250,12 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <div className="bos-standard-detail-head">
         {completeness.complete
           ? <div style={{display:"grid",gap:12}}><div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
-              <form action={publishStandard}><input type="hidden" name="standardId" value={standard.id}/>
+              <form action={publishStandard} style={{display:"grid",gap:8}}><input type="hidden" name="standardId" value={standard.id}/>
+                <aside className="bos-context-guide"><strong>TEST KRYTERIUM · 4×TAK</strong><p>Przed publikacją potwierdź jakość Kryterium Gotowości. Ten test dotyczy definicji Standardu, nie oceny konkretnego pracownika.</p></aside>
+                <label><input type="checkbox" name="observable" required/> TAK — kryterium opisuje zachowanie lub wynik, który można zaobserwować.</label>
+                <label><input type="checkbox" name="realWork" required/> TAK — kryterium można sprawdzić w rzeczywistej pracy.</label>
+                <label><input type="checkbox" name="repeatable" required/> TAK — dwie osoby powinny dojść do podobnej oceny.</label>
+                <label><input type="checkbox" name="coversCritical" required/> TAK — kryterium obejmuje czynności K istotne dla gotowości do roli.</label>
                 <button type="submit" className="bos-standard-primary-action">OPUBLIKUJ STANDARD</button>
               </form>
               <p>Publikacja zamknie edycję tej wersji. Dalsze zmiany będą wymagały utworzenia nowej wersji.</p>

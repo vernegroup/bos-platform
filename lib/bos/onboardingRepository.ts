@@ -226,9 +226,10 @@ export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
 }
 
-export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;decision:"READY"|"NOT_YET"|"STOP";summary:string;recommendations?:string}) {
+export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;decision:"READY"|"NOT_YET"|"STOP";summary:string;recommendations?:string;formalitiesConfirmed:boolean}) {
   requirePersistedOnboarding(); const sql=db(); const organizationId=tenantId(input.organizationId);
   const summary=input.summary.trim(), recommendations=input.recommendations?.trim()||null;
+  if(!input.formalitiesConfirmed) throw new Error("Przed decyzją potwierdź weryfikację wymaganych formalności poza BOS.");
   if(!summary) throw new Error("Podsumowanie decyzji jest wymagane.");
   if(input.decision!=="READY" && !recommendations) throw new Error("Dla JESZCZE NIE lub STOP podaj powód i dalsze działanie.");
   return sql.begin(async tx=>{
@@ -390,7 +391,7 @@ export async function createDraftTask(input:{
   requirePersistedOnboarding();
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const name=input.name.trim(), execution=input.execution.trim(), readyWhen=input.readyWhen.trim();
-  if(!name || !execution || !readyWhen) throw new Error("Czynność, prawidłowe wykonanie i kryterium gotowości są wymagane.");
+  if(!name || !execution) throw new Error("Czynność i prawidłowe wykonanie są wymagane.");
   return sql.begin(async tx=>{
     const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
@@ -621,8 +622,8 @@ export function validateStandardCompleteness(input:{
   if(new Set(taskPositions).size!==taskPositions.length||taskPositions.some(position=>position<1||position>18))
     reasons.push("Czynności muszą mieć unikalną kolejność w zakresie 1–18.");
   input.tasks.forEach((task,index)=>{
-    if(!task.name.trim()||!task.execution.trim()||!task.readyWhen.trim())
-      reasons.push(`Czynność ${index+1}: uzupełnij nazwę, prawidłowe wykonanie i kryterium gotowości.`);
+    if(!task.name.trim()||!task.execution.trim())
+      reasons.push(`Czynność ${index+1}: uzupełnij nazwę i prawidłowe wykonanie.`);
   });
   const requirementPositions=input.startRequirements.map(x=>x.order);
   if(new Set(requirementPositions).size!==requirementPositions.length||requirementPositions.some(position=>position<1))
@@ -699,8 +700,9 @@ export async function createDraftStandardVersion(input:{
 }
 
 
-export async function publishDraftStandard(input:{organizationId:string;standardId:string;publishedByUserId:string}) {
+export async function publishDraftStandard(input:{organizationId:string;standardId:string;publishedByUserId:string;qualityCheckPassed:boolean}) {
   requirePersistedOnboarding();
+  if(!input.qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
     const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status
