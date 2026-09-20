@@ -203,11 +203,12 @@ export function getProcessProgress(process: ProcessRecord) {
 }
 
 export async function listClosures(organizationId?:string) {
-  if (!hasDatabase()) return onboardingClosures.map(c=>({...c,decision:c.result==="GOTOWY"?"READY" as const:c.result==="JESZCZE NIE"?"NOT_YET" as const:"STOP" as const,decisionSequence:1,reopenReason:undefined}));
+  if (!hasDatabase()) return onboardingClosures.map(c=>({...c,decision:c.result==="GOTOWY"?"READY" as const:c.result==="JESZCZE NIE"?"NOT_YET" as const:"STOP" as const,decisionSequence:1,reopenReason:undefined,isLatest:true}));
   const sql=db(); const orgId=tenantId(organizationId);
   const rows=await sql`
     SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,sv.version_label,p.started_on,c.verified_at,
       owner.display_name owner,verifier.display_name verified_by,c.decision,c.summary,c.recommendations,c.decision_sequence,c.reopen_reason,
+      (c.decision_sequence=(SELECT max(c2.decision_sequence) FROM onboarding_closures c2 WHERE c2.onboarding_process_id=c.onboarding_process_id AND c2.organization_id=c.organization_id)) is_latest,
       (SELECT count(*)::int FROM onboarding_task_progress tp WHERE tp.onboarding_process_id=p.id AND tp.checked_at IS NOT NULL) completed_tasks,
       (SELECT count(*)::int FROM onboarding_task_progress tp WHERE tp.onboarding_process_id=p.id) total_tasks
     FROM onboarding_closures c JOIN onboarding_processes p ON p.id=c.onboarding_process_id AND p.organization_id=c.organization_id
@@ -217,7 +218,7 @@ export async function listClosures(organizationId?:string) {
   return rows.map(r=>({id:r.id,processId:r.onboarding_process_id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
     startedAt:datePL(r.started_on),closedAt:datePL(r.verified_at),owner:r.owner,verifiedBy:r.verified_by,
     result:r.decision==="READY"?"GOTOWY" as const:r.decision==="NOT_YET"?"JESZCZE NIE" as const:"STOP" as const,
-    decision:r.decision as "READY"|"NOT_YET"|"STOP",decisionSequence:r.decision_sequence,reopenReason:r.reopen_reason??undefined,
+    decision:r.decision as "READY"|"NOT_YET"|"STOP",decisionSequence:r.decision_sequence,reopenReason:r.reopen_reason??undefined,isLatest:Boolean(r.is_latest),
     completedTasks:r.completed_tasks,totalTasks:r.total_tasks,summary:r.summary,recommendations:r.recommendations??undefined}));
 }
 
