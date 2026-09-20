@@ -1,4 +1,4 @@
-export type OnboardingClosureResult = "WDROŻENIE ZAKOŃCZONE" | "ZAKOŃCZONE Z ZALECENIAMI";
+export type OnboardingClosureResult = "GOTOWY" | "JESZCZE NIE" | "STOP";
 
 export type OnboardingClosure = {
   id: string;
@@ -28,7 +28,7 @@ export const onboardingClosures: OnboardingClosure[] = [
     closedAt: "24.08.2026",
     owner: "Anna Wiśniewska",
     verifiedBy: "Anna Wiśniewska",
-    result: "WDROŻENIE ZAKOŃCZONE",
+    result: "GOTOWY",
     completedTasks: 3,
     totalTasks: 3,
     summary: "Wszystkie czynności standardu zostały wykonane i zweryfikowane zgodnie z kryteriami gotowości.",
@@ -43,7 +43,7 @@ export const onboardingClosures: OnboardingClosure[] = [
     closedAt: "29.07.2026",
     owner: "Jan Kowalski",
     verifiedBy: "Jan Kowalski",
-    result: "ZAKOŃCZONE Z ZALECENIAMI",
+    result: "JESZCZE NIE",
     completedTasks: 4,
     totalTasks: 4,
     summary: "Proces zakończony po potwierdzeniu wszystkich kryteriów wersji v1.1.",
@@ -59,7 +59,7 @@ export const onboardingClosures: OnboardingClosure[] = [
     closedAt: "05.08.2026",
     owner: "Jan Kowalski",
     verifiedBy: "Marta Nowak",
-    result: "WDROŻENIE ZAKOŃCZONE",
+    result: "GOTOWY",
     completedTasks: 3,
     totalTasks: 3,
     summary: "Rezultat procesu zweryfikowany. Pracownik realizuje pełny zakres czynności stanowiska.",
