@@ -1,8 +1,20 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getStandard } from "@/lib/bos/onboardingRepository";
+import { getStandard, updateDraftStandard } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
+
+async function updateDraft(formData: FormData) {
+  "use server";
+  const access = await requireBOSAccess();
+  const standardId = String(formData.get("standardId") ?? "");
+  await updateDraftStandard({
+    organizationId: access.organization.id,
+    standardId,
+    name: String(formData.get("name") ?? ""),
+    area: String(formData.get("area") ?? ""),
+  });
+}
 
 export default async function StandardDetailPage({
   params,
@@ -14,7 +26,9 @@ export default async function StandardDetailPage({
   const standard = await getStandard(standardId, access.organization.id);
   if (!standard) notFound();
 
-  const current = standard.versions.find((version) => version.version === standard.currentVersion)!;
+  const current = standard.versions.find((version) => version.version === standard.currentVersion) ?? standard.versions[0];
+  if (!current) notFound();
+  const isDraft = current.status === "DRAFT";
 
   return (
     <>
@@ -28,6 +42,18 @@ export default async function StandardDetailPage({
         </div>
         <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div>
       </section>
+
+      {isDraft && (
+        <form action={updateDraft} className="bos-standard-detail-head">
+          <input type="hidden" name="standardId" value={standard.id} />
+          <div style={{display:"grid",gap:"10px",width:"100%",maxWidth:"720px"}}>
+            <span className="bos-dashboard-section-kicker">WERSJA ROBOCZA — DANE PODSTAWOWE</span>
+            <input name="name" required maxLength={160} defaultValue={standard.name} style={{padding:"10px"}} />
+            <input name="area" maxLength={160} defaultValue={standard.area} placeholder="Obszar" style={{padding:"10px"}} />
+            <div><button type="submit" className="bos-standard-primary-action">ZAPISZ DRAFT</button></div>
+          </div>
+        </form>
+      )}
 
       <nav className="bos-standard-tabs" aria-label="Sekcje standardu">
         <span className="is-active">CZYNNOŚCI</span>
@@ -43,7 +69,7 @@ export default async function StandardDetailPage({
           <p>{current.note}</p>
         </div>
         <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}</strong></div>
-        <Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>
+        {!isDraft && <Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}
       </section>
 
       <section className="bos-standard-task-table" aria-label="Czynności Standardu Stanowiska">
