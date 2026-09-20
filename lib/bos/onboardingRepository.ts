@@ -235,6 +235,7 @@ export async function closeProcess(input:{organizationId?:string;processId:strin
     if(!member) throw new Error("Osoba podejmująca decyzję nie należy aktywnie do organizacji.");
     const [process]=await tx`SELECT id,standard_id,standard_version_id,employee_name_snapshot,status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
     if(!process) throw new Error("Nie znaleziono procesu.");
+    if(process.status!=="READY_TO_CLOSE") throw new Error("Proces nie jest w stanie READY_TO_CLOSE.");
     const [gate]=await tx`SELECT
       count(*) FILTER(WHERE tp.checked_at IS NULL)::int tasks_missing,
       count(*) FILTER(WHERE st.is_critical AND (tp.solo_at IS NULL OR tp.checked_at IS NULL))::int critical_missing
@@ -256,8 +257,11 @@ export async function reopenProcess(input:{organizationId?:string;processId:stri
   return sql.begin(async tx=>{
     const [member]=await tx`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} AND status='ACTIVE' LIMIT 1`;
     if(!member) throw new Error("Osoba wznawiająca nie należy aktywnie do organizacji.");
-    const [closure]=await tx`SELECT id FROM onboarding_closures WHERE id=${input.closureId} AND onboarding_process_id=${input.processId} AND organization_id=${organizationId} LIMIT 1`;
-    if(!closure) throw new Error("Nie znaleziono decyzji do wznowienia.");
+    const [closure]=await tx`SELECT c.id FROM onboarding_closures c WHERE c.id=${input.closureId} AND c.onboarding_process_id=${input.processId} AND c.organization_id=${organizationId}
+      AND c.decision_sequence=(SELECT max(c2.decision_sequence) FROM onboarding_closures c2 WHERE c2.onboarding_process_id=c.onboarding_process_id AND c2.organization_id=c.organization_id) LIMIT 1`;
+    if(!closure) throw new Error("Wznowić można wyłącznie ostatnią decyzję procesu.");
+    const [process]=await tx`SELECT status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
+    if(!process || !["CLOSED","PAUSED"].includes(process.status)) throw new Error("Proces nie jest zamknięty ani wstrzymany.");
     await tx`INSERT INTO onboarding_reopen_events(organization_id,onboarding_process_id,closure_id,reopened_by_user_id,reason) VALUES(${organizationId},${input.processId},${input.closureId},${input.userId},${reason})`;
     await tx`UPDATE onboarding_processes SET status='IN_PROGRESS',closed_at=null,updated_at=now() WHERE id=${input.processId} AND organization_id=${organizationId}`;
   });
