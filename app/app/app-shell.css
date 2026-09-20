@@ -3267,3 +3267,11 @@
 .bos-process-task-note{flex-basis:100%;margin-top:3px}
 @media(max-width:850px){.bos-process-task-row{grid-template-columns:28px minmax(150px,1fr);gap:10px}.bos-process-task-row>p,.bos-process-stage-flow{grid-column:2}}
 @media(max-width:600px){.bos-process-summary{grid-template-columns:1fr 1fr}.bos-process-stage-flow{gap:4px!important}.bos-process-stage-flow button{min-height:30px;padding:0 6px}}
+
+/* 1.15 — operational start requirements */
+.bos-start-check-list{display:grid;border-top:1px solid var(--bos-line)}
+.bos-start-check-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--bos-line)}
+.bos-start-check-row>span,.bos-start-check-row small{font-size:11px;letter-spacing:.06em;color:var(--bos-muted)}
+.bos-start-check-row>div{display:grid;gap:4px}.bos-start-check-row button{min-width:128px;padding:8px 10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+.bos-start-check-row button.is-done{cursor:default;opacity:.72}.bos-start-check-row button:disabled{cursor:default}
+@media(max-width:600px){.bos-start-check-row{grid-template-columns:32px 1fr}.bos-start-check-row form{grid-column:2}.bos-start-check-row button{width:100%}}
