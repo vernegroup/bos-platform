@@ -45,6 +45,7 @@ export type StandardVersionRecord = {
   status: StandardVersionStatus;
   date: string;
   note: string;
+  publishedBy?: string;
   tasks: StandardTaskRecord[];
   startRequirements: StartRequirementRecord[];
   readinessCriteria: ReadinessCriterionRecord[];
@@ -88,7 +89,11 @@ export async function getStandard(standardId: string, organizationId?: string) {
   const sql = db(); const orgId = tenantId(organizationId);
   const standards = await sql`SELECT id,name,area,status,current_version_id FROM standards WHERE id=${standardId} AND organization_id=${orgId} LIMIT 1`;
   if (!standards[0]) return null;
-  const versions = await sql`SELECT id,version_number,version_label,status,published_at,created_at,change_note FROM standard_versions WHERE standard_id=${standardId} AND organization_id=${orgId} ORDER BY version_number DESC`;
+  const versions = await sql`SELECT sv.id,sv.version_number,sv.version_label,sv.status,sv.published_at,sv.created_at,sv.change_note,
+      publisher.display_name published_by
+    FROM standard_versions sv
+    LEFT JOIN users publisher ON publisher.id=sv.published_by_user_id
+    WHERE sv.standard_id=${standardId} AND sv.organization_id=${orgId} ORDER BY sv.version_number DESC`;
   const mapped: StandardVersionRecord[] = [];
   for (const v of versions) {
     const tasks = await sql`SELECT id,position,name,execution,ready_when,hint,is_critical FROM standard_tasks WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
@@ -96,7 +101,7 @@ export async function getStandard(standardId: string, organizationId?: string) {
     const criteria = await sql`SELECT id,position,criterion,verification_method,verification_method_other FROM standard_readiness_criteria WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
     mapped.push({
       id:v.id,version:v.version_label,versionNumber:v.version_number,status:v.status as StandardVersionStatus,
-      date:datePL(v.published_at??v.created_at),note:v.change_note??"",
+      date:datePL(v.published_at??v.created_at),note:v.change_note??"",publishedBy:v.published_by??undefined,
       tasks:tasks.map(t=>({id:t.id,order:t.position,name:t.name,execution:t.execution,readyWhen:t.ready_when,hint:t.hint??"",isCritical:t.is_critical})),
       startRequirements:requirements.map(r=>({id:r.id,order:r.position,category:r.category,requirement:r.requirement})),
       readinessCriteria:criteria.map(r=>({id:r.id,order:r.position,criterion:r.criterion,verificationMethod:r.verification_method,verificationMethodOther:r.verification_method_other??undefined}))
@@ -472,6 +477,42 @@ export async function getDraftStandardCompleteness(input:{organizationId:string;
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0];
   if(!current||current.status!=="DRAFT") throw new Error("Walidacja przed publikacją dotyczy wyłącznie roboczej wersji Standardu.");
   return validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
+}
+
+
+export async function publishDraftStandard(input:{organizationId:string;standardId:string;publishedByUserId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  return sql.begin(async tx=>{
+    const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status
+      FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} FOR UPDATE OF s,sv`;
+    if(!standard) throw new Error("Nie znaleziono Standardu.");
+    if(standard.status!=="DRAFT") throw new Error("Publikować można wyłącznie roboczą wersję Standardu.");
+
+    const membership=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
+      AND user_id=${input.publishedByUserId} AND status='ACTIVE' LIMIT 1`;
+    if(!membership[0]) throw new Error("Publikujący użytkownik nie ma aktywnego członkostwa w organizacji.");
+
+    const tasks=await tx`SELECT id,position,name,execution,ready_when,hint,is_critical FROM standard_tasks
+      WHERE organization_id=${organizationId} AND standard_version_id=${standard.version_id} ORDER BY position`;
+    const requirements=await tx`SELECT id,position,category,requirement FROM standard_start_requirements
+      WHERE organization_id=${organizationId} AND standard_version_id=${standard.version_id} ORDER BY position`;
+    const criteria=await tx`SELECT id,position,criterion,verification_method,verification_method_other FROM standard_readiness_criteria
+      WHERE organization_id=${organizationId} AND standard_version_id=${standard.version_id} ORDER BY position`;
+    const completeness=validateStandardCompleteness({
+      name:standard.name,
+      tasks:tasks.map(t=>({id:t.id,order:t.position,name:t.name,execution:t.execution,readyWhen:t.ready_when,hint:t.hint??"",isCritical:t.is_critical})),
+      startRequirements:requirements.map(x=>({id:x.id,order:x.position,category:x.category,requirement:x.requirement})),
+      readinessCriteria:criteria.map(x=>({id:x.id,order:x.position,criterion:x.criterion,verificationMethod:x.verification_method,verificationMethodOther:x.verification_method_other??undefined}))
+    });
+    if(!completeness.complete) throw new Error(`Standard nie jest gotowy do publikacji: ${completeness.reasons.join(" ")}`);
+
+    await tx`UPDATE standard_versions SET status='PUBLISHED',published_at=now(),published_by_user_id=${input.publishedByUserId},updated_at=now()
+      WHERE id=${standard.version_id} AND standard_id=${standard.id} AND organization_id=${organizationId} AND status='DRAFT'`;
+    await tx`UPDATE standards SET status='ACTIVE',updated_at=now() WHERE id=${standard.id} AND organization_id=${organizationId}`;
+    return standard.version_id as string;
+  });
 }
 
 

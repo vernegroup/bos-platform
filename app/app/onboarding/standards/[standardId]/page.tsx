@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import {
   createDraftReadinessCriterion, createDraftStartRequirement, createDraftTask, deleteDraftReadinessCriterion,
   deleteDraftStartRequirement, deleteDraftTask, getStandard, moveDraftReadinessCriterion, moveDraftStartRequirement,
-  moveDraftTask, updateDraftReadinessCriterion, updateDraftStandard, updateDraftStartRequirement, updateDraftTask,
+  moveDraftTask, publishDraftStandard, updateDraftReadinessCriterion, updateDraftStandard, updateDraftStartRequirement, updateDraftTask,
   validateStandardCompleteness,
 } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
@@ -105,6 +105,14 @@ async function reorderReadinessCriterion(formData: FormData) {
   redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
 }
 
+
+async function publishStandard(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id});
+  redirect(`/app/onboarding/standards/${standardId}`);
+}
+
 export default async function StandardDetailPage({params}:{params:Promise<{standardId:string}>}) {
   const access=await requireBOSAccess(); const {standardId}=await params;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
@@ -125,7 +133,8 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
 
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><span className="is-active">CZYNNOŚCI</span><span>SZCZEGÓŁY</span><span>PLIKI</span><a href="#historia">HISTORIA WERSJI</a></nav>
     <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":"AKTYWNA WERSJA"}</span>
-      <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p></div>
+      <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p>
+      {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
       {!isDraft&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
 
@@ -237,7 +246,12 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         <span className="bos-dashboard-count">{completeness.complete?"GOTOWY":"BLOKADA"}</span></div>
       <div className="bos-standard-detail-head">
         {completeness.complete
-          ? <div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
+          ? <div style={{display:"grid",gap:12}}><div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
+              <form action={publishStandard}><input type="hidden" name="standardId" value={standard.id}/>
+                <button type="submit" className="bos-standard-primary-action">OPUBLIKUJ STANDARD</button>
+              </form>
+              <p>Publikacja zamknie edycję tej wersji. Dalsze zmiany będą wymagały utworzenia nowej wersji.</p>
+            </div>
           : <div style={{width:"100%"}}><strong>Standard nie jest jeszcze gotowy do publikacji.</strong>
               <ul style={{margin:"12px 0 0",paddingLeft:22,display:"grid",gap:6}}>
                 {completeness.reasons.map(reason=><li key={reason}>{reason}</li>)}
