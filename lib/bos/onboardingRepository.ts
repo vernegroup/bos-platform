@@ -574,12 +574,75 @@ export async function createStandard(input:{organizationId?:string;productId:str
   });
 }
 
-export async function createProcess(input:{organizationId?:string;productId:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;ownerUserId:string;buddyUserId?:string;startedOn:string;targetOn?:string;createdByUserId:string}) {
-  const sql=db(); const organizationId=tenantId(input.organizationId);
+export async function listOnboardingStartOptions(organizationId?:string) {
+  requirePersistedOnboarding();
+  const sql=db(); const orgId=tenantId(organizationId);
+  const [standards,memberships,products]=await Promise.all([
+    sql`SELECT s.id standard_id,s.name,s.area,sv.id version_id,sv.version_label
+      FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
+      WHERE s.organization_id=${orgId} AND s.status='ACTIVE' AND sv.status='PUBLISHED'
+      ORDER BY s.name,sv.version_number DESC`,
+    sql`SELECT u.id,u.display_name,u.email,m.role FROM memberships m JOIN users u ON u.id=m.user_id
+      WHERE m.organization_id=${orgId} AND m.status='ACTIVE' AND u.status='ACTIVE' ORDER BY u.display_name`,
+    sql`SELECT p.id,p.key,p.name FROM licenses l JOIN products p ON p.id=l.product_id
+      WHERE l.organization_id=${orgId} AND l.status='ACTIVE' AND p.status='ACTIVE' ORDER BY p.name`
+  ]);
+  return {
+    standards:standards.map(x=>({standardId:x.standard_id,name:x.name,area:x.area??"",versionId:x.version_id,version:x.version_label})),
+    members:memberships.map(x=>({id:x.id,name:x.display_name,email:x.email,role:x.role})),
+    products:products.map(x=>({id:x.id,key:x.key,name:x.name}))
+  };
+}
+
+export async function createProcess(input:{
+  organizationId?:string;productId:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;
+  ownerUserId:string;trainerUserId:string;evaluatorUserId:string;buddyUserId?:string;startedOn:string;targetOn?:string;createdByUserId:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const employeeName=input.employeeName.trim();
+  if(!employeeName) throw new Error("Pracownik jest wymagany.");
+  if(!input.startedOn) throw new Error("Data startu jest wymagana.");
   return sql.begin(async tx=>{
-    const tasks=await tx`SELECT id FROM standard_tasks WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
-    const [process]=await tx`INSERT INTO onboarding_processes(organization_id,product_id,employee_id,employee_name_snapshot,standard_id,standard_version_id,owner_user_id,buddy_user_id,status,started_on,target_on,created_by_user_id) VALUES(${organizationId},${input.productId},${input.employeeId??null},${input.employeeName},${input.standardId},${input.standardVersionId},${input.ownerUserId},${input.buddyUserId??null},'IN_PROGRESS',${input.startedOn},${input.targetOn??null},${input.createdByUserId}) RETURNING id`;
-    for(const task of tasks){await tx`INSERT INTO onboarding_task_progress(organization_id,onboarding_process_id,standard_task_id,status) VALUES(${organizationId},${process.id},${task.id},'TODO')`;}
+    const [version]=await tx`SELECT sv.id,sv.standard_id,sv.status,s.status standard_status
+      FROM standard_versions sv JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
+      WHERE sv.id=${input.standardVersionId} AND sv.standard_id=${input.standardId} AND sv.organization_id=${organizationId}
+      FOR SHARE OF sv,s`;
+    if(!version || version.status!=="PUBLISHED" || version.standard_status!=="ACTIVE")
+      throw new Error("Onboarding można rozpocząć wyłącznie na opublikowanej wersji aktywnego Standardu.");
+
+    const [licensedProduct]=await tx`SELECT p.id FROM products p JOIN licenses l ON l.product_id=p.id
+      WHERE p.id=${input.productId} AND p.status='ACTIVE' AND l.organization_id=${organizationId} AND l.status='ACTIVE' LIMIT 1`;
+    if(!licensedProduct) throw new Error("Organizacja nie ma aktywnej licencji produktu.");
+
+    const actors=[input.ownerUserId,input.trainerUserId,input.evaluatorUserId,input.createdByUserId,...(input.buddyUserId?[input.buddyUserId]:[])];
+    const uniqueActors=[...new Set(actors)];
+    const activeActors=await tx`SELECT user_id FROM memberships WHERE organization_id=${organizationId}
+      AND status='ACTIVE' AND user_id = ANY(${uniqueActors})`;
+    if(activeActors.length!==uniqueActors.length) throw new Error("Wszystkie osoby przypisane do procesu muszą być aktywnymi członkami organizacji.");
+    if(input.employeeId){
+      const employee=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
+        AND user_id=${input.employeeId} AND status='ACTIVE' LIMIT 1`;
+      if(!employee[0]) throw new Error("Wybrany pracownik nie należy aktywnie do tej organizacji.");
+    }
+
+    const [process]=await tx`INSERT INTO onboarding_processes(
+      organization_id,product_id,employee_id,employee_name_snapshot,standard_id,standard_version_id,
+      owner_user_id,trainer_user_id,evaluator_user_id,buddy_user_id,status,started_on,target_on,created_by_user_id
+    ) VALUES(
+      ${organizationId},${input.productId},${input.employeeId??null},${employeeName},${input.standardId},${input.standardVersionId},
+      ${input.ownerUserId},${input.trainerUserId},${input.evaluatorUserId},${input.buddyUserId??null},'PLANNED',
+      ${input.startedOn},${input.targetOn??null},${input.createdByUserId}
+    ) RETURNING id`;
+
+    await tx`INSERT INTO onboarding_task_progress(organization_id,onboarding_process_id,standard_task_id)
+      SELECT ${organizationId},${process.id},id FROM standard_tasks
+      WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
+    await tx`INSERT INTO onboarding_start_checks(organization_id,onboarding_process_id,requirement_id)
+      SELECT ${organizationId},${process.id},id FROM standard_start_requirements
+      WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
+    await tx`INSERT INTO onboarding_readiness_checks(organization_id,onboarding_process_id,readiness_criterion_id)
+      SELECT ${organizationId},${process.id},id FROM standard_readiness_criteria
+      WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
     return process.id as string;
   });
 }
