@@ -3192,3 +3192,117 @@
 .bos-app-chat-fab{position:fixed;right:28px;bottom:26px;z-index:45;width:54px;height:54px;border:1px solid rgba(255,255,255,.18);border-radius:50%;display:grid;place-items:center;background:#0b1f31;color:#d6a541;box-shadow:0 12px 30px rgba(10,25,39,.24);text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
 .bos-app-chat-fab svg{width:23px;height:23px}.bos-app-chat-fab:hover,.bos-app-chat-fab:focus-visible{transform:translateY(-3px);background:#142d42;box-shadow:0 17px 36px rgba(10,25,39,.3)}
 @media(max-width:800px){.bos-app-chat-fab{right:18px;bottom:18px;width:50px;height:50px}}
+
+
+/* ===========================================================
+   BOS ONBOARDING — 1.11 RESPONSIVE / STATES / ACCESSIBILITY
+   =========================================================== */
+.bos-onboarding-shell :where(input,select,textarea){
+  width:100%;max-width:100%;border:1px solid var(--bos-border-strong);border-radius:var(--bos-radius-sm);
+  background:var(--bos-white);color:var(--bos-text);
+}
+.bos-onboarding-shell :where(input,select){min-height:40px}
+.bos-onboarding-shell textarea{resize:vertical;line-height:1.45}
+.bos-onboarding-shell :where(input,select,textarea):disabled{background:var(--bos-cream-100);color:var(--bos-text-subtle)}
+.bos-onboarding-shell button{min-height:34px;padding:0 10px;border:1px solid var(--bos-border-strong);border-radius:var(--bos-radius-sm);background:var(--bos-white);color:var(--bos-text);font-size:8px;font-weight:700}
+.bos-onboarding-shell .bos-standard-primary-action{border-color:var(--bos-navy-900);background:var(--bos-navy-900);color:var(--bos-text-inverse)}
+.bos-onboarding-shell .bos-standard-primary-action:hover{background:var(--bos-navy-800)}
+.bos-onboarding-shell .bos-standard-primary-action:disabled{border-color:var(--bos-border);background:var(--bos-cream-200);color:var(--bos-text-subtle)}
+.bos-onboarding-shell form{min-width:0}
+.bos-onboarding-shell .bos-process-new-lock{opacity:1}
+.bos-onboarding-shell .bos-process-new-lock button{margin-top:12px}
+.bos-onboarding-shell .bos-operational-empty{min-height:112px;display:flex;flex-direction:column;justify-content:center;background:var(--bos-surface-soft)}
+.bos-onboarding-shell .bos-operational-empty strong{color:var(--bos-navy-950)}
+.bos-onboarding-shell .bos-standard-history{scroll-margin-top:76px}
+.bos-onboarding-shell .bos-standard-version-row b{color:var(--bos-text-muted)}
+.bos-onboarding-shell .bos-standard-version-row b[data-current="true"]{color:var(--bos-green-700)}
+.bos-onboarding-shell .bos-form-stack{display:grid;gap:10px;width:100%}
+.bos-onboarding-shell .bos-form-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bos-onboarding-shell .bos-inline-actions{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap}
+.bos-onboarding-shell .bos-process-new-field>label{display:grid;gap:6px;min-width:0}
+.bos-onboarding-shell .bos-process-new-field>label small{color:var(--bos-text-subtle);font-size:7px;font-weight:700;letter-spacing:.06em}
+.bos-onboarding-shell .bos-readonly-note{padding:12px 0;border-bottom:1px solid var(--bos-border);color:var(--bos-text-muted);font-size:9px}
+
+@media(max-width:850px){
+  .bos-onboarding-shell .bos-standard-detail-head{grid-template-columns:minmax(0,1fr) 76px}
+  .bos-onboarding-shell .bos-standard-detail-head>.bos-standard-primary-action{grid-column:1/-1;margin-left:0;width:max-content}
+  .bos-onboarding-shell .bos-standard-version-row{grid-template-columns:54px 78px minmax(0,1fr)}
+  .bos-onboarding-shell .bos-standard-version-row span,.bos-onboarding-shell .bos-standard-version-row b{grid-column:3}
+}
+@media(max-width:600px){
+  .bos-onboarding-shell .bos-app-intro{display:grid;grid-template-columns:1fr;gap:14px}
+  .bos-onboarding-shell .bos-app-build-state{justify-self:start}
+  .bos-onboarding-shell .bos-standard-detail-head{grid-template-columns:1fr;padding:16px 8px;gap:12px}
+  .bos-onboarding-shell .bos-standard-detail-head>div:nth-child(2){padding:0;border-left:0}
+  .bos-onboarding-shell .bos-standard-detail-head>.bos-standard-primary-action{grid-column:1;width:100%}
+  .bos-onboarding-shell .bos-standard-tabs{gap:18px;white-space:nowrap}
+  .bos-onboarding-shell .bos-standard-task-row{padding-left:8px;padding-right:8px}
+  .bos-onboarding-shell .bos-standard-history{margin-top:30px}
+  .bos-onboarding-shell .bos-standard-version-row{grid-template-columns:48px 1fr;padding:12px 8px}
+  .bos-onboarding-shell .bos-standard-version-row p,.bos-onboarding-shell .bos-standard-version-row span,.bos-onboarding-shell .bos-standard-version-row b{grid-column:2}
+  .bos-onboarding-shell .bos-process-new{margin-top:18px}
+  .bos-onboarding-shell .bos-process-new-field{padding:16px 8px}
+  .bos-onboarding-shell .bos-process-new-lock{padding:16px 8px}
+  .bos-onboarding-shell .bos-process-next{align-items:flex-start;flex-direction:column}
+  .bos-onboarding-shell .bos-process-next-action{width:100%}
+  .bos-onboarding-shell .bos-process-next-action a{display:flex;min-height:44px;align-items:center}
+}
+@media(max-width:420px){
+  .bos-onboarding-shell .bos-onboarding-commandbar>div{min-width:104px}
+  .bos-onboarding-shell .bos-standard-primary-action{min-height:44px}
+  .bos-onboarding-shell .bos-standard-tabs span,.bos-onboarding-shell .bos-standard-tabs a{height:44px;padding-top:16px}
+}
+
+
+/* BOS ONBOARDING 1.13 — Functional & UI Parity Recovery */
+.bos-process-summary{grid-template-columns:minmax(180px,1fr) 100px 100px 90px 90px}
+.bos-process-task-head,.bos-process-task-row{grid-template-columns:38px 220px minmax(190px,.8fr) minmax(330px,1.4fr)}
+.bos-process-task-row div>small{color:var(--app-muted);font-size:7px;line-height:1.45}
+.bos-process-stage-flow{display:flex!important;flex-direction:row!important;align-items:center;gap:5px!important;flex-wrap:wrap}
+.bos-process-stage-flow form{display:inline-flex}
+.bos-process-stage-flow button{min-height:26px;padding:0 7px;border:1px solid #d1d4d5;background:transparent;color:var(--app-muted);font-size:7px;font-weight:700;letter-spacing:.35px}
+.bos-process-stage-flow button:not(:disabled):hover{border-color:var(--app-accent);color:var(--app-accent)}
+.bos-process-stage-flow button.is-done{border-color:#c8d2c7;background:#edf2ec;color:#536a54}
+.bos-process-stage-flow button:disabled:not(.is-done){opacity:.45;cursor:not-allowed}
+.bos-process-task-note{flex-basis:100%;margin-top:3px}
+@media(max-width:850px){.bos-process-task-row{grid-template-columns:28px minmax(150px,1fr);gap:10px}.bos-process-task-row>p,.bos-process-stage-flow{grid-column:2}}
+@media(max-width:600px){.bos-process-summary{grid-template-columns:1fr 1fr}.bos-process-stage-flow{gap:4px!important}.bos-process-stage-flow button{min-height:30px;padding:0 6px}}
+
+/* 1.15 — operational start requirements */
+.bos-start-check-list{display:grid;border-top:1px solid var(--bos-line)}
+.bos-start-check-row{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--bos-line)}
+.bos-start-check-row>span,.bos-start-check-row small{font-size:11px;letter-spacing:.06em;color:var(--bos-muted)}
+.bos-start-check-row>div{display:grid;gap:4px}.bos-start-check-row button{min-width:128px;padding:8px 10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+.bos-start-check-row button.is-done{cursor:default;opacity:.72}.bos-start-check-row button:disabled{cursor:default}
+@media(max-width:600px){.bos-start-check-row{grid-template-columns:32px 1fr}.bos-start-check-row form{grid-column:2}.bos-start-check-row button{width:100%}}
+
+/* 1.16 — progress audit, factual notes and handover */
+.bos-process-stage{display:grid;gap:3px;align-self:start}.bos-process-stage>small{font-size:6px!important;max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bos-process-note-form{flex-basis:100%;display:grid;gap:6px;margin-top:7px;padding-top:8px;border-top:1px solid var(--bos-line)}
+.bos-process-note-form label{display:grid;gap:5px}.bos-process-note-form label>span{font-size:7px;font-weight:700;letter-spacing:.06em;color:var(--app-muted)}
+.bos-process-note-form textarea{width:100%;min-height:54px;resize:vertical;padding:8px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:9px;line-height:1.45}
+.bos-process-note-form>div{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.bos-process-note-form>div small{max-width:430px;font-size:7px;line-height:1.45}
+.bos-process-note-form button{min-height:28px;padding:0 9px;border:1px solid var(--bos-line);background:transparent;font-size:7px;font-weight:700;white-space:nowrap}
+@media(max-width:600px){.bos-process-stage{min-width:31%}.bos-process-stage>small{max-width:100%}.bos-process-note-form>div{display:grid}.bos-process-note-form button{min-height:36px;width:100%}}
+
+/* 1.17 — contextual BOS guidance */
+.bos-context-guide{margin:0 0 14px;padding:11px 14px;border-left:2px solid var(--bos-gold-500,#a88b55);background:var(--bos-surface-soft);display:grid;gap:4px}
+.bos-context-guide strong{font-size:8px;letter-spacing:.08em;color:var(--bos-navy-950)}
+.bos-context-guide p{margin:0;max-width:900px;font-size:9px;line-height:1.5;color:var(--bos-text-muted)}
+.bos-context-guide.is-compact{margin:2px 0 0;padding:8px 10px}.bos-context-inline{display:block;margin-top:5px;color:var(--bos-text-muted)!important}
+@media(max-width:600px){.bos-context-guide{padding:10px 11px}.bos-context-guide p{font-size:10px}}
+
+/* 1.18 — readiness gate */
+.bos-readiness-gates{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--bos-line);margin-bottom:14px}
+.bos-readiness-gates>div{display:grid;gap:5px;padding:12px;border-right:1px solid var(--bos-line)}.bos-readiness-gates>div:last-child{border-right:0}
+.bos-readiness-gates span{font-size:8px;color:var(--bos-muted)}.bos-readiness-gates strong{font-size:9px}.bos-readiness-gates b{font-size:11px}.bos-readiness-gates .is-pass b{color:#58745e}
+.bos-readiness-list{display:grid;border-top:1px solid var(--bos-line)}.bos-readiness-list article{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,340px);gap:18px;padding:14px 0;border-bottom:1px solid var(--bos-line);align-items:center}
+.bos-readiness-list article>div{display:grid;gap:5px}.bos-readiness-list span,.bos-readiness-list small{font-size:8px;color:var(--bos-muted)}.bos-readiness-list article>form{display:grid;gap:6px}.bos-readiness-list input{padding:8px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:9px}.bos-readiness-list button{padding:8px;border:1px solid var(--bos-line);background:transparent;font-size:8px;font-weight:700}.bos-readiness-pass{font-size:9px;color:#58745e;text-align:right}
+@media(max-width:850px){.bos-readiness-gates{grid-template-columns:repeat(2,1fr)}.bos-readiness-gates>div:nth-child(2){border-right:0}}
+@media(max-width:600px){.bos-readiness-gates{grid-template-columns:1fr}.bos-readiness-gates>div{border-right:0;border-bottom:1px solid var(--bos-line)}.bos-readiness-list article{grid-template-columns:1fr}.bos-readiness-pass{text-align:left}}
+
+/* 1.19 — closure decision and reopen */
+.bos-close-decision-form{display:grid;gap:12px}.bos-close-decision-form label{display:grid;gap:6px}.bos-close-decision-form label>span{font-size:8px;font-weight:700;letter-spacing:.07em;color:var(--bos-muted)}
+.bos-close-decision-form textarea{min-height:82px;padding:10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:10px;resize:vertical}.bos-close-decisions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bos-close-decisions button,.bos-reopen-form button{min-height:38px;border:1px solid var(--bos-line);background:transparent;font-size:9px;font-weight:700}.bos-close-decisions button:disabled{opacity:.4}
+.bos-reopen-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px}.bos-reopen-form input{padding:10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:9px}
+@media(max-width:600px){.bos-close-decisions{grid-template-columns:1fr}.bos-reopen-form{grid-template-columns:1fr}}

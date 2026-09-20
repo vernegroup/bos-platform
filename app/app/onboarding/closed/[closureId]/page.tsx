@@ -1,9 +1,13 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getClosure, getStandard } from "@/lib/bos/onboardingRepository";
+import { notFound, redirect } from "next/navigation";
+import { getClosure, getStandard, reopenProcess } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
+async function reopen(formData:FormData) {
+  "use server"; const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const closureId=String(formData.get("closureId")??"");
+  await reopenProcess({organizationId:access.organization.id,processId,closureId,userId:access.user.id,reason:String(formData.get("reason")??"")}); redirect(`/app/onboarding/processes/${processId}`);
+}
 export default async function ClosureDetailPage({ params }: { params: Promise<{ closureId: string }> }) {
   const access = await requireBOSAccess();
   const { closureId } = await params;
@@ -67,6 +71,10 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <strong>{closure.employee} / {standard.name} / {closure.standardVersion}</strong>
         <p>Ten rekord reprezentuje zamknięty wynik procesu i nie powinien zmieniać się po publikacji kolejnych wersji Standardu Stanowiska.</p>
       </section>
+      {closure.isLatest&&<section className="bos-process-card"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">HISTORIA DECYZJI</span><h2>Wznowienie procesu</h2></div><span className="bos-dashboard-count">DECYZJA #{closure.decisionSequence}</span></div>
+        <p>Wznowienie nie usuwa tej Karty Zakończenia. Rekord pozostaje w historii, a proces wraca do pracy z zachowanym postępem.</p>
+        <form action={reopen} className="bos-reopen-form"><input type="hidden" name="processId" value={closure.processId}/><input type="hidden" name="closureId" value={closure.id}/><input name="reason" required maxLength={500} placeholder="Powód wznowienia procesu"/><button type="submit">WZNÓW PROCES</button></form>
+      </section>}
     </>
   );
 }
