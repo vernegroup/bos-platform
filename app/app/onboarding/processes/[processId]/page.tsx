@@ -59,6 +59,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         <div className="bos-process-summary-progress" role="progressbar" aria-label="Postęp wdrożenia" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent}><i style={{ width: `${progress.percent}%` }} /></div>
       </section>
 
+      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · START</strong><p>Warunek rozpoczęcia oznacza coś, co faktycznie musi być dostępne lub przygotowane przed wdrożeniem. Potwierdź stan rzeczywisty — nie plan jego wykonania.</p></aside>
       <section className="bos-process-card">
         <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZED STARTEM</span><h2>Warunki rozpoczęcia</h2></div>
           <span className="bos-dashboard-count">{process.startChecks.filter(x=>x.isSatisfied).length} z {version.startRequirements.length} potwierdzonych</span></div>
@@ -76,6 +77,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <span className="bos-dashboard-count">{progress.completed} z {progress.total} czynności gotowych</span>
         </div>
 
+        <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · 5 ETAPÓW</strong><p>WYJAŚNIJ — omów. POKAŻ — zademonstruj. RAZEM — wykonajcie wspólnie. SAM — pracownik wykonuje bez pomocy. SPRAWDŹ — oceń rezultat według warunku zaliczenia. Deklaracja „wiem” nie zastępuje SAM.</p></aside>
         <div className="bos-process-task-head">
           <span>LP.</span><span>CZYNNOŚĆ ZE STANDARDU</span><span>CO SPRAWDZIĆ</span><span>POSTĘP BOS</span>
         </div>
@@ -85,7 +87,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           return (
             <article className="bos-process-task-row" key={task.id}>
               <span>{String(task.order).padStart(2, "0")}{task.isCritical ? " · K" : ""}</span>
-              <div><strong>{task.name}</strong><p>{task.execution}</p>{task.hint&&<small>WSKAZÓWKA: {task.hint}</small>}</div>
+              <div><strong>{task.name}</strong><p>{task.execution}</p>{task.isCritical&&<small className="bos-context-inline">K — błąd w tej czynności może mieć poważne konsekwencje. K nie oznacza po prostu „ważne”.</small>}{task.hint&&<small>WSKAZÓWKA: {task.hint}</small>}</div>
               <p>{task.readyWhen}</p>
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
                 {stageLabels.map(([stage,label,key,actorKey],stageIndex)=>{ const done=Boolean(state[key]); const previousKey=stageIndex>0?stageLabels[stageIndex-1][2]:null; const previousDone=stageIndex===0||Boolean(previousKey&&state[previousKey]);
@@ -97,6 +99,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         })}
       </section>
 
+      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · HANDOVER</strong><p>Przy przekazaniu procesu następna osoba powinna oprzeć się na zapisanych etapach, datach i faktach. Nie zaczynaj wdrożenia od początku tylko dlatego, że zmienił się prowadzący.</p></aside>
       <section className="bos-process-next">
         <div>
           <span className="bos-dashboard-section-kicker">NASTĘPNY KROK</span>
