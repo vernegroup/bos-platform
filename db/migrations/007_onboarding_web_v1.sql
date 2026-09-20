@@ -350,6 +350,11 @@ CREATE TRIGGER onboarding_closures_append_only_guard
 BEFORE UPDATE OR DELETE ON onboarding_closures
 FOR EACH ROW EXECUTE FUNCTION bos_guard_onboarding_closure_append_only();
 
+CREATE TABLE IF NOT EXISTS bos_schema_migrations (
+  name text PRIMARY KEY,
+  applied_at timestamptz NOT NULL DEFAULT now()
+);
+
 INSERT INTO bos_schema_migrations(name)
 VALUES ('007_onboarding_web_v1.sql')
 ON CONFLICT(name) DO NOTHING;
