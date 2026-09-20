@@ -69,6 +69,7 @@ type PersistedTaskProgress = {
   togetherAt?: string | Date | null;
   soloAt?: string | Date | null;
   checkedAt?: string | Date | null;
+  explainedBy?: string | null; shownBy?: string | null; togetherBy?: string | null; soloBy?: string | null; checkedBy?: string | null;
 };
 
 function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskProgress & { standardTaskId: string } {
@@ -85,6 +86,7 @@ export type ProcessTaskRecord = {
   checkedAt?: string | Date;
   completedAt?: string;
   note?: string;
+  explainedBy?: string; shownBy?: string; togetherBy?: string; soloBy?: string; checkedBy?: string;
 };
 export type ProcessStartCheckRecord = { requirementId:string; isSatisfied:boolean; checkedAt?:string|Date; note?:string };
 export type ProcessRecord = {
@@ -161,7 +163,8 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
     SELECT p.id,p.employee_name_snapshot,p.standard_id,sv.version_label,p.started_on,p.target_on,
       u.display_name owner,p.status,
       COALESCE(json_agg(json_build_object('standardTaskId',tp.standard_task_id,'explainedAt',tp.explained_at,
-        'shownAt',tp.shown_at,'togetherAt',tp.together_at,'soloAt',tp.solo_at,'checkedAt',tp.checked_at,'note',tp.note))
+        'shownAt',tp.shown_at,'togetherAt',tp.together_at,'soloAt',tp.solo_at,'checkedAt',tp.checked_at,'note',tp.note,
+        'explainedBy',ue.display_name,'shownBy',us.display_name,'togetherBy',ut.display_name,'soloBy',uo.display_name,'checkedBy',uc.display_name))
         FILTER (WHERE tp.id IS NOT NULL),'[]'::json) tasks,
       COALESCE((SELECT json_agg(json_build_object('requirementId',sc.requirement_id,'isSatisfied',sc.is_satisfied,'checkedAt',sc.checked_at,'note',sc.note))
         FROM onboarding_start_checks sc WHERE sc.onboarding_process_id=p.id AND sc.organization_id=p.organization_id),'[]'::json) start_checks
@@ -169,16 +172,19 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
     JOIN standard_versions sv ON sv.id=p.standard_version_id AND sv.organization_id=p.organization_id
     JOIN users u ON u.id=p.owner_user_id
     LEFT JOIN onboarding_task_progress tp ON tp.onboarding_process_id=p.id AND tp.organization_id=p.organization_id
+    LEFT JOIN users ue ON ue.id=tp.explained_by_user_id LEFT JOIN users us ON us.id=tp.shown_by_user_id
+    LEFT JOIN users ut ON ut.id=tp.together_by_user_id LEFT JOIN users uo ON uo.id=tp.solo_by_user_id LEFT JOIN users uc ON uc.id=tp.checked_by_user_id
     WHERE p.organization_id=${orgId} AND p.status IN ('PLANNED','IN_PROGRESS','PAUSED','READY_TO_CLOSE')
     GROUP BY p.id,sv.version_label,u.display_name ORDER BY p.started_on DESC`;
   return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
     startedAt:datePL(r.started_on),targetDate:r.target_on?datePL(r.target_on):"",owner:r.owner,status:r.status==="PLANNED"?"PLANOWANE" as const:r.status==="PAUSED"?"WSTRZYMANE" as const:"W TOKU" as const,
     startChecks:((r.start_checks??[]) as Array<{requirementId:string;isSatisfied:boolean;checkedAt?:string;note?:string}>).map(x=>({requirementId:x.requirementId,isSatisfied:x.isSatisfied,checkedAt:x.checkedAt??undefined,note:x.note??undefined})),
-    tasks:((r.tasks??[]) as Array<{standardTaskId:string;explainedAt?:string;shownAt?:string;togetherAt?:string;soloAt?:string;checkedAt?:string;note?:string}>)
+    tasks:((r.tasks??[]) as Array<{standardTaskId:string;explainedAt?:string;shownAt?:string;togetherAt?:string;soloAt?:string;checkedAt?:string;note?:string;explainedBy?:string;shownBy?:string;togetherBy?:string;soloBy?:string;checkedBy?:string}>)
       .filter(hasStandardTaskId).map(x=>({standardTaskId:x.standardTaskId,
         status:x.checkedAt?"GOTOWE" as const:(x.explainedAt||x.shownAt||x.togetherAt||x.soloAt)?"W TOKU" as const:"DO WYKONANIA" as const,
         explainedAt:x.explainedAt??undefined,shownAt:x.shownAt??undefined,togetherAt:x.togetherAt??undefined,soloAt:x.soloAt??undefined,checkedAt:x.checkedAt??undefined,
-        completedAt:x.checkedAt?datePL(x.checkedAt):undefined,note:x.note??undefined}))}));
+        completedAt:x.checkedAt?datePL(x.checkedAt):undefined,note:x.note??undefined,
+        explainedBy:x.explainedBy??undefined,shownBy:x.shownBy??undefined,togetherBy:x.togetherBy??undefined,soloBy:x.soloBy??undefined,checkedBy:x.checkedBy??undefined}))}));
 }
 
 export async function getProcess(processId:string, organizationId?:string) {
@@ -222,6 +228,17 @@ export async function confirmStartRequirement(input:{organizationId?:string;proc
     const [remaining]=await tx`SELECT count(*)::int count FROM onboarding_start_checks WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND is_satisfied=false`;
     if(remaining.count===0) await tx`UPDATE onboarding_processes SET status='IN_PROGRESS',updated_at=now() WHERE id=${input.processId} AND organization_id=${organizationId} AND status='PLANNED'`;
   });
+}
+
+export async function updateTaskNote(input:{organizationId?:string;processId:string;standardTaskId:string;note:string;userId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const note=input.note.trim();
+  if(note.length>500) throw new Error("Notatka może mieć maksymalnie 500 znaków.");
+  const member=await sql`SELECT 1 FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} AND status='ACTIVE' LIMIT 1`;
+  if(!member[0]) throw new Error("Osoba zapisująca notatkę nie należy aktywnie do tej organizacji.");
+  const rows=await sql`UPDATE onboarding_task_progress SET note=${note||null},updated_at=now()
+    WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} RETURNING id`;
+  if(!rows[0]) throw new Error("Nie znaleziono czynności w tym procesie.");
 }
 
 export type OnboardingTaskStage = "EXPLAINED"|"SHOWN"|"TOGETHER"|"SOLO"|"CHECKED";
