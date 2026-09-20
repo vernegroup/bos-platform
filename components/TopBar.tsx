@@ -17,22 +17,18 @@ export default function TopBar() {
         </Link>
 
         <nav className="bos-topbar-right" aria-label="Główna nawigacja">
-          <a className="bos-topbar-link" href="#produkty">
-            Produkty
-          </a>
-
-          <Link className="bos-topbar-link" href="/implementation">
-            Implementation
-          </Link>
-
-          <a className="bos-topbar-link bos-topbar-contact" href="#kontakt">
-            Kontakt
-          </a>
+          <div className="bos-topbar-primary-links">
+          </div>
 
           <Link className="bos-topbar-login" href="/login">
             Zaloguj się
             <span aria-hidden="true">→</span>
           </Link>
+
+          <div className="bos-topbar-secondary-links">
+            <a className="bos-topbar-link" href="#produkty">Produkty</a>
+            <a className="bos-topbar-link" href="#kontakt">Kontakt</a>
+          </div>
         </nav>
       </div>
 
