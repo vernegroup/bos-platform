@@ -4,11 +4,9 @@ import { onboardingStandards } from "@/data/onboardingStandards";
 import { onboardingProcesses } from "@/data/onboardingProcesses";
 import { onboardingClosures } from "@/data/onboardingClosures";
 
-export const DEMO_ORGANIZATION_ID = "00000000-0000-0000-0000-000000000001";
-function tenantId(organizationId?:string){
-  if (organizationId) return organizationId;
-  if (hasDatabase()) throw new Error("organizationId is required for persisted onboarding data.");
-  return DEMO_ORGANIZATION_ID;
+function tenantId(organizationId?: string) {
+  if (!organizationId) throw new Error("organizationId is required for onboarding data.");
+  return organizationId;
 }
 
 const datePL = (value: string | Date | null) => {
@@ -16,6 +14,45 @@ const datePL = (value: string | Date | null) => {
   const d = new Date(value);
   return new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
 };
+
+export type StandardVersionStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
+export type StandardTaskRecord = {
+  id: string;
+  order: number;
+  name: string;
+  execution: string;
+  readyWhen: string;
+  hint: string;
+  isCritical: boolean;
+};
+export type StartRequirementRecord = {
+  id: string;
+  order: number;
+  category: "TOOLS" | "ACCESS" | "MATERIALS" | "INSTRUCTIONS" | "WORKPLACE" | "OTHER";
+  requirement: string;
+};
+export type ReadinessCriterionRecord = {
+  id: string;
+  order: number;
+  criterion: string;
+  verificationMethod: "OBSERVATION" | "INDEPENDENT_TASK" | "WORK_SAMPLE" | "CONTROL_QUESTIONS" | "KNOWLEDGE_TEST" | "OTHER";
+  verificationMethodOther?: string;
+};
+export type StandardVersionRecord = {
+  id: string;
+  version: string;
+  versionNumber: number;
+  status: StandardVersionStatus;
+  date: string;
+  note: string;
+  tasks: StandardTaskRecord[];
+  startRequirements: StartRequirementRecord[];
+  readinessCriteria: ReadinessCriterionRecord[];
+};
+
+function requirePersistedOnboarding() {
+  if (!hasDatabase()) throw new Error("Database is required for persisted onboarding operations.");
+}
 
 type PersistedTaskProgress = {
   standardTaskId?: string;
@@ -28,30 +65,45 @@ function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskPr
   return Boolean(task.standardTaskId);
 }
 
-export async function listStandards(organizationId?:string) {
+export async function listStandards(organizationId?: string) {
   if (!hasDatabase()) return onboardingStandards;
-  const sql=db(); const orgId=tenantId(organizationId);
-  const rows=await sql`
-    SELECT s.id,s.name,s.area,s.status,sv.version_label,sv.published_at,sv.change_note,
-      (SELECT count(*)::int FROM standard_tasks st WHERE st.standard_version_id=sv.id) task_count
-    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id
-    WHERE s.organization_id=${orgId} ORDER BY s.name`;
-  return rows.map(r=>({id:r.id,name:r.name,area:r.area??"",status:r.status==="ACTIVE"?"AKTYWNY":"ROBOCZY",currentVersion:r.version_label,updatedAt:datePL(r.published_at),versions:[{version:r.version_label,date:datePL(r.published_at),note:r.change_note??"",tasks:Array.from({length:r.task_count},(_,i)=>({id:`count-${i}`,order:i+1,name:"",execution:"",readyWhen:""}))}]}));
+  const sql = db(); const orgId = tenantId(organizationId);
+  const rows = await sql`
+    SELECT s.id,s.name,s.area,s.status,s.current_version_id,
+      sv.version_label,sv.status version_status,sv.published_at,sv.created_at,
+      (SELECT count(*)::int FROM standard_tasks st WHERE st.standard_version_id=sv.id AND st.organization_id=s.organization_id) task_count
+    FROM standards s
+    LEFT JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    WHERE s.organization_id=${orgId}
+    ORDER BY s.updated_at DESC,s.name`;
+  return rows.map(r=>({
+    id:r.id,name:r.name,area:r.area??"",status:r.status==="ACTIVE"?"AKTYWNY":"ROBOCZY",
+    currentVersion:r.version_label??"",updatedAt:datePL(r.published_at??r.created_at??null),
+    versionStatus:r.version_status??null,taskCount:r.task_count??0,versions:[]
+  }));
 }
 
-export async function getStandard(standardId:string, organizationId?:string) {
+export async function getStandard(standardId: string, organizationId?: string) {
   if (!hasDatabase()) return onboardingStandards.find(s=>s.id===standardId) ?? null;
-  const sql=db(); const orgId=tenantId(organizationId);
-  const standards=await sql`SELECT id,name,area,status,current_version_id FROM standards WHERE id=${standardId} AND organization_id=${orgId} LIMIT 1`;
-  if(!standards[0]) return null;
-  const versions=await sql`SELECT id,version_label,published_at,change_note FROM standard_versions WHERE standard_id=${standardId} AND organization_id=${orgId} ORDER BY version_number DESC`;
-  const mapped=[];
-  for(const v of versions){
-    const tasks=await sql`SELECT id,position,name,execution,ready_when FROM standard_tasks WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
-    mapped.push({version:v.version_label,date:datePL(v.published_at),note:v.change_note??"",tasks:tasks.map(t=>({id:t.id,order:t.position,name:t.name,execution:t.execution,readyWhen:t.ready_when}))});
+  const sql = db(); const orgId = tenantId(organizationId);
+  const standards = await sql`SELECT id,name,area,status,current_version_id FROM standards WHERE id=${standardId} AND organization_id=${orgId} LIMIT 1`;
+  if (!standards[0]) return null;
+  const versions = await sql`SELECT id,version_number,version_label,status,published_at,created_at,change_note FROM standard_versions WHERE standard_id=${standardId} AND organization_id=${orgId} ORDER BY version_number DESC`;
+  const mapped: StandardVersionRecord[] = [];
+  for (const v of versions) {
+    const tasks = await sql`SELECT id,position,name,execution,ready_when,hint,is_critical FROM standard_tasks WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
+    const requirements = await sql`SELECT id,position,category,requirement FROM standard_start_requirements WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
+    const criteria = await sql`SELECT id,position,criterion,verification_method,verification_method_other FROM standard_readiness_criteria WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
+    mapped.push({
+      id:v.id,version:v.version_label,versionNumber:v.version_number,status:v.status as StandardVersionStatus,
+      date:datePL(v.published_at??v.created_at),note:v.change_note??"",
+      tasks:tasks.map(t=>({id:t.id,order:t.position,name:t.name,execution:t.execution,readyWhen:t.ready_when,hint:t.hint??"",isCritical:t.is_critical})),
+      startRequirements:requirements.map(r=>({id:r.id,order:r.position,category:r.category,requirement:r.requirement})),
+      readinessCriteria:criteria.map(r=>({id:r.id,order:r.position,criterion:r.criterion,verificationMethod:r.verification_method,verificationMethodOther:r.verification_method_other??undefined}))
+    });
   }
-  const current=versions.find(v=>v.id===standards[0].current_version_id);
-  return {id:standards[0].id,name:standards[0].name,area:standards[0].area??"",status:standards[0].status==="ACTIVE"?"AKTYWNY" as const:"ROBOCZY" as const,currentVersion:current?.version_label??"",updatedAt:datePL(current?.published_at??null),versions:mapped};
+  const current=mapped.find(v=>v.id===standards[0].current_version_id);
+  return {id:standards[0].id,name:standards[0].name,area:standards[0].area??"",status:standards[0].status==="ACTIVE"?"AKTYWNY" as const:"ROBOCZY" as const,currentVersion:current?.version??"",updatedAt:current?.date??"",versions:mapped};
 }
 
 export async function listProcesses(organizationId?:string) {
