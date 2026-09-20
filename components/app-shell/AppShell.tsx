@@ -12,7 +12,7 @@ type AppShellProps = {
   organizationName: string;
 };
 
-type IconName = "home"|"products"|"users"|"company"|"search"|"updates"|"settings"|"help"|"logout"|"bell"|"chevron";
+type IconName = "home"|"products"|"users"|"company"|"search"|"updates"|"settings"|"help"|"logout"|"bell"|"chevron"|"chat";
 
 const navigation:{label:string;href:string;icon:IconName}[] = [
   { label:"Strona główna", href:"/app", icon:"home" },
@@ -39,6 +39,7 @@ function Icon({name}:{name:IconName}) {
     logout:<><path d="M10 5H5v14h5"/><path d="M14 8l4 4-4 4M18 12H9"/></>,
     bell:<><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 20h4"/></>,
     chevron:<path d="m8 10 4 4 4-4"/>,
+    chat:<><path d="M5 18.5 3.5 21l3.8-1.3A9 9 0 1 0 5 18.5Z"/><path d="M8 11.5h.01M12 11.5h.01M16 11.5h.01"/></>,
   };
   return <svg {...common}>{paths[name]}</svg>;
 }
@@ -114,6 +115,7 @@ export default function AppShell({children,account,organizationName}:AppShellPro
         </div>
       </header>
       <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
+      <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>
     </div>
   </div>;
 }

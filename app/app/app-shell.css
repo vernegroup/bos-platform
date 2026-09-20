@@ -3186,3 +3186,9 @@
 .bos-products-header,.p7-head,.p8-head,.p9-head,.p9s-head,.bos-core-view-head,.bos-app-intro{padding-top:0!important;padding-bottom:18px!important;border-bottom:0!important}.bos-products-header h1,.p7-head h1,.p8-head h1,.p9-head h1,.p9s-head h1,.bos-core-view-head h1,.bos-app-intro h1{font-size:29px!important;font-weight:600!important}.bos-products-header p,.p7-head p,.p8-head p,.p9-head p,.p9s-head p,.bos-core-view-head p,.bos-app-intro p{font-size:10px!important}
 .bos-products-grid,.p7-summary,.p8-summary,.p9-search-summary,.bos-core-commandbar{gap:14px!important}.bos-product-card,.p7-summary article,.p8-summary article,.p9-search-summary article,.bos-core-commandbar>div,.p7-table,.p8-company>dl,.p8-license-grid>article,.p9-results,.p9s-list,.bos-core-update-history,.bos-app-placeholder{border-color:#e7e3dc!important;box-shadow:0 5px 18px rgba(20,38,54,.04)!important}.bos-product-card>a,.p7-invite button,.p9-search button{background:#b98836!important}
 @media(max-width:900px){.bos-app-shell{grid-template-columns:190px minmax(0,1fr)}.bos-app-workspace{width:calc(100% - 44px)}}@media(max-width:800px){.bos-app-shell{grid-template-columns:1fr}.bos-app-workspace{width:calc(100% - 32px);padding-top:28px}}
+
+
+/* Global floating help/chat entry */
+.bos-app-chat-fab{position:fixed;right:28px;bottom:26px;z-index:45;width:54px;height:54px;border:1px solid rgba(255,255,255,.18);border-radius:50%;display:grid;place-items:center;background:#0b1f31;color:#d6a541;box-shadow:0 12px 30px rgba(10,25,39,.24);text-decoration:none;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.bos-app-chat-fab svg{width:23px;height:23px}.bos-app-chat-fab:hover,.bos-app-chat-fab:focus-visible{transform:translateY(-3px);background:#142d42;box-shadow:0 17px 36px rgba(10,25,39,.3)}
+@media(max-width:800px){.bos-app-chat-fab{right:18px;bottom:18px;width:50px;height:50px}}
