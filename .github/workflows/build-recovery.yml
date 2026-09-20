@@ -2,6 +2,8 @@ name: Build Recovery
 on:
   push:
     branches: [onboarding-section-1]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 jobs:
   build:
