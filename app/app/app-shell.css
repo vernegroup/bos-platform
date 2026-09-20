@@ -3252,3 +3252,18 @@
   .bos-onboarding-shell .bos-standard-primary-action{min-height:44px}
   .bos-onboarding-shell .bos-standard-tabs span,.bos-onboarding-shell .bos-standard-tabs a{height:44px;padding-top:16px}
 }
+
+
+/* BOS ONBOARDING 1.13 — Functional & UI Parity Recovery */
+.bos-process-summary{grid-template-columns:minmax(180px,1fr) 100px 100px 90px 90px}
+.bos-process-task-head,.bos-process-task-row{grid-template-columns:38px 220px minmax(190px,.8fr) minmax(330px,1.4fr)}
+.bos-process-task-row div>small{color:var(--app-muted);font-size:7px;line-height:1.45}
+.bos-process-stage-flow{display:flex!important;flex-direction:row!important;align-items:center;gap:5px!important;flex-wrap:wrap}
+.bos-process-stage-flow form{display:inline-flex}
+.bos-process-stage-flow button{min-height:26px;padding:0 7px;border:1px solid #d1d4d5;background:transparent;color:var(--app-muted);font-size:7px;font-weight:700;letter-spacing:.35px}
+.bos-process-stage-flow button:not(:disabled):hover{border-color:var(--app-accent);color:var(--app-accent)}
+.bos-process-stage-flow button.is-done{border-color:#c8d2c7;background:#edf2ec;color:#536a54}
+.bos-process-stage-flow button:disabled:not(.is-done){opacity:.45;cursor:not-allowed}
+.bos-process-task-note{flex-basis:100%;margin-top:3px}
+@media(max-width:850px){.bos-process-task-row{grid-template-columns:28px minmax(150px,1fr);gap:10px}.bos-process-task-row>p,.bos-process-stage-flow{grid-column:2}}
+@media(max-width:600px){.bos-process-summary{grid-template-columns:1fr 1fr}.bos-process-stage-flow{gap:4px!important}.bos-process-stage-flow button{min-height:30px;padding:0 6px}}

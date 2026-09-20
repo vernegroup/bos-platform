@@ -64,6 +64,11 @@ type PersistedTaskProgress = {
   status?: string;
   completedAt?: string | Date | null;
   note?: string | null;
+  explainedAt?: string | Date | null;
+  shownAt?: string | Date | null;
+  togetherAt?: string | Date | null;
+  soloAt?: string | Date | null;
+  checkedAt?: string | Date | null;
 };
 
 function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskProgress & { standardTaskId: string } {
@@ -143,6 +148,7 @@ export async function listProcesses(organizationId?:string) {
     tasks:((r.tasks??[]) as Array<{standardTaskId:string;explainedAt?:string;shownAt?:string;togetherAt?:string;soloAt?:string;checkedAt?:string;note?:string}>)
       .filter(hasStandardTaskId).map(x=>({standardTaskId:x.standardTaskId,
         status:x.checkedAt?"GOTOWE" as const:(x.explainedAt||x.shownAt||x.togetherAt||x.soloAt)?"W TOKU" as const:"DO WYKONANIA" as const,
+        explainedAt:x.explainedAt??undefined,shownAt:x.shownAt??undefined,togetherAt:x.togetherAt??undefined,soloAt:x.soloAt??undefined,checkedAt:x.checkedAt??undefined,
         completedAt:x.checkedAt?datePL(x.checkedAt):undefined,note:x.note??undefined}))}));
 }
 
@@ -175,9 +181,23 @@ export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
 }
 
-export async function updateTaskProgress(input:{organizationId?:string;processId:string;standardTaskId:string;status:"TODO"|"IN_PROGRESS"|"DONE";note?:string;completedByUserId?:string}) {
-  const sql=db(); const organizationId=tenantId(input.organizationId);
-  await sql`UPDATE onboarding_task_progress SET status=${input.status}::onboarding_task_status,note=${input.note??null},completed_at=${input.status==="DONE"?new Date():null},completed_by_user_id=${input.completedByUserId??null},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId}`;
+export type OnboardingTaskStage = "EXPLAINED"|"SHOWN"|"TOGETHER"|"SOLO"|"CHECKED";
+
+export async function confirmTaskStage(input:{organizationId?:string;processId:string;standardTaskId:string;stage:OnboardingTaskStage;userId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const now=new Date();
+  const actor=await sql`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} LIMIT 1`;
+  if(!actor[0]) throw new Error("Osoba potwierdzająca etap nie należy do tej organizacji.");
+  const rows=input.stage==="EXPLAINED"
+    ? await sql`UPDATE onboarding_task_progress SET explained_at=${now},explained_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} RETURNING id`
+    : input.stage==="SHOWN"
+    ? await sql`UPDATE onboarding_task_progress SET shown_at=${now},shown_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND explained_at IS NOT NULL RETURNING id`
+    : input.stage==="TOGETHER"
+    ? await sql`UPDATE onboarding_task_progress SET together_at=${now},together_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND shown_at IS NOT NULL RETURNING id`
+    : input.stage==="SOLO"
+    ? await sql`UPDATE onboarding_task_progress SET solo_at=${now},solo_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND together_at IS NOT NULL RETURNING id`
+    : await sql`UPDATE onboarding_task_progress SET checked_at=${now},checked_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND solo_at IS NOT NULL RETURNING id`;
+  if(!rows[0]) throw new Error("Etapy BOS potwierdzaj kolejno: WYJAŚNIJ → POKAŻ → RAZEM → SAM → SPRAWDŹ.");
 }
 
 export async function archiveStandard(standardId:string, organizationId?:string) {

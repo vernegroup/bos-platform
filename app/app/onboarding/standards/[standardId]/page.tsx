@@ -142,7 +142,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWA CZYNNOŚĆ</span>
       <input name="name" required maxLength={240} placeholder="Nazwa czynności" disabled={!canAdd} style={{padding:10}}/>
       <textarea name="execution" required placeholder="Prawidłowe wykonanie" disabled={!canAdd} rows={3} style={{padding:10}}/>
-      <textarea name="readyWhen" required placeholder="Kryterium gotowości — po czym wiadomo, że czynność jest wykonana prawidłowo?" disabled={!canAdd} rows={2} style={{padding:10}}/>
+      <textarea name="readyWhen" required placeholder="Co sprawdzić przy SPRAWDŹ? — po czym wiadomo, że ta czynność została wykonana prawidłowo?" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <textarea name="hint" placeholder="Podpowiedź / wskazówka (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <label><input type="checkbox" name="isCritical" disabled={!canAdd}/> K — czynność krytyczna</label>
       <div><button type="submit" className="bos-standard-primary-action" disabled={!canAdd}>{canAdd?"DODAJ CZYNNOŚĆ":"OSIĄGNIĘTO LIMIT 18"}</button></div>
@@ -151,7 +151,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
     {current.tasks.length===0?<section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">BRAK CZYNNOŚCI</span>
       <h2>Standard nie ma jeszcze zdefiniowanych czynności.</h2><p>{isDraft?"Dodaj pierwszą czynność powyżej.":"Ta wersja nie zawiera czynności."}</p></div></section>:
     <section className="bos-standard-task-table" aria-label="Czynności Standardu Stanowiska">
-      <div className="bos-standard-task-head"><span>LP.</span><span>CZYNNOŚĆ</span><span>PRAWIDŁOWE WYKONANIE</span><span>KRYTERIUM GOTOWOŚCI</span></div>
+      <div className="bos-standard-task-head"><span>LP.</span><span>CZYNNOŚĆ</span><span>PRAWIDŁOWE WYKONANIE</span><span>CO SPRAWDZIĆ PRZY SPRAWDŹ</span></div>
       {current.tasks.map((task,index)=><div key={task.id}>
         <div className="bos-standard-task-row"><span>{String(index+1).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong><p>{task.execution}</p><p>{task.readyWhen}</p></div>
         {task.hint&&<div className="bos-standard-detail-head" style={{paddingTop:10,paddingBottom:10}}><p><strong>Podpowiedź:</strong> {task.hint}</p></div>}
