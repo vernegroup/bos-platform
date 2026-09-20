@@ -206,20 +206,61 @@ export async function listClosures(organizationId?:string) {
   if (!hasDatabase()) return onboardingClosures;
   const sql=db(); const orgId=tenantId(organizationId);
   const rows=await sql`
-    SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,sv.version_label,
-      p.started_on,c.verified_at,owner.display_name owner,verifier.display_name verified_by,
-      c.result,c.summary,c.recommendations,
-      (SELECT count(*)::int FROM onboarding_task_progress tp WHERE tp.onboarding_process_id=p.id AND tp.status='DONE') completed_tasks,
+    SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,sv.version_label,p.started_on,c.verified_at,
+      owner.display_name owner,verifier.display_name verified_by,c.decision,c.summary,c.recommendations,c.decision_sequence,c.reopen_reason,
+      (SELECT count(*)::int FROM onboarding_task_progress tp WHERE tp.onboarding_process_id=p.id AND tp.checked_at IS NOT NULL) completed_tasks,
       (SELECT count(*)::int FROM onboarding_task_progress tp WHERE tp.onboarding_process_id=p.id) total_tasks
-    FROM onboarding_closures c JOIN onboarding_processes p ON p.id=c.onboarding_process_id
-    JOIN standard_versions sv ON sv.id=c.standard_version_id JOIN users owner ON owner.id=p.owner_user_id
-    JOIN users verifier ON verifier.id=c.verified_by_user_id WHERE c.organization_id=${orgId}
-    ORDER BY c.verified_at DESC`;
-  return rows.map(r=>({id:r.id,processId:r.onboarding_process_id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,startedAt:datePL(r.started_on),closedAt:datePL(r.verified_at),owner:r.owner,verifiedBy:r.verified_by,result:r.result==="COMPLETED"?"WDROŻENIE ZAKOŃCZONE" as const:"ZAKOŃCZONE Z ZALECENIAMI" as const,completedTasks:r.completed_tasks,totalTasks:r.total_tasks,summary:r.summary,recommendations:r.recommendations??undefined}));
+    FROM onboarding_closures c JOIN onboarding_processes p ON p.id=c.onboarding_process_id AND p.organization_id=c.organization_id
+    JOIN standard_versions sv ON sv.id=c.standard_version_id AND sv.organization_id=c.organization_id
+    JOIN users owner ON owner.id=p.owner_user_id JOIN users verifier ON verifier.id=c.verified_by_user_id
+    WHERE c.organization_id=${orgId} ORDER BY c.verified_at DESC,c.decision_sequence DESC`;
+  return rows.map(r=>({id:r.id,processId:r.onboarding_process_id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
+    startedAt:datePL(r.started_on),closedAt:datePL(r.verified_at),owner:r.owner,verifiedBy:r.verified_by,
+    result:r.decision==="READY"?"GOTOWY" as const:r.decision==="NOT_YET"?"JESZCZE NIE" as const:"STOP" as const,
+    decision:r.decision as "READY"|"NOT_YET"|"STOP",decisionSequence:r.decision_sequence,reopenReason:r.reopen_reason??undefined,
+    completedTasks:r.completed_tasks,totalTasks:r.total_tasks,summary:r.summary,recommendations:r.recommendations??undefined}));
 }
 
 export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
+}
+
+export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;decision:"READY"|"NOT_YET"|"STOP";summary:string;recommendations?:string}) {
+  requirePersistedOnboarding(); const sql=db(); const organizationId=tenantId(input.organizationId);
+  const summary=input.summary.trim(), recommendations=input.recommendations?.trim()||null;
+  if(!summary) throw new Error("Podsumowanie decyzji jest wymagane.");
+  if(input.decision!=="READY" && !recommendations) throw new Error("Dla JESZCZE NIE lub STOP podaj powód i dalsze działanie.");
+  return sql.begin(async tx=>{
+    const [member]=await tx`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.verifiedByUserId} AND status='ACTIVE' LIMIT 1`;
+    if(!member) throw new Error("Osoba podejmująca decyzję nie należy aktywnie do organizacji.");
+    const [process]=await tx`SELECT id,standard_id,standard_version_id,employee_name_snapshot,status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
+    if(!process) throw new Error("Nie znaleziono procesu.");
+    const [gate]=await tx`SELECT
+      count(*) FILTER(WHERE tp.checked_at IS NULL)::int tasks_missing,
+      count(*) FILTER(WHERE st.is_critical AND (tp.solo_at IS NULL OR tp.checked_at IS NULL))::int critical_missing
+      FROM onboarding_task_progress tp JOIN standard_tasks st ON st.id=tp.standard_task_id AND st.organization_id=tp.organization_id
+      WHERE tp.onboarding_process_id=${process.id} AND tp.organization_id=${organizationId}`;
+    const [readiness]=await tx`SELECT count(*) FILTER(WHERE is_passed=false)::int missing FROM onboarding_readiness_checks WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
+    if((gate?.tasks_missing??1)>0||(gate?.critical_missing??1)>0||(readiness?.missing??1)>0) throw new Error("Readiness Gate nie jest kompletny.");
+    const [seq]=await tx`SELECT COALESCE(max(decision_sequence),0)::int+1 sequence FROM onboarding_closures WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
+    const [closure]=await tx`INSERT INTO onboarding_closures(organization_id,onboarding_process_id,standard_id,standard_version_id,employee_name_snapshot,decision,verified_by_user_id,summary,recommendations,decision_sequence)
+      VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.decision}::onboarding_decision_result,${input.verifiedByUserId},${summary},${recommendations},${seq.sequence}) RETURNING id`;
+    await tx`UPDATE onboarding_processes SET status=${input.decision==="NOT_YET"?"PAUSED":"CLOSED"}::onboarding_process_status,closed_at=${input.decision==="NOT_YET"?null:new Date()},updated_at=now() WHERE id=${process.id} AND organization_id=${organizationId}`;
+    return closure.id as string;
+  });
+}
+
+export async function reopenProcess(input:{organizationId?:string;processId:string;closureId:string;userId:string;reason:string}) {
+  requirePersistedOnboarding(); const sql=db(); const organizationId=tenantId(input.organizationId); const reason=input.reason.trim();
+  if(!reason) throw new Error("Powód wznowienia jest wymagany.");
+  return sql.begin(async tx=>{
+    const [member]=await tx`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} AND status='ACTIVE' LIMIT 1`;
+    if(!member) throw new Error("Osoba wznawiająca nie należy aktywnie do organizacji.");
+    const [closure]=await tx`SELECT id FROM onboarding_closures WHERE id=${input.closureId} AND onboarding_process_id=${input.processId} AND organization_id=${organizationId} LIMIT 1`;
+    if(!closure) throw new Error("Nie znaleziono decyzji do wznowienia.");
+    await tx`INSERT INTO onboarding_reopen_events(organization_id,onboarding_process_id,closure_id,reopened_by_user_id,reason) VALUES(${organizationId},${input.processId},${input.closureId},${input.userId},${reason})`;
+    await tx`UPDATE onboarding_processes SET status='IN_PROGRESS',closed_at=null,updated_at=now() WHERE id=${input.processId} AND organization_id=${organizationId}`;
+  });
 }
 
 export async function confirmStartRequirement(input:{organizationId?:string;processId:string;requirementId:string;userId:string}) {
@@ -774,15 +815,4 @@ export async function createProcess(input:{
   });
 }
 
-export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;result:"COMPLETED"|"COMPLETED_WITH_RECOMMENDATIONS";summary:string;recommendations?:string}) {
-  const sql=db(); const organizationId=tenantId(input.organizationId);
-  return sql.begin(async tx=>{
-    const [process]=await tx`SELECT id,standard_id,standard_version_id,employee_name_snapshot FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
-    if(!process) throw new Error("Onboarding process not found.");
-    const [remaining]=await tx`SELECT count(*)::int count FROM onboarding_task_progress WHERE onboarding_process_id=${input.processId} AND organization_id=${organizationId} AND status<>'DONE'`;
-    if(remaining.count>0) throw new Error("Onboarding process is not ready to close.");
-    const [closure]=await tx`INSERT INTO onboarding_closures(organization_id,onboarding_process_id,standard_id,standard_version_id,employee_name_snapshot,verified_by_user_id,result,summary,recommendations,verified_at) VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.verifiedByUserId},${input.result}::onboarding_closure_result,${input.summary},${input.recommendations??null},now()) RETURNING id`;
-    await tx`UPDATE onboarding_processes SET status='CLOSED',closed_at=now(),updated_at=now() WHERE id=${process.id} AND organization_id=${organizationId}`;
-    return closure.id as string;
-  });
-}
+
