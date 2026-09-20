@@ -162,6 +162,50 @@ export async function archiveStandard(standardId:string, organizationId?:string)
 }
 
 
+export async function createDraftStandard(input:{
+  organizationId:string;
+  productId:string;
+  name:string;
+  area?:string;
+  createdByUserId:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  const name=input.name.trim();
+  if(!name) throw new Error("Nazwa Standardu jest wymagana.");
+  return sql.begin(async tx=>{
+    const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id)
+      VALUES(${organizationId},${input.productId},${name},${input.area?.trim()||null},'DRAFT',${input.createdByUserId})
+      RETURNING id`;
+    const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,created_by_user_id)
+      VALUES(${organizationId},${standard.id},1,'v1','DRAFT','Wersja robocza',${input.createdByUserId})
+      RETURNING id`;
+    await tx`UPDATE standards SET current_version_id=${version.id},updated_at=now()
+      WHERE id=${standard.id} AND organization_id=${organizationId}`;
+    return standard.id as string;
+  });
+}
+
+export async function updateDraftStandard(input:{
+  organizationId:string;
+  standardId:string;
+  name:string;
+  area?:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  const name=input.name.trim();
+  if(!name) throw new Error("Nazwa Standardu jest wymagana.");
+  const rows=await sql`
+    UPDATE standards s SET name=${name},area=${input.area?.trim()||null},updated_at=now()
+    FROM standard_versions sv
+    WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
+      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+    RETURNING s.id`;
+  if(!rows[0]) throw new Error("Można edytować wyłącznie roboczy Standard.");
+}
+
+
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
