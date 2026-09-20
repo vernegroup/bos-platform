@@ -206,6 +206,84 @@ export async function updateDraftStandard(input:{
 }
 
 
+export async function createDraftTask(input:{
+  organizationId:string; standardId:string; name:string; execution:string; readyWhen:string; hint?:string; isCritical?:boolean;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  const name=input.name.trim(), execution=input.execution.trim(), readyWhen=input.readyWhen.trim();
+  if(!name || !execution || !readyWhen) throw new Error("Czynność, prawidłowe wykonanie i kryterium gotowości są wymagane.");
+  return sql.begin(async tx=>{
+    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
+    if(!version) throw new Error("Czynności można edytować wyłącznie w roboczej wersji Standardu.");
+    const [countRow]=await tx`SELECT count(*)::int count FROM standard_tasks WHERE organization_id=${organizationId} AND standard_version_id=${version.id}`;
+    if(countRow.count>=18) throw new Error("Standard może zawierać maksymalnie 18 czynności.");
+    const [positionRow]=await tx`SELECT gs position FROM generate_series(1,18) gs
+      WHERE NOT EXISTS (SELECT 1 FROM standard_tasks st WHERE st.organization_id=${organizationId}
+        AND st.standard_version_id=${version.id} AND st.position=gs) ORDER BY gs LIMIT 1`;
+    const [task]=await tx`INSERT INTO standard_tasks(organization_id,standard_version_id,position,name,execution,ready_when,hint,is_critical)
+      VALUES(${organizationId},${version.id},${positionRow.position},${name},${execution},${readyWhen},${input.hint?.trim()||null},${Boolean(input.isCritical)}) RETURNING id`;
+    return task.id as string;
+  });
+}
+
+export async function updateDraftTask(input:{
+  organizationId:string; standardId:string; taskId:string; name:string; execution:string; readyWhen:string; hint?:string; isCritical?:boolean;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  const name=input.name.trim(), execution=input.execution.trim(), readyWhen=input.readyWhen.trim();
+  if(!name || !execution || !readyWhen) throw new Error("Czynność, prawidłowe wykonanie i kryterium gotowości są wymagane.");
+  const rows=await sql`UPDATE standard_tasks st SET name=${name},execution=${execution},ready_when=${readyWhen},
+      hint=${input.hint?.trim()||null},is_critical=${Boolean(input.isCritical)}
+    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
+      AND st.id=${input.taskId} AND st.organization_id=${organizationId} AND st.standard_version_id=sv.id RETURNING st.id`;
+  if(!rows[0]) throw new Error("Nie znaleziono edytowalnej czynności w roboczej wersji Standardu.");
+}
+
+export async function deleteDraftTask(input:{organizationId:string;standardId:string;taskId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  return sql.begin(async tx=>{
+    const [task]=await tx`SELECT st.id,st.position,st.standard_version_id FROM standard_tasks st
+      JOIN standard_versions sv ON sv.id=st.standard_version_id AND sv.organization_id=st.organization_id
+      JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
+      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+        AND sv.status='DRAFT' AND st.id=${input.taskId} FOR UPDATE OF st`;
+    if(!task) throw new Error("Nie znaleziono edytowalnej czynności w roboczej wersji Standardu.");
+    await tx`DELETE FROM standard_tasks WHERE id=${task.id} AND organization_id=${organizationId}`;
+  });
+}
+
+export async function moveDraftTask(input:{organizationId:string;standardId:string;taskId:string;direction:"UP"|"DOWN"}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  return sql.begin(async tx=>{
+    const [task]=await tx`SELECT st.id,st.position,st.standard_version_id FROM standard_tasks st
+      JOIN standard_versions sv ON sv.id=st.standard_version_id AND sv.organization_id=st.organization_id
+      JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
+      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+        AND sv.status='DRAFT' AND st.id=${input.taskId} FOR UPDATE OF st`;
+    if(!task) throw new Error("Nie znaleziono edytowalnej czynności w roboczej wersji Standardu.");
+    const [other]=input.direction==="UP"
+      ? await tx`SELECT id,position FROM standard_tasks WHERE organization_id=${organizationId}
+          AND standard_version_id=${task.standard_version_id} AND position<${task.position} ORDER BY position DESC LIMIT 1 FOR UPDATE`
+      : await tx`SELECT id,position FROM standard_tasks WHERE organization_id=${organizationId}
+          AND standard_version_id=${task.standard_version_id} AND position>${task.position} ORDER BY position ASC LIMIT 1 FOR UPDATE`;
+    if(!other) return;
+    const target=other.position;
+    // DRAFT versions cannot own onboarding processes. Delete/reinsert provides a collision-free swap while preserving the task UUID.
+    const [moving]=await tx`DELETE FROM standard_tasks WHERE id=${task.id} AND organization_id=${organizationId}
+      RETURNING id,organization_id,standard_version_id,name,execution,ready_when,hint,is_critical`;
+    await tx`UPDATE standard_tasks SET position=${task.position} WHERE id=${other.id} AND organization_id=${organizationId}`;
+    await tx`INSERT INTO standard_tasks(id,organization_id,standard_version_id,position,name,execution,ready_when,hint,is_critical)
+      VALUES(${moving.id},${moving.organization_id},${moving.standard_version_id},${target},${moving.name},${moving.execution},${moving.ready_when},${moving.hint},${moving.is_critical})`;
+  });
+}
+
+
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
