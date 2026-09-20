@@ -24,7 +24,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
 
   const progress = getProcessProgress(process);
   const criticalTasks=version.tasks.filter(task=>task.isCritical);
-  const criticalCompleted=criticalTasks.filter(task=>process.tasks.find(item=>item.standardTaskId===task.id)?.checkedAt).length;
+  const criticalCompleted=criticalTasks.filter(task=>Boolean(process.tasks.find(item=>item.standardTaskId===task.id)?.completedAt)).length;
 
   return (
     <>
