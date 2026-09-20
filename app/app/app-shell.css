@@ -3300,3 +3300,9 @@
 .bos-readiness-list article>div{display:grid;gap:5px}.bos-readiness-list span,.bos-readiness-list small{font-size:8px;color:var(--bos-muted)}.bos-readiness-list article>form{display:grid;gap:6px}.bos-readiness-list input{padding:8px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:9px}.bos-readiness-list button{padding:8px;border:1px solid var(--bos-line);background:transparent;font-size:8px;font-weight:700}.bos-readiness-pass{font-size:9px;color:#58745e;text-align:right}
 @media(max-width:850px){.bos-readiness-gates{grid-template-columns:repeat(2,1fr)}.bos-readiness-gates>div:nth-child(2){border-right:0}}
 @media(max-width:600px){.bos-readiness-gates{grid-template-columns:1fr}.bos-readiness-gates>div{border-right:0;border-bottom:1px solid var(--bos-line)}.bos-readiness-list article{grid-template-columns:1fr}.bos-readiness-pass{text-align:left}}
+
+/* 1.19 — closure decision and reopen */
+.bos-close-decision-form{display:grid;gap:12px}.bos-close-decision-form label{display:grid;gap:6px}.bos-close-decision-form label>span{font-size:8px;font-weight:700;letter-spacing:.07em;color:var(--bos-muted)}
+.bos-close-decision-form textarea{min-height:82px;padding:10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:10px;resize:vertical}.bos-close-decisions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bos-close-decisions button,.bos-reopen-form button{min-height:38px;border:1px solid var(--bos-line);background:transparent;font-size:9px;font-weight:700}.bos-close-decisions button:disabled{opacity:.4}
+.bos-reopen-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px}.bos-reopen-form input{padding:10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:9px}
+@media(max-width:600px){.bos-close-decisions{grid-template-columns:1fr}.bos-reopen-form{grid-template-columns:1fr}}
