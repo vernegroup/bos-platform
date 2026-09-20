@@ -445,23 +445,23 @@ export function validateStandardCompleteness(input:{
   if(input.tasks.length<1) reasons.push("Dodaj co najmniej 1 czynność.");
   if(input.tasks.length>18) reasons.push("Standard może zawierać maksymalnie 18 czynności.");
   const taskPositions=input.tasks.map(x=>x.order);
-  if(new Set(taskPositions).size!==taskPositions.length||taskPositions.some((position,index)=>position!==index+1))
-    reasons.push("Uporządkuj czynności w ciągłej kolejności od 1.");
+  if(new Set(taskPositions).size!==taskPositions.length||taskPositions.some(position=>position<1||position>18))
+    reasons.push("Czynności muszą mieć unikalną kolejność w zakresie 1–18.");
   input.tasks.forEach((task,index)=>{
     if(!task.name.trim()||!task.execution.trim()||!task.readyWhen.trim())
       reasons.push(`Czynność ${index+1}: uzupełnij nazwę, prawidłowe wykonanie i kryterium gotowości.`);
   });
   const requirementPositions=input.startRequirements.map(x=>x.order);
-  if(new Set(requirementPositions).size!==requirementPositions.length||requirementPositions.some((position,index)=>position!==index+1))
-    reasons.push("Uporządkuj warunki rozpoczęcia w ciągłej kolejności od 1.");
+  if(new Set(requirementPositions).size!==requirementPositions.length||requirementPositions.some(position=>position<1))
+    reasons.push("Warunki rozpoczęcia muszą mieć unikalną dodatnią kolejność.");
   input.startRequirements.forEach((requirement,index)=>{
     if(!requirement.requirement.trim()) reasons.push(`Warunek rozpoczęcia ${index+1}: uzupełnij treść.`);
   });
   if(input.readinessCriteria.length<1) reasons.push("Dodaj co najmniej 1 kryterium gotowości.");
   if(input.readinessCriteria.length>3) reasons.push("Standard może zawierać maksymalnie 3 kryteria gotowości.");
   const criterionPositions=input.readinessCriteria.map(x=>x.order);
-  if(new Set(criterionPositions).size!==criterionPositions.length||criterionPositions.some((position,index)=>position!==index+1))
-    reasons.push("Uporządkuj kryteria gotowości w ciągłej kolejności od 1.");
+  if(new Set(criterionPositions).size!==criterionPositions.length||criterionPositions.some(position=>position<1||position>3))
+    reasons.push("Kryteria gotowości muszą mieć unikalną kolejność w zakresie 1–3.");
   input.readinessCriteria.forEach((criterion,index)=>{
     if(!criterion.criterion.trim()) reasons.push(`Kryterium gotowości ${index+1}: uzupełnij treść.`);
     if(criterion.verificationMethod==="OTHER"&&!criterion.verificationMethodOther?.trim())
