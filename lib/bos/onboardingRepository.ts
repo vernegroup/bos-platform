@@ -480,6 +480,53 @@ export async function getDraftStandardCompleteness(input:{organizationId:string;
 }
 
 
+export async function createDraftStandardVersion(input:{
+  organizationId:string; standardId:string; createdByUserId:string; changeNote:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const changeNote=input.changeNote.trim();
+  if(!changeNote) throw new Error("Opis zmiany jest wymagany.");
+  return sql.begin(async tx=>{
+    const [standard]=await tx`SELECT s.id,s.current_version_id,sv.id source_version_id,sv.version_number,sv.status
+      FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} FOR UPDATE OF s,sv`;
+    if(!standard) throw new Error("Nie znaleziono Standardu.");
+    if(standard.status!=="PUBLISHED") throw new Error("Nową wersję można utworzyć wyłącznie z opublikowanej wersji Standardu.");
+
+    const membership=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
+      AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
+    if(!membership[0]) throw new Error("Użytkownik nie ma aktywnego członkostwa w organizacji.");
+
+    const existingDraft=await tx`SELECT id FROM standard_versions WHERE organization_id=${organizationId}
+      AND standard_id=${standard.id} AND status='DRAFT' LIMIT 1 FOR UPDATE`;
+    if(existingDraft[0]) throw new Error("Ten Standard ma już wersję roboczą.");
+
+    const [numberRow]=await tx`SELECT COALESCE(max(version_number),0)::int + 1 next_number
+      FROM standard_versions WHERE organization_id=${organizationId} AND standard_id=${standard.id}`;
+    const versionNumber=numberRow.next_number as number;
+    const [draft]=await tx`INSERT INTO standard_versions(
+        organization_id,standard_id,version_number,version_label,status,change_note,created_by_user_id
+      ) VALUES(
+        ${organizationId},${standard.id},${versionNumber},${"v"+versionNumber},'DRAFT',${changeNote},${input.createdByUserId}
+      ) RETURNING id,version_label`;
+
+    await tx`INSERT INTO standard_tasks(organization_id,standard_version_id,position,name,execution,ready_when,hint,is_critical)
+      SELECT organization_id,${draft.id},position,name,execution,ready_when,hint,is_critical
+      FROM standard_tasks WHERE organization_id=${organizationId} AND standard_version_id=${standard.source_version_id} ORDER BY position`;
+    await tx`INSERT INTO standard_start_requirements(organization_id,standard_version_id,position,category,requirement)
+      SELECT organization_id,${draft.id},position,category,requirement
+      FROM standard_start_requirements WHERE organization_id=${organizationId} AND standard_version_id=${standard.source_version_id} ORDER BY position`;
+    await tx`INSERT INTO standard_readiness_criteria(organization_id,standard_version_id,position,criterion,verification_method,verification_method_other)
+      SELECT organization_id,${draft.id},position,criterion,verification_method,verification_method_other
+      FROM standard_readiness_criteria WHERE organization_id=${organizationId} AND standard_version_id=${standard.source_version_id} ORDER BY position`;
+
+    await tx`UPDATE standards SET current_version_id=${draft.id},status='DRAFT',updated_at=now()
+      WHERE id=${standard.id} AND organization_id=${organizationId}`;
+    return {id:draft.id as string,version:draft.version_label as string};
+  });
+}
+
+
 export async function publishDraftStandard(input:{organizationId:string;standardId:string;publishedByUserId:string}) {
   requirePersistedOnboarding();
   const sql=db(); const organizationId=tenantId(input.organizationId);
