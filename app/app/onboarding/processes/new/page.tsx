@@ -14,7 +14,7 @@ async function startOnboarding(fd:FormData){
   const [standardId,standardVersionId]=standardChoice.split(":");
   const buddyUserId=text(fd,"buddyUserId");
   await createProcess({
-    organizationId:access.organization.id,productId:text(fd,"productId"),
+    organizationId:access.organization.id,
     employeeId:employeeId||undefined,employeeName,standardId,standardVersionId,
     ownerUserId:text(fd,"ownerUserId"),trainerUserId:text(fd,"trainerUserId"),evaluatorUserId:text(fd,"evaluatorUserId"),
     buddyUserId:buddyUserId||undefined,startedOn:text(fd,"startedOn"),targetOn:text(fd,"targetOn")||undefined,
@@ -25,7 +25,6 @@ async function startOnboarding(fd:FormData){
 
 export default async function NewProcessPage(){
   const access=await requireBOSAccess(); const options=await listOnboardingStartOptions(access.organization.id);
-  const onboardingProduct=options.products.find(p=>p.key.toLowerCase().includes("onboarding"))??options.products[0];
   const today=new Date().toISOString().slice(0,10);
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
@@ -34,10 +33,9 @@ export default async function NewProcessPage(){
       <div className="bos-app-build-state"><span>POWIĄZANIE</span><strong>STANDARDVERSION / TRWAŁE</strong></div>
     </section>
     <section className="bos-process-new">
-      {!options.standards.length||!options.members.length||!onboardingProduct?<div className="bos-operational-empty"><strong>Nie można utworzyć wdrożenia</strong>
+      {!options.standards.length||!options.members.length?<div className="bos-operational-empty"><strong>Nie można utworzyć wdrożenia</strong>
         <p>Potrzebujesz opublikowanego Standardu, aktywnych członków organizacji i aktywnej licencji produktu.</p></div>:
       <form action={startOnboarding} style={{display:"grid",gap:18}}>
-        <input type="hidden" name="productId" value={onboardingProduct.id}/>
         <div className="bos-process-new-field"><span>01 / PRACOWNIK</span><strong>Pracownik</strong>
           <select name="employeeId" defaultValue="" style={{padding:10}}><option value="">Osoba spoza kont BOS / wpisz nazwę poniżej</option>
             {options.members.map(m=><option value={m.id} key={m.id}>{m.name} · {m.email}</option>)}</select>

@@ -38,6 +38,11 @@ export type ReadinessCriterionRecord = {
   verificationMethod: "OBSERVATION" | "INDEPENDENT_TASK" | "WORK_SAMPLE" | "CONTROL_QUESTIONS" | "KNOWLEDGE_TEST" | "OTHER";
   verificationMethodOther?: string;
 };
+export type StandardListRecord = {
+  id:string; name:string; area:string; status:"AKTYWNY"|"ROBOCZY"; currentVersion:string; updatedAt:string;
+  versionStatus:StandardVersionStatus|null; taskCount:number;
+};
+
 export type StandardVersionRecord = {
   id: string;
   version: string;
@@ -66,15 +71,15 @@ function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskPr
   return Boolean(task.standardTaskId);
 }
 
-export async function listStandards(organizationId?: string) {
-  if (!hasDatabase()) return onboardingStandards;
+export async function listStandards(organizationId?: string): Promise<StandardListRecord[]> {
+  if (!hasDatabase()) return onboardingStandards.map(s=>({id:s.id,name:s.name,area:s.area,status:s.status,currentVersion:s.currentVersion,updatedAt:s.updatedAt,versionStatus:null,taskCount:s.versions.find(v=>v.version===s.currentVersion)?.tasks.length??0}));
   const sql = db(); const orgId = tenantId(organizationId);
   const rows = await sql`
     SELECT s.id,s.name,s.area,s.status,s.current_version_id,
       sv.version_label,sv.status version_status,sv.published_at,sv.created_at,
       (SELECT count(*)::int FROM standard_tasks st WHERE st.standard_version_id=sv.id AND st.organization_id=s.organization_id) task_count
     FROM standards s
-    LEFT JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
+    LEFT JOIN standard_versions sv ON sv.id=COALESCE((SELECT d.id FROM standard_versions d WHERE d.standard_id=s.id AND d.organization_id=s.organization_id AND d.status='DRAFT' ORDER BY d.version_number DESC LIMIT 1),s.current_version_id) AND sv.organization_id=s.organization_id
     WHERE s.organization_id=${orgId}
     ORDER BY s.updated_at DESC,s.name`;
   return rows.map(r=>({
@@ -214,7 +219,7 @@ export async function updateDraftStandard(input:{
     UPDATE standards s SET name=${name},area=${input.area?.trim()||null},updated_at=now()
     FROM standard_versions sv
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
-      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
     RETURNING s.id`;
   if(!rows[0]) throw new Error("Można edytować wyłącznie roboczy Standard.");
 }
@@ -335,7 +340,7 @@ export async function deleteDraftStartRequirement(input:{organizationId:string;s
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const rows=await sql`DELETE FROM standard_start_requirements sr USING standards s,standard_versions sv
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
-      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
       AND sr.id=${input.requirementId} AND sr.organization_id=${organizationId} AND sr.standard_version_id=sv.id RETURNING sr.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
 }
@@ -413,7 +418,7 @@ export async function deleteDraftReadinessCriterion(input:{organizationId:string
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const rows=await sql`DELETE FROM standard_readiness_criteria rc USING standards s,standard_versions sv
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
-      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
       AND rc.id=${input.criterionId} AND rc.organization_id=${organizationId} AND rc.standard_version_id=sv.id RETURNING rc.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
 }
@@ -589,7 +594,7 @@ export async function listOnboardingStartOptions(organizationId?:string) {
   const [standards,memberships,products]=await Promise.all([
     sql`SELECT s.id standard_id,s.name,s.area,sv.id version_id,sv.version_label
       FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
-      WHERE s.organization_id=${orgId} AND s.status='ACTIVE' AND sv.status='PUBLISHED'
+      WHERE s.organization_id=${orgId} AND s.status='ACTIVE' AND sv.status='PUBLISHED' AND sv.id=s.current_version_id
       ORDER BY s.name,sv.version_number DESC`,
     sql`SELECT u.id,u.display_name,u.email,m.role FROM memberships m JOIN users u ON u.id=m.user_id
       WHERE m.organization_id=${orgId} AND m.status='ACTIVE' AND u.status='ACTIVE' ORDER BY u.display_name`,
@@ -604,23 +609,23 @@ export async function listOnboardingStartOptions(organizationId?:string) {
 }
 
 export async function createProcess(input:{
-  organizationId?:string;productId:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;
+  organizationId?:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;
   ownerUserId:string;trainerUserId:string;evaluatorUserId:string;buddyUserId?:string;startedOn:string;targetOn?:string;createdByUserId:string;
 }) {
   requirePersistedOnboarding();
-  const sql=db(); const organizationId=tenantId(input.organizationId); const employeeName=input.employeeName.trim();
-  if(!employeeName) throw new Error("Pracownik jest wymagany.");
+  const sql=db(); const organizationId=tenantId(input.organizationId); let employeeName=input.employeeName.trim();
   if(!input.startedOn) throw new Error("Data startu jest wymagana.");
+  if(input.targetOn && input.targetOn<input.startedOn) throw new Error("Data celu nie może być wcześniejsza niż data startu.");
   return sql.begin(async tx=>{
-    const [version]=await tx`SELECT sv.id,sv.standard_id,sv.status,s.status standard_status
+    const [version]=await tx`SELECT sv.id,sv.standard_id,sv.status,s.status standard_status,s.product_id
       FROM standard_versions sv JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
-      WHERE sv.id=${input.standardVersionId} AND sv.standard_id=${input.standardId} AND sv.organization_id=${organizationId}
+      WHERE sv.id=${input.standardVersionId} AND sv.standard_id=${input.standardId} AND sv.organization_id=${organizationId} AND s.current_version_id=sv.id
       FOR SHARE OF sv,s`;
     if(!version || version.status!=="PUBLISHED" || version.standard_status!=="ACTIVE")
       throw new Error("Onboarding można rozpocząć wyłącznie na opublikowanej wersji aktywnego Standardu.");
 
     const [licensedProduct]=await tx`SELECT p.id FROM products p JOIN licenses l ON l.product_id=p.id
-      WHERE p.id=${input.productId} AND p.status='ACTIVE' AND l.organization_id=${organizationId} AND l.status='ACTIVE' LIMIT 1`;
+      WHERE p.id=${version.product_id} AND p.status='ACTIVE' AND l.organization_id=${organizationId} AND l.status='ACTIVE' LIMIT 1`;
     if(!licensedProduct) throw new Error("Organizacja nie ma aktywnej licencji produktu.");
 
     const actors=[input.ownerUserId,input.trainerUserId,input.evaluatorUserId,input.createdByUserId,...(input.buddyUserId?[input.buddyUserId]:[])];
@@ -629,16 +634,18 @@ export async function createProcess(input:{
       AND status='ACTIVE' AND user_id = ANY(${uniqueActors})`;
     if(activeActors.length!==uniqueActors.length) throw new Error("Wszystkie osoby przypisane do procesu muszą być aktywnymi członkami organizacji.");
     if(input.employeeId){
-      const employee=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
-        AND user_id=${input.employeeId} AND status='ACTIVE' LIMIT 1`;
+      const employee=await tx`SELECT u.display_name FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.organization_id=${organizationId} AND m.user_id=${input.employeeId} AND m.status=\'ACTIVE\' AND u.status=\'ACTIVE\' LIMIT 1`;
       if(!employee[0]) throw new Error("Wybrany pracownik nie należy aktywnie do tej organizacji.");
+      employeeName=employee[0].display_name;
+    } else if(!employeeName) {
+      throw new Error("Pracownik jest wymagany.");
     }
 
     const [process]=await tx`INSERT INTO onboarding_processes(
       organization_id,product_id,employee_id,employee_name_snapshot,standard_id,standard_version_id,
       owner_user_id,trainer_user_id,evaluator_user_id,buddy_user_id,status,started_on,target_on,created_by_user_id
     ) VALUES(
-      ${organizationId},${input.productId},${input.employeeId??null},${employeeName},${input.standardId},${input.standardVersionId},
+      ${organizationId},${version.product_id},${input.employeeId??null},${employeeName},${input.standardId},${input.standardVersionId},
       ${input.ownerUserId},${input.trainerUserId},${input.evaluatorUserId},${input.buddyUserId??null},'PLANNED',
       ${input.startedOn},${input.targetOn??null},${input.createdByUserId}
     ) RETURNING id`;
