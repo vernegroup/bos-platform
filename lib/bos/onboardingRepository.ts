@@ -634,7 +634,7 @@ export async function createProcess(input:{
       AND status='ACTIVE' AND user_id = ANY(${uniqueActors})`;
     if(activeActors.length!==uniqueActors.length) throw new Error("Wszystkie osoby przypisane do procesu muszą być aktywnymi członkami organizacji.");
     if(input.employeeId){
-      const employee=await tx`SELECT u.display_name FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.organization_id=${organizationId} AND m.user_id=${input.employeeId} AND m.status=\'ACTIVE\' AND u.status=\'ACTIVE\' LIMIT 1`;
+      const employee=await tx`SELECT u.display_name FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.organization_id=${organizationId} AND m.user_id=${input.employeeId} AND m.status='ACTIVE' AND u.status='ACTIVE' LIMIT 1`;
       if(!employee[0]) throw new Error("Wybrany pracownik nie należy aktywnie do tej organizacji.");
       employeeName=employee[0].display_name;
     } else if(!employeeName) {
