@@ -811,6 +811,8 @@ export async function createProcess(input:{
     await tx`INSERT INTO onboarding_readiness_checks(organization_id,onboarding_process_id,readiness_criterion_id)
       SELECT ${organizationId},${process.id},id FROM standard_readiness_criteria
       WHERE organization_id=${organizationId} AND standard_version_id=${input.standardVersionId} ORDER BY position`;
+    const [startCount]=await tx`SELECT count(*)::int count FROM onboarding_start_checks WHERE organization_id=${organizationId} AND onboarding_process_id=${process.id}`;
+    if(startCount.count===0) await tx`UPDATE onboarding_processes SET status='IN_PROGRESS',updated_at=now() WHERE id=${process.id} AND organization_id=${organizationId} AND status='PLANNED'`;
     return process.id as string;
   });
 }
