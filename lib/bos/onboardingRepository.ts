@@ -75,6 +75,23 @@ function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskPr
   return Boolean(task.standardTaskId);
 }
 
+export type ProcessTaskRecord = {
+  standardTaskId: string;
+  status: "GOTOWE"|"W TOKU"|"DO WYKONANIA";
+  explainedAt?: string | Date;
+  shownAt?: string | Date;
+  togetherAt?: string | Date;
+  soloAt?: string | Date;
+  checkedAt?: string | Date;
+  completedAt?: string;
+  note?: string;
+};
+export type ProcessRecord = {
+  id:string; employee:string; standardId:string; standardVersion:string; startedAt:string; targetDate:string; owner:string;
+  status:"W TOKU"|"WSTRZYMANE";
+  tasks:ProcessTaskRecord[];
+};
+
 export async function listStandards(organizationId?: string) {
   if (!hasDatabase()) return onboardingStandards;
   const sql = db(); const orgId = tenantId(organizationId);
@@ -128,8 +145,15 @@ export async function getStandard(standardId: string, organizationId?: string): 
   return {id:standards[0].id,name:standards[0].name,area:standards[0].area??"",status:draft?"ROBOCZY" as const:standards[0].status==="ACTIVE"?"AKTYWNY" as const:"ROBOCZY" as const,currentVersion:working?.version??"",updatedAt:working?.date??"",versions:mapped};
 }
 
-export async function listProcesses(organizationId?:string) {
-  if (!hasDatabase()) return onboardingProcesses;
+export async function listProcesses(organizationId?:string): Promise<ProcessRecord[]> {
+  if (!hasDatabase()) return onboardingProcesses.map(process=>({...process,tasks:process.tasks.map(task=>({
+    ...task,
+    explainedAt:task.status!=="DO WYKONANIA"?task.completedAt??"fallback":undefined,
+    shownAt:task.status!=="DO WYKONANIA"?task.completedAt??"fallback":undefined,
+    togetherAt:task.status!=="DO WYKONANIA"?task.completedAt??"fallback":undefined,
+    soloAt:task.status==="GOTOWE"?task.completedAt??"fallback":undefined,
+    checkedAt:task.status==="GOTOWE"?task.completedAt??"fallback":undefined
+  }))}));
   const sql=db(); const orgId=tenantId(organizationId);
   const rows=await sql`
     SELECT p.id,p.employee_name_snapshot,p.standard_id,sv.version_label,p.started_on,p.target_on,
@@ -156,7 +180,7 @@ export async function getProcess(processId:string, organizationId?:string) {
   const all=await listProcesses(organizationId); return all.find(p=>p.id===processId) ?? null;
 }
 
-export function getProcessProgress(process: Awaited<ReturnType<typeof listProcesses>>[number]) {
+export function getProcessProgress(process: ProcessRecord) {
   const completed=process.tasks.filter((t: { status: string })=>t.status==="GOTOWE").length;
   return {completed,total:process.tasks.length,percent:process.tasks.length?Math.round(completed/process.tasks.length*100):0};
 }
