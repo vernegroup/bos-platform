@@ -6,7 +6,7 @@ export const dynamic="force-dynamic";
 export default async function ClosedPage(){
  const access=await requireBOSAccess();const org=access.organization.id;
  const [closures,standards]=await Promise.all([listClosures(org),listStandards(org)]);
- const recommendations=closures.filter(c=>c.result==="ZAKOŃCZONE Z ZALECENIAMI").length;
+ const ready=closures.filter(c=>c.result==="GOTOWY").length; const notYet=closures.filter(c=>c.result==="JESZCZE NIE").length; const stopped=closures.filter(c=>c.result==="STOP").length;
  return <>
   <section className="bos-app-intro bos-onboarding-view-head">
    <div><div className="bos-app-kicker">03 / ZAMKNIJ</div><h1>Historia wdrożeń</h1><p>Zamknięte wyniki procesów wraz z pracownikiem, wersją Standardu Stanowiska i rezultatem weryfikacji.</p></div>
@@ -14,8 +14,7 @@ export default async function ClosedPage(){
   </section>
   <div className="bos-onboarding-commandbar">
    <div><span>ZAKOŃCZONE</span><strong>{closures.length}</strong></div>
-   <div><span>Z ZALECENIAMI</span><strong>{recommendations}</strong></div>
-   <div><span>BEZ ZALECEŃ</span><strong>{closures.length-recommendations}</strong></div>
+   <div><span>GOTOWY</span><strong>{ready}</strong></div><div><span>JESZCZE NIE</span><strong>{notYet}</strong></div><div><span>STOP</span><strong>{stopped}</strong></div>
   </div>
   <section className="bos-closure-list bos-operational-list">
    <div className="bos-closure-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>ZAMKNIĘCIE</span><span>WYNIK</span><span /></div>
