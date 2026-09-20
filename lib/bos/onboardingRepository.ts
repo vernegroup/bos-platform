@@ -86,10 +86,12 @@ export type ProcessTaskRecord = {
   completedAt?: string;
   note?: string;
 };
+export type ProcessStartCheckRecord = { requirementId:string; isSatisfied:boolean; checkedAt?:string|Date; note?:string };
 export type ProcessRecord = {
   id:string; employee:string; standardId:string; standardVersion:string; startedAt:string; targetDate:string; owner:string;
-  status:"W TOKU"|"WSTRZYMANE";
+  status:"PLANOWANE"|"W TOKU"|"WSTRZYMANE";
   tasks:ProcessTaskRecord[];
+  startChecks:ProcessStartCheckRecord[];
 };
 
 export async function listStandards(organizationId?: string) {
@@ -146,7 +148,7 @@ export async function getStandard(standardId: string, organizationId?: string): 
 }
 
 export async function listProcesses(organizationId?:string): Promise<ProcessRecord[]> {
-  if (!hasDatabase()) return onboardingProcesses.map(process=>({...process,tasks:process.tasks.map(task=>({
+  if (!hasDatabase()) return onboardingProcesses.map(process=>({...process,status:"W TOKU" as const,startChecks:[],tasks:process.tasks.map(task=>({
     ...task,
     explainedAt:task.status!=="DO WYKONANIA"?task.completedAt??"fallback":undefined,
     shownAt:task.status!=="DO WYKONANIA"?task.completedAt??"fallback":undefined,
@@ -160,7 +162,9 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
       u.display_name owner,p.status,
       COALESCE(json_agg(json_build_object('standardTaskId',tp.standard_task_id,'explainedAt',tp.explained_at,
         'shownAt',tp.shown_at,'togetherAt',tp.together_at,'soloAt',tp.solo_at,'checkedAt',tp.checked_at,'note',tp.note))
-        FILTER (WHERE tp.id IS NOT NULL),'[]'::json) tasks
+        FILTER (WHERE tp.id IS NOT NULL),'[]'::json) tasks,
+      COALESCE((SELECT json_agg(json_build_object('requirementId',sc.requirement_id,'isSatisfied',sc.is_satisfied,'checkedAt',sc.checked_at,'note',sc.note))
+        FROM onboarding_start_checks sc WHERE sc.onboarding_process_id=p.id AND sc.organization_id=p.organization_id),'[]'::json) start_checks
     FROM onboarding_processes p
     JOIN standard_versions sv ON sv.id=p.standard_version_id AND sv.organization_id=p.organization_id
     JOIN users u ON u.id=p.owner_user_id
@@ -168,7 +172,8 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
     WHERE p.organization_id=${orgId} AND p.status IN ('PLANNED','IN_PROGRESS','PAUSED','READY_TO_CLOSE')
     GROUP BY p.id,sv.version_label,u.display_name ORDER BY p.started_on DESC`;
   return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
-    startedAt:datePL(r.started_on),targetDate:r.target_on?datePL(r.target_on):"",owner:r.owner,status:r.status==="PAUSED"?"WSTRZYMANE" as const:"W TOKU" as const,
+    startedAt:datePL(r.started_on),targetDate:r.target_on?datePL(r.target_on):"",owner:r.owner,status:r.status==="PLANNED"?"PLANOWANE" as const:r.status==="PAUSED"?"WSTRZYMANE" as const:"W TOKU" as const,
+    startChecks:((r.start_checks??[]) as Array<{requirementId:string;isSatisfied:boolean;checkedAt?:string;note?:string}>).map(x=>({requirementId:x.requirementId,isSatisfied:x.isSatisfied,checkedAt:x.checkedAt??undefined,note:x.note??undefined})),
     tasks:((r.tasks??[]) as Array<{standardTaskId:string;explainedAt?:string;shownAt?:string;togetherAt?:string;soloAt?:string;checkedAt?:string;note?:string}>)
       .filter(hasStandardTaskId).map(x=>({standardTaskId:x.standardTaskId,
         status:x.checkedAt?"GOTOWE" as const:(x.explainedAt||x.shownAt||x.togetherAt||x.soloAt)?"W TOKU" as const:"DO WYKONANIA" as const,
@@ -205,11 +210,27 @@ export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
 }
 
+export async function confirmStartRequirement(input:{organizationId?:string;processId:string;requirementId:string;userId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  return sql.begin(async tx=>{
+    const membership=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} AND status='ACTIVE' LIMIT 1`;
+    if(!membership[0]) throw new Error("Osoba potwierdzająca warunek nie należy aktywnie do tej organizacji.");
+    const rows=await tx`UPDATE onboarding_start_checks SET is_satisfied=true,checked_by_user_id=${input.userId},checked_at=now(),updated_at=now()
+      WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND requirement_id=${input.requirementId} RETURNING id`;
+    if(!rows[0]) throw new Error("Nie znaleziono warunku rozpoczęcia dla tego procesu.");
+    const [remaining]=await tx`SELECT count(*)::int count FROM onboarding_start_checks WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND is_satisfied=false`;
+    if(remaining.count===0) await tx`UPDATE onboarding_processes SET status='IN_PROGRESS',updated_at=now() WHERE id=${input.processId} AND organization_id=${organizationId} AND status='PLANNED'`;
+  });
+}
+
 export type OnboardingTaskStage = "EXPLAINED"|"SHOWN"|"TOGETHER"|"SOLO"|"CHECKED";
 
 export async function confirmTaskStage(input:{organizationId?:string;processId:string;standardTaskId:string;stage:OnboardingTaskStage;userId:string}) {
   requirePersistedOnboarding();
   const sql=db(); const organizationId=tenantId(input.organizationId); const now=new Date();
+  const [process]=await sql`SELECT status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} LIMIT 1`;
+  if(!process || process.status==='PLANNED') throw new Error("Najpierw potwierdź wszystkie warunki rozpoczęcia.");
   const actor=await sql`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} LIMIT 1`;
   if(!actor[0]) throw new Error("Osoba potwierdzająca etap nie należy do tej organizacji.");
   const rows=input.stage==="EXPLAINED"
