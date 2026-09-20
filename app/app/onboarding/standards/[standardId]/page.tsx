@@ -144,7 +144,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <textarea name="execution" required placeholder="Prawidłowe wykonanie" disabled={!canAdd} rows={3} style={{padding:10}}/>
       <textarea name="readyWhen" required placeholder="Co sprawdzić przy SPRAWDŹ? — po czym wiadomo, że ta czynność została wykonana prawidłowo?" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <textarea name="hint" placeholder="Podpowiedź / wskazówka (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
-      <label><input type="checkbox" name="isCritical" disabled={!canAdd}/> K — czynność krytyczna</label>
+      <label><input type="checkbox" name="isCritical" disabled={!canAdd}/> K — czynność krytyczna</label><aside className="bos-context-guide is-compact"><strong>KIEDY OZNACZYĆ K?</strong><p>Zapytaj: co się stanie, jeśli pracownik zrobi tę czynność źle? K oznacza ryzyko poważnych konsekwencji, nie samo znaczenie czynności.</p></aside>
       <div><button type="submit" className="bos-standard-primary-action" disabled={!canAdd}>{canAdd?"DODAJ CZYNNOŚĆ":"OSIĄGNIĘTO LIMIT 18"}</button></div>
     </form></section>}
 
@@ -205,6 +205,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
     </section>
 
     <section id="kryteria-gotowosci" className="bos-standard-history">
+      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · KRYTERIUM GOTOWOŚCI</strong><p>Kryterium opisuje gotowość do całej roli, a nie pojedynczą czynność. Wszystkie czynności mogą być zaliczone, a kryterium końcowe nadal niespełnione. Decyzję o gotowości podejmuje człowiek.</p></aside>
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">SPRAWDŹ</span><h2>Kryteria gotowości</h2>
         <p>Od 1 do 3 kryteriów końcowych określających, jak potwierdzić gotowość pracownika.</p></div>
         <span className="bos-dashboard-count">{current.readinessCriteria.length}/3</span></div>
