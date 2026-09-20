@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import {
-  createDraftTask, deleteDraftTask, getStandard, moveDraftTask, updateDraftStandard, updateDraftTask,
+  createDraftStartRequirement, createDraftTask, deleteDraftStartRequirement, deleteDraftTask, getStandard,
+  moveDraftStartRequirement, moveDraftTask, updateDraftStandard, updateDraftStartRequirement, updateDraftTask,
 } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
@@ -42,6 +43,35 @@ async function reorderTask(formData: FormData) {
   if(direction!=="UP" && direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId"),direction});
   redirect(`/app/onboarding/standards/${standardId}`);
+}
+
+
+async function addStartRequirement(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  const category=text(formData,"category") as "TOOLS"|"ACCESS"|"MATERIALS"|"INSTRUCTIONS"|"WORKPLACE"|"OTHER";
+  await createDraftStartRequirement({organizationId:access.organization.id,standardId,category,requirement:text(formData,"requirement")});
+  redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
+}
+async function editStartRequirement(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  const category=text(formData,"category") as "TOOLS"|"ACCESS"|"MATERIALS"|"INSTRUCTIONS"|"WORKPLACE"|"OTHER";
+  await updateDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId"),category,requirement:text(formData,"requirement")});
+  redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
+}
+async function removeStartRequirement(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
+  await deleteDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId")});
+  redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
+}
+async function reorderStartRequirement(formData: FormData) {
+  "use server";
+  const access=await requireBOSAccess(); const standardId=text(formData,"standardId"); const direction=text(formData,"direction");
+  if(direction!=="UP"&&direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
+  await moveDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId"),direction});
+  redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
 }
 
 export default async function StandardDetailPage({params}:{params:Promise<{standardId:string}>}) {
@@ -98,6 +128,40 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         </div>}
       </div>)}
     </section>}
+
+    <section id="warunki-startu" className="bos-standard-history">
+      <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZED STARTEM</span><h2>Warunki rozpoczęcia</h2>
+        <p>Elementy, które muszą być dostępne lub przygotowane przed rozpoczęciem wdrożenia.</p></div>
+        <span className="bos-dashboard-count">{current.startRequirements.length} warunki</span></div>
+      {isDraft&&<div className="bos-standard-detail-head"><form action={addStartRequirement} style={{display:"grid",gap:10,width:"100%"}}>
+        <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWY WARUNEK</span>
+        <select name="category" defaultValue="TOOLS" style={{padding:10}}>
+          <option value="TOOLS">NARZĘDZIA</option><option value="ACCESS">DOSTĘPY</option><option value="MATERIALS">MATERIAŁY</option>
+          <option value="INSTRUCTIONS">INSTRUKCJE</option><option value="WORKPLACE">STANOWISKO PRACY</option><option value="OTHER">INNE</option>
+        </select>
+        <textarea name="requirement" required rows={2} placeholder="Co musi być gotowe przed rozpoczęciem?" style={{padding:10}}/>
+        <div><button type="submit" className="bos-standard-primary-action">DODAJ WARUNEK</button></div>
+      </form></div>}
+      {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
+      current.startRequirements.map((requirement,index)=><div className="bos-standard-detail-head" key={requirement.id}>
+        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {requirement.category}</span>
+          {!isDraft&&<p>{requirement.requirement}</p>}</div>
+        {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
+          <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/>
+          <select name="category" defaultValue={requirement.category} style={{padding:8}}>
+            <option value="TOOLS">NARZĘDZIA</option><option value="ACCESS">DOSTĘPY</option><option value="MATERIALS">MATERIAŁY</option>
+            <option value="INSTRUCTIONS">INSTRUKCJE</option><option value="WORKPLACE">STANOWISKO PRACY</option><option value="OTHER">INNE</option>
+          </select>
+          <textarea name="requirement" required rows={2} defaultValue={requirement.requirement} style={{padding:8}}/>
+          <div><button type="submit" className="bos-standard-primary-action">ZAPISZ WARUNEK</button></div>
+        </form>}
+        {isDraft&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <form action={reorderStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><input type="hidden" name="direction" value="UP"/><button type="submit" disabled={index===0}>↑ W GÓRĘ</button></form>
+          <form action={reorderStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><input type="hidden" name="direction" value="DOWN"/><button type="submit" disabled={index===current.startRequirements.length-1}>↓ W DÓŁ</button></form>
+          <form action={removeStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><button type="submit">USUŃ</button></form>
+        </div>}
+      </div>)}
+    </section>
 
     <section id="historia" className="bos-standard-history"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">WERSJONOWANIE</span><h2>Historia wersji</h2></div>
       <span className="bos-dashboard-count">{standard.versions.length} wersje</span></div>

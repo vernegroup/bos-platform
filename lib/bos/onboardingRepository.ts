@@ -284,6 +284,75 @@ export async function moveDraftTask(input:{organizationId:string;standardId:stri
 }
 
 
+export async function createDraftStartRequirement(input:{
+  organizationId:string; standardId:string; category:StartRequirementRecord["category"]; requirement:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const requirement=input.requirement.trim();
+  if(!requirement) throw new Error("Warunek rozpoczęcia jest wymagany.");
+  return sql.begin(async tx=>{
+    const [version]=await tx`SELECT sv.id FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+      WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT' FOR UPDATE OF sv`;
+    if(!version) throw new Error("Warunki rozpoczęcia można edytować wyłącznie w roboczej wersji Standardu.");
+    const [positionRow]=await tx`SELECT COALESCE(max(position),0)::int + 1 position FROM standard_start_requirements
+      WHERE organization_id=${organizationId} AND standard_version_id=${version.id}`;
+    const [row]=await tx`INSERT INTO standard_start_requirements(organization_id,standard_version_id,position,category,requirement)
+      VALUES(${organizationId},${version.id},${positionRow.position},${input.category}::onboarding_start_requirement_category,${requirement}) RETURNING id`;
+    return row.id as string;
+  });
+}
+
+export async function updateDraftStartRequirement(input:{
+  organizationId:string; standardId:string; requirementId:string; category:StartRequirementRecord["category"]; requirement:string;
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId); const requirement=input.requirement.trim();
+  if(!requirement) throw new Error("Warunek rozpoczęcia jest wymagany.");
+  const rows=await sql`UPDATE standard_start_requirements sr
+    SET category=${input.category}::onboarding_start_requirement_category,requirement=${requirement},updated_at=now()
+    FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
+    WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
+      AND sr.id=${input.requirementId} AND sr.organization_id=${organizationId} AND sr.standard_version_id=sv.id RETURNING sr.id`;
+  if(!rows[0]) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
+}
+
+export async function deleteDraftStartRequirement(input:{organizationId:string;standardId:string;requirementId:string}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  const rows=await sql`DELETE FROM standard_start_requirements sr USING standards s,standard_versions sv
+    WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
+      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sr.id=${input.requirementId} AND sr.organization_id=${organizationId} AND sr.standard_version_id=sv.id RETURNING sr.id`;
+  if(!rows[0]) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
+}
+
+export async function moveDraftStartRequirement(input:{
+  organizationId:string;standardId:string;requirementId:string;direction:"UP"|"DOWN";
+}) {
+  requirePersistedOnboarding();
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  return sql.begin(async tx=>{
+    const [row]=await tx`SELECT sr.id,sr.position,sr.standard_version_id FROM standard_start_requirements sr
+      JOIN standard_versions sv ON sv.id=sr.standard_version_id AND sv.organization_id=sr.organization_id
+      JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id
+      WHERE s.id=${input.standardId} AND s.current_version_id=sv.id AND s.organization_id=${organizationId}
+        AND sv.status='DRAFT' AND sr.id=${input.requirementId} FOR UPDATE OF sr`;
+    if(!row) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
+    const [other]=input.direction==="UP"
+      ? await tx`SELECT id,position FROM standard_start_requirements WHERE organization_id=${organizationId}
+          AND standard_version_id=${row.standard_version_id} AND position<${row.position} ORDER BY position DESC LIMIT 1 FOR UPDATE`
+      : await tx`SELECT id,position FROM standard_start_requirements WHERE organization_id=${organizationId}
+          AND standard_version_id=${row.standard_version_id} AND position>${row.position} ORDER BY position ASC LIMIT 1 FOR UPDATE`;
+    if(!other) return;
+    const [moving]=await tx`DELETE FROM standard_start_requirements WHERE id=${row.id} AND organization_id=${organizationId}
+      RETURNING id,organization_id,standard_version_id,category,requirement,created_at,updated_at`;
+    await tx`UPDATE standard_start_requirements SET position=${row.position},updated_at=now() WHERE id=${other.id} AND organization_id=${organizationId}`;
+    await tx`INSERT INTO standard_start_requirements(id,organization_id,standard_version_id,position,category,requirement,created_at,updated_at)
+      VALUES(${moving.id},${moving.organization_id},${moving.standard_version_id},${other.position},${moving.category},${moving.requirement},${moving.created_at},now())`;
+  });
+}
+
+
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
