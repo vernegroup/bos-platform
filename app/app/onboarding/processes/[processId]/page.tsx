@@ -10,7 +10,7 @@ async function confirmStage(formData: FormData) {
   if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap BOS.");
   await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
 }
-const stageLabels=[["EXPLAINED","WYJAŚNIJ"],["SHOWN","POKAŻ"],["TOGETHER","RAZEM"],["SOLO","SAM"],["CHECKED","SPRAWDŹ"]] as const;
+const stageLabels=[["EXPLAINED","WYJAŚNIJ","explainedAt"],["SHOWN","POKAŻ","shownAt"],["TOGETHER","RAZEM","togetherAt"],["SOLO","SAM","soloAt"],["CHECKED","SPRAWDŹ","checkedAt"]] as const;
 
 export default async function ProcessDetailPage({ params }: { params: Promise<{ processId: string }> }) {
   const access = await requireBOSAccess();
@@ -65,7 +65,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
               <div><strong>{task.name}</strong><p>{task.execution}</p>{task.hint&&<small>WSKAZÓWKA: {task.hint}</small>}</div>
               <p>{task.readyWhen}</p>
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
-                {stageLabels.map(([stage,label],stageIndex)=>{ const keys=["explainedAt","shownAt","togetherAt","soloAt","checkedAt"] as const; const done=Boolean(state[keys[stageIndex]]); const previousDone=stageIndex===0||Boolean(state[keys[stageIndex-1]]);
+                {stageLabels.map(([stage,label,key],stageIndex)=>{ const done=Boolean(state[key]); const previousKey=stageIndex>0?stageLabels[stageIndex-1][2]:null; const previousDone=stageIndex===0||Boolean(previousKey&&state[previousKey]);
                   return <form action={confirmStage} key={stage}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><input type="hidden" name="stage" value={stage}/><button type="submit" className={done?"is-done":""} disabled={done||!previousDone} aria-pressed={done}>{label}{done?" ✓":""}</button></form>; })}
                 {state.note&&<small className="bos-process-task-note">{state.note}</small>}
               </div>
