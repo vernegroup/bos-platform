@@ -50,6 +50,11 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
+      <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
+        <Link href="/app/onboarding/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
+        <Link href="/app/onboarding/processes" className="is-active"><span>02</span><strong>PRZEPROWADŹ</strong><small>Karta Postępu</small></Link>
+        <Link href="/app/onboarding/closed"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
+      </nav>
 
       <section className="bos-app-intro">
         <div>
@@ -86,7 +91,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <span className="bos-dashboard-count">{progress.completed} z {progress.total} czynności gotowych</span>
         </div>
 
-        <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · 5 ETAPÓW</strong><p>WYJAŚNIJ — omów. POKAŻ — zademonstruj. RAZEM — wykonajcie wspólnie. SAM — pracownik wykonuje bez pomocy. SPRAWDŹ — oceń rezultat według warunku zaliczenia. Deklaracja „wiem” nie zastępuje SAM.</p></aside>
+        <aside className="bos-guidance bos-guidance-primary"><div><span className="bos-guidance-eyebrow">TERAZ · PRZEPROWADŹ</span><strong>Prowadź każdą czynność przez 5 etapów</strong><p>Nie zaliczaj wiedzy deklarowanej. Etapy opisują rzeczywistą pracę: najpierw wyjaśnij i pokaż, potem oddawaj wykonanie pracownikowi, aż zrobi je sam i rezultat zostanie sprawdzony.</p></div><details><summary>? Jak działa 5 etapów</summary><p><b>WYJAŚNIJ</b> — pracownik rozumie co, po co i na co uważać. <b>POKAŻ</b> — widzi prawidłowe wykonanie. <b>RAZEM</b> — wykonuje z pomocą. <b>SAM</b> — wykonuje bez prowadzenia krok po kroku. <b>SPRAWDŹ</b> — oceniasz rzeczywisty rezultat według Standardu.</p></details></aside>
         <div className="bos-process-task-head">
           <span>LP.</span><span>CZYNNOŚĆ ZE STANDARDU</span><span>CO SPRAWDZIĆ</span><span>POSTĘP BOS</span>
         </div>
@@ -100,8 +105,20 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
               <p>{task.readyWhen}</p>
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
                 {stageLabels.map(([stage,label,key,actorKey],stageIndex)=>{ const done=Boolean(state[key]); const previousKey=stageIndex>0?stageLabels[stageIndex-1][2]:null; const previousDone=stageIndex===0||Boolean(previousKey&&state[previousKey]);
-                  return <div className="bos-process-stage" key={stage}><form action={confirmStage}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><input type="hidden" name="stage" value={stage}/><button type="submit" className={done?"is-done":""} disabled={done||!previousDone||!startComplete} aria-pressed={done}>{label}{done?" ✓":""}</button></form>{done&&<small>{shortDate(state[key])} · {state[actorKey]||"—"}</small>}</div>; })}
-                <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Dwukrotnie wybrał zły kod produktu — wrócić do listy kodów."/></label><div><small>Zapisz fakt lub działanie do powtórzenia, nie ocenę osoby. Błąd nie kasuje wcześniejszych etapów — popraw, powtórz i sprawdź ponownie.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
+                  const guidance={
+                    EXPLAINED:["Powiedz, co ma zrobić, po co, jaki ma być rezultat i na co uważać.","Przejdź dalej, gdy pracownik potrafi własnymi słowami opisać zadanie."],
+                    SHOWN:["Wykonaj czynność tak, jak robi się ją naprawdę. Pokazuj rezultat i punkty kontroli.","Przejdź dalej po rzeczywistej demonstracji, nie po samym omówieniu."],
+                    TOGETHER:["Pracownik wykonuje czynność. Ty pomagasz tylko tam, gdzie jest to potrzebne.","RAZEM nie oznacza wykonania zadania za pracownika."],
+                    SOLO:["Oddaj wykonanie pracownikowi bez prowadzenia krok po kroku.","SAM zaznacz dopiero po rzeczywistym samodzielnym wykonaniu. „Rozumiem” nie wystarcza."],
+                    CHECKED:["Porównaj rzeczywisty rezultat z prawidłowym wykonaniem i warunkiem SPRAWDŹ.","Potwierdź dopiero wtedy, gdy rezultat spełnia Standard."]
+                  }[stage];
+                  return <div className={`bos-process-stage ${!done&&previousDone?"is-current":""}`} key={stage}>
+                    <div className="bos-stage-guidance"><span>{String(stageIndex+1).padStart(2,"0")}</span><div><strong>{label}</strong><p>{guidance[0]}</p><small>{guidance[1]}</small></div></div>
+                    <form action={confirmStage}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><input type="hidden" name="stage" value={stage}/><button type="submit" className={done?"is-done":""} disabled={done||!previousDone||!startComplete} aria-pressed={done}>{done?`${label} ✓`:`POTWIERDŹ ${label}`}</button></form>
+                    {done&&<small className="bos-stage-audit">{shortDate(state[key])} · {state[actorKey]||"—"}</small>}
+                  </div>; })}
+                <details className="bos-error-recovery"><summary>WYSTĄPIŁ BŁĄD — jak wrócić do prawidłowego wykonania?</summary><div><b>ZATRZYMAJ → WSKAŻ → POPRAW → POWTÓRZ → SPRAWDŹ</b><p>Błąd nie kasuje wcześniejszych etapów. Zatrzymaj błędne wykonanie, wskaż konkretną różnicę względem Standardu, popraw sposób działania, pozwól powtórzyć czynność i sprawdź rezultat ponownie.</p><small>W notatce zapisuj fakt, np. „Pominięto sprawdzenie uszkodzenia opakowania”, a nie ocenę osoby, np. „nieuważny”.</small></div></details>
+                <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Pominięto sprawdzenie kodu produktu — powtórzyć czynność i sprawdzić rezultat."/></label><div><small>Zapisz zaobserwowany fakt lub działanie do powtórzenia. Nie oceniaj osoby.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
               </div>
             </article>
           );
