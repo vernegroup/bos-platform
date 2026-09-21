@@ -752,30 +752,34 @@ export async function createStandard(input:{organizationId?:string;productId:str
 export async function listOnboardingStartOptions(organizationId?:string) {
   requirePersistedOnboarding();
   const sql=db(); const orgId=tenantId(organizationId);
-  const [standards,memberships,products]=await Promise.all([
+  const [standards,memberships,employees,products]=await Promise.all([
     sql`SELECT s.id standard_id,s.name,s.area,sv.id version_id,sv.version_label
       FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.organization_id=${orgId} AND s.status='ACTIVE' AND sv.status='PUBLISHED'
       ORDER BY s.name,sv.version_number DESC`,
     sql`SELECT u.id,u.display_name,u.email,m.role FROM memberships m JOIN users u ON u.id=m.user_id
       WHERE m.organization_id=${orgId} AND m.status='ACTIVE' AND u.status='ACTIVE' ORDER BY u.display_name`,
+    sql`SELECT e.id,e.first_name,e.last_name,e.employee_number,e.position,e.department,e.linked_user_id
+      FROM employees e WHERE e.organization_id=${orgId} AND e.status='ACTIVE'
+      ORDER BY e.last_name,e.first_name,e.created_at`,
     sql`SELECT p.id,p.key,p.name FROM licenses l JOIN products p ON p.id=l.product_id
       WHERE l.organization_id=${orgId} AND l.status='ACTIVE' AND p.status='ACTIVE' ORDER BY p.name`
   ]);
   return {
     standards:standards.map(x=>({standardId:x.standard_id,name:x.name,area:x.area??"",versionId:x.version_id,version:x.version_label})),
     members:memberships.map(x=>({id:x.id,name:x.display_name,email:x.email,role:x.role})),
+    employees:employees.map(x=>({id:x.id,name:[x.first_name,x.last_name].filter(Boolean).join(" "),employeeNumber:x.employee_number??"",position:x.position??"",department:x.department??"",linkedUserId:x.linked_user_id??undefined})),
     products:products.map(x=>({id:x.id,key:x.key,name:x.name}))
   };
 }
 
 export async function createProcess(input:{
-  organizationId?:string;productId:string;employeeId?:string;employeeName:string;standardId:string;standardVersionId:string;
+  organizationId?:string;productId:string;employeeId:string;standardId:string;standardVersionId:string;
   ownerUserId:string;trainerUserId:string;evaluatorUserId:string;buddyUserId?:string;startedOn:string;targetOn?:string;createdByUserId:string;
 }) {
   requirePersistedOnboarding();
-  const sql=db(); const organizationId=tenantId(input.organizationId); const employeeName=input.employeeName.trim();
-  if(!employeeName) throw new Error("Pracownik jest wymagany.");
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  if(!input.employeeId) throw new Error("Pracownik jest wymagany.");
   if(!input.startedOn) throw new Error("Data startu jest wymagana.");
   return sql.begin(async tx=>{
     const [version]=await tx`SELECT sv.id,sv.standard_id,sv.status,s.status standard_status
@@ -794,17 +798,17 @@ export async function createProcess(input:{
     const activeActors=await tx`SELECT user_id FROM memberships WHERE organization_id=${organizationId}
       AND status='ACTIVE' AND user_id = ANY(${uniqueActors})`;
     if(activeActors.length!==uniqueActors.length) throw new Error("Wszystkie osoby przypisane do procesu muszą być aktywnymi członkami organizacji.");
-    if(input.employeeId){
-      const employee=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId}
-        AND user_id=${input.employeeId} AND status='ACTIVE' LIMIT 1`;
-      if(!employee[0]) throw new Error("Wybrany pracownik nie należy aktywnie do tej organizacji.");
-    }
+
+    const [employee]=await tx`SELECT id,first_name,last_name FROM employees
+      WHERE id=${input.employeeId} AND organization_id=${organizationId} AND status='ACTIVE' LIMIT 1 FOR SHARE`;
+    if(!employee) throw new Error("Wybrany pracownik nie istnieje lub nie jest aktywny w tej organizacji.");
+    const employeeName=[employee.first_name,employee.last_name].filter(Boolean).join(" ").trim();
 
     const [process]=await tx`INSERT INTO onboarding_processes(
       organization_id,product_id,employee_id,employee_name_snapshot,standard_id,standard_version_id,
       owner_user_id,trainer_user_id,evaluator_user_id,buddy_user_id,status,started_on,target_on,created_by_user_id
     ) VALUES(
-      ${organizationId},${input.productId},${input.employeeId??null},${employeeName},${input.standardId},${input.standardVersionId},
+      ${organizationId},${input.productId},${employee.id},${employeeName},${input.standardId},${input.standardVersionId},
       ${input.ownerUserId},${input.trainerUserId},${input.evaluatorUserId},${input.buddyUserId??null},'PLANNED',
       ${input.startedOn},${input.targetOn??null},${input.createdByUserId}
     ) RETURNING id`;
@@ -823,5 +827,3 @@ export async function createProcess(input:{
     return process.id as string;
   });
 }
-
-
