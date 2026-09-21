@@ -72,7 +72,7 @@ export async function listClosures(organizationId?:string) {
   if (!hasDatabase()) return onboardingClosures.map(c=>({...c,decision:c.result==="GOTOWY"?"READY" as const:c.result==="JESZCZE NIE"?"NOT_YET" as const:"STOP" as const,decisionSequence:1,reopenReason:undefined,isLatest:true}));
   const sql=db(); const orgId=tenantId(organizationId);
   const rows=await sql`
-    SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,sv.version_label,p.started_on,c.verified_at,
+    SELECT c.id,c.onboarding_process_id,c.employee_name_snapshot,c.standard_id,p.employee_id,sv.version_label,p.started_on,c.verified_at,
       owner.display_name owner,verifier.display_name verified_by,c.decision,c.summary,c.recommendations,c.decision_sequence,c.reopen_reason,
       (c.decision_sequence=(SELECT max(c2.decision_sequence) FROM onboarding_closures c2 WHERE c2.onboarding_process_id=c.onboarding_process_id AND c2.organization_id=c.organization_id)) is_latest,
       (SELECT count(*)::int FROM onboarding_task_progress tp WHERE tp.onboarding_process_id=p.id AND tp.checked_at IS NOT NULL) completed_tasks,
@@ -81,7 +81,7 @@ export async function listClosures(organizationId?:string) {
     JOIN standard_versions sv ON sv.id=c.standard_version_id AND sv.organization_id=c.organization_id
     JOIN users owner ON owner.id=p.owner_user_id JOIN users verifier ON verifier.id=c.verified_by_user_id
     WHERE c.organization_id=${orgId} ORDER BY c.verified_at DESC,c.decision_sequence DESC`;
-  return rows.map(r=>({id:r.id,processId:r.onboarding_process_id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
+  return rows.map(r=>({id:r.id,processId:r.onboarding_process_id,employeeId:r.employee_id??undefined,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
     startedAt:datePL(r.started_on),closedAt:datePL(r.verified_at),owner:r.owner,verifiedBy:r.verified_by,
     result:r.decision==="READY"?"GOTOWY" as const:r.decision==="NOT_YET"?"JESZCZE NIE" as const:"STOP" as const,
     decision:r.decision as "READY"|"NOT_YET"|"STOP",decisionSequence:r.decision_sequence,reopenReason:r.reopen_reason??undefined,isLatest:Boolean(r.is_latest),
@@ -90,6 +90,32 @@ export async function listClosures(organizationId?:string) {
 
 export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
+}
+
+export async function getClosureOutcome(closureId:string, organizationId?:string) {
+  requirePersistedOnboarding();
+  const sql=db(); const orgId=tenantId(organizationId);
+  const [closure]=await sql`
+    SELECT c.onboarding_process_id,p.employee_id,e.position,e.department
+    FROM onboarding_closures c
+    JOIN onboarding_processes p ON p.id=c.onboarding_process_id AND p.organization_id=c.organization_id
+    LEFT JOIN employees e ON e.id=p.employee_id AND e.organization_id=p.organization_id
+    WHERE c.id=${closureId} AND c.organization_id=${orgId} LIMIT 1`;
+  if(!closure) return null;
+  const [tasks,startChecks,readinessChecks]=await Promise.all([
+    sql`SELECT standard_task_id,explained_at,shown_at,together_at,solo_at,checked_at,note
+      FROM onboarding_task_progress WHERE organization_id=${orgId} AND onboarding_process_id=${closure.onboarding_process_id}`,
+    sql`SELECT requirement_id,is_satisfied,checked_at FROM onboarding_start_checks
+      WHERE organization_id=${orgId} AND onboarding_process_id=${closure.onboarding_process_id}`,
+    sql`SELECT readiness_criterion_id,is_passed,checked_at,note FROM onboarding_readiness_checks
+      WHERE organization_id=${orgId} AND onboarding_process_id=${closure.onboarding_process_id}`
+  ]);
+  return {
+    position:closure.position??"",department:closure.department??"",
+    tasks:tasks.map(x=>({standardTaskId:x.standard_task_id,explainedAt:x.explained_at??undefined,shownAt:x.shown_at??undefined,togetherAt:x.together_at??undefined,soloAt:x.solo_at??undefined,checkedAt:x.checked_at??undefined,note:x.note??undefined})),
+    startChecks:startChecks.map(x=>({requirementId:x.requirement_id,isSatisfied:Boolean(x.is_satisfied),checkedAt:x.checked_at??undefined})),
+    readinessChecks:readinessChecks.map(x=>({criterionId:x.readiness_criterion_id,isPassed:Boolean(x.is_passed),checkedAt:x.checked_at??undefined,note:x.note??undefined}))
+  };
 }
 
 export async function closeProcess(input:{organizationId?:string;processId:string;verifiedByUserId:string;decision:"READY"|"NOT_YET"|"STOP";summary:string;recommendations?:string;formalitiesConfirmed:boolean}) {
