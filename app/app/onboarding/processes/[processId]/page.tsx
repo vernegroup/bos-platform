@@ -149,11 +149,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         </div>
         <div className="bos-process-next-action">
           <span>{progress.percent}%</span>
-          {readyForDecision ? (
-            <Link href={`/app/onboarding/processes/${process.id}/close`}>PRZEJDŹ DO DECYZJI →</Link>
-          ) : (
-            <b>ZAMKNIĘCIE NIEDOSTĘPNE</b>
-          )}
+          <Link href={`/app/onboarding/processes/${process.id}/close`}>{readyForDecision ? "PRZEJDŹ DO DECYZJI →" : "JESZCZE NIE / STOP →"}</Link>
         </div>
       </section>
     </>

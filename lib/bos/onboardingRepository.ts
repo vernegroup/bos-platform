@@ -103,14 +103,17 @@ export async function closeProcess(input:{organizationId?:string;processId:strin
     if(!member) throw new Error("Osoba podejmująca decyzję nie należy aktywnie do organizacji.");
     const [process]=await tx`SELECT id,standard_id,standard_version_id,employee_name_snapshot,status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
     if(!process) throw new Error("Nie znaleziono procesu.");
-    if(process.status!=="READY_TO_CLOSE") throw new Error("Proces nie jest w stanie READY_TO_CLOSE.");
-    const [gate]=await tx`SELECT
-      count(*) FILTER(WHERE tp.checked_at IS NULL)::int tasks_missing,
-      count(*) FILTER(WHERE st.is_critical AND (tp.solo_at IS NULL OR tp.checked_at IS NULL))::int critical_missing
-      FROM onboarding_task_progress tp JOIN standard_tasks st ON st.id=tp.standard_task_id AND st.organization_id=tp.organization_id
-      WHERE tp.onboarding_process_id=${process.id} AND tp.organization_id=${organizationId}`;
-    const [readiness]=await tx`SELECT count(*) FILTER(WHERE is_passed=false)::int missing FROM onboarding_readiness_checks WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
-    if((gate?.tasks_missing??1)>0||(gate?.critical_missing??1)>0||(readiness?.missing??1)>0) throw new Error("Readiness Gate nie jest kompletny.");
+    if(!["PLANNED","IN_PROGRESS","READY_TO_CLOSE"].includes(process.status)) throw new Error("Proces nie jest otwarty do decyzji.");
+    if(input.decision==="READY") {
+      if(process.status!=="READY_TO_CLOSE") throw new Error("Decyzja GOTOWY wymaga kompletnego Readiness Gate.");
+      const [gate]=await tx`SELECT
+        count(*) FILTER(WHERE tp.checked_at IS NULL)::int tasks_missing,
+        count(*) FILTER(WHERE st.is_critical AND (tp.solo_at IS NULL OR tp.checked_at IS NULL))::int critical_missing
+        FROM onboarding_task_progress tp JOIN standard_tasks st ON st.id=tp.standard_task_id AND st.organization_id=tp.organization_id
+        WHERE tp.onboarding_process_id=${process.id} AND tp.organization_id=${organizationId}`;
+      const [readiness]=await tx`SELECT count(*) FILTER(WHERE is_passed=false)::int missing FROM onboarding_readiness_checks WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
+      if((gate?.tasks_missing??1)>0||(gate?.critical_missing??1)>0||(readiness?.missing??1)>0) throw new Error("Readiness Gate nie jest kompletny.");
+    }
     const [seq]=await tx`SELECT COALESCE(max(decision_sequence),0)::int+1 sequence FROM onboarding_closures WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
     const [closure]=await tx`INSERT INTO onboarding_closures(organization_id,onboarding_process_id,standard_id,standard_version_id,employee_name_snapshot,decision,verified_by_user_id,summary,recommendations,decision_sequence)
       VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.decision}::onboarding_decision_result,${input.verifiedByUserId},${summary},${recommendations},${seq.sequence}) RETURNING id`;
