@@ -110,13 +110,14 @@ async function publishStandard(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const qualityCheckPassed=["observable","realWork","repeatable","coversCritical"].every(key=>formData.get(key)==="on");
-  if(!qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
-  await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed});
+  if(!qualityCheckPassed) redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent("Zaznacz wszystkie cztery odpowiedzi TAK w teście jakości.")}#gotowosc-publikacji`);
+  try { await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed}); }
+  catch(error) { const message=error instanceof Error?error.message:"Standard nie spełnia warunków publikacji."; redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent(message)}#gotowosc-publikacji`); }
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 
-export default async function StandardDetailPage({params}:{params:Promise<{standardId:string}>}) {
-  const access=await requireBOSAccess(); const {standardId}=await params;
+export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>,searchParams:Promise<{publishError?:string}>}) {
+  const access=await requireBOSAccess(); const {standardId}=await params; const {publishError}=await searchParams;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
@@ -203,9 +204,9 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         <div><button type="submit" className="bos-standard-primary-action">DODAJ WARUNEK</button></div>
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
-      current.startRequirements.map((requirement,index)=><div className="bos-standard-editor-row bos-editor-action-layout" key={requirement.id}>
-        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {requirement.category}</span>
-          {!isDraft&&<p>{requirement.requirement}</p>}</div>
+      current.startRequirements.map((requirement,index)=><details className="bos-saved-editor-card" key={requirement.id}>
+        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {requirement.category}</span><strong>{requirement.requirement}</strong>{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
+        <div className="bos-standard-editor-row bos-editor-action-layout">
         {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/>
           <select name="category" defaultValue={requirement.category} style={{padding:8}}>
@@ -220,7 +221,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
           <form action={reorderStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><input type="hidden" name="direction" value="DOWN"/><button type="submit" disabled={index===current.startRequirements.length-1}>↓ W DÓŁ</button></form>
           <form action={removeStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/><button type="submit">USUŃ</button></form>
         </div>}
-      </div>)}
+      </div></details>)}
     </section>
 
     <section id="kryteria-gotowosci" className="bos-standard-history bos-standard-editor-section">
@@ -240,9 +241,9 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         <div><button type="submit" className="bos-standard-primary-action" disabled={!canAddCriterion}>{canAddCriterion?"DODAJ KRYTERIUM":"OSIĄGNIĘTO LIMIT 3"}</button></div>
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
-      current.readinessCriteria.map((criterion,index)=><div className="bos-standard-editor-row bos-editor-action-layout" key={criterion.id}>
-        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span>
-          {!isDraft&&<><p>{criterion.criterion}</p>{criterion.verificationMethodOther&&<p>{criterion.verificationMethodOther}</p>}</>}</div>
+      current.readinessCriteria.map((criterion,index)=><details className="bos-saved-editor-card" key={criterion.id}>
+        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span><strong>{criterion.criterion}</strong>{criterion.verificationMethodOther&&<small>{criterion.verificationMethodOther}</small>}{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
+        <div className="bos-standard-editor-row bos-editor-action-layout">
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/>
           <textarea name="criterion" required rows={2} defaultValue={criterion.criterion} style={{padding:8}}/>
@@ -258,7 +259,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
           <form action={reorderReadinessCriterion}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/><input type="hidden" name="direction" value="DOWN"/><button type="submit" disabled={index===current.readinessCriteria.length-1}>↓ W DÓŁ</button></form>
           <form action={removeReadinessCriterion}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/><button type="submit">USUŃ</button></form>
         </div>}
-      </div>)}
+      </div></details>)}
     </section>
 
     {isDraft&&<section id="gotowosc-publikacji" className="bos-standard-history bos-standard-editor-section">
@@ -267,6 +268,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         <p>System sprawdza dane Standardu przed udostępnieniem go do użycia w onboardingu.</p></div>
         <span className="bos-dashboard-count">{completeness.complete?"GOTOWY":"BLOKADA"}</span></div>
       <div className="bos-standard-detail-head">
+        {publishError&&<div className="bos-publish-error" role="alert"><strong>Nie można opublikować Standardu</strong><p>{publishError}</p><span>Popraw wskazany element i spróbuj ponownie.</span></div>}
         {completeness.complete
           ? <div style={{display:"grid",gap:12}}><div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
               <form action={publishStandard} style={{display:"grid",gap:8}}><input type="hidden" name="standardId" value={standard.id}/>
