@@ -123,9 +123,19 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
   const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
+    <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
+      <Link href="/app/onboarding/standards" className="is-active"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
+      <Link href="/app/onboarding/processes"><span>02</span><strong>PRZEPROWADŹ</strong><small>Karta Postępu</small></Link>
+      <Link href="/app/onboarding/closed"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
+    </nav>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
       <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
       <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
+    <aside className="bos-guidance bos-guidance-primary">
+      <div><span className="bos-guidance-eyebrow">TERAZ · PRZYGOTUJ</span><strong>Zbuduj wzorzec stanowiska</strong>
+      <p>Po tej części Standard ma odpowiadać na trzy pytania: czego nauczyć, na co szczególnie uważać i po czym poznać gotowość.</p></div>
+      <details><summary>? Jak pracować z tą częścią</summary><p>Opisuj rzeczywistą pracę własnymi słowami. Czynności zapisuj tak, aby można je było pokazać, wykonać i sprawdzić. Nie musisz wykorzystać wszystkich 18 pozycji.</p></details>
+    </aside>
 
     {isDraft&&<form action={updateDraft} className="bos-standard-detail-head"><input type="hidden" name="standardId" value={standard.id}/>
       <div style={{display:"grid",gap:10,width:"100%",maxWidth:720}}><span className="bos-dashboard-section-kicker">WERSJA ROBOCZA — DANE PODSTAWOWE</span>
@@ -142,11 +152,14 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
 
     {isDraft&&<section className="bos-standard-detail-head" aria-label="Dodaj czynność"><form action={addTask} style={{display:"grid",gap:10,width:"100%"}}>
       <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWA CZYNNOŚĆ</span>
-      <input name="name" required maxLength={240} placeholder="Nazwa czynności" disabled={!canAdd} style={{padding:10}}/>
-      <textarea name="execution" required placeholder="Prawidłowe wykonanie" disabled={!canAdd} rows={3} style={{padding:10}}/>
+      <label className="bos-guided-field"><strong>Co pracownik ma zrobić?</strong><span>Wpisz czynność, którą można wykonać i zobaczyć jej rezultat.</span>
+      <input name="name" required maxLength={240} placeholder="np. Sprawdza dostawę przed przyjęciem" disabled={!canAdd} style={{padding:10}}/></label>
+      <details className="bos-guidance-inline"><summary>? Co tu wpisać</summary><p>Nie wpisuj szerokiego obszaru, np. „obsługa magazynu”. Rozbij go na realne czynności: „przyjmuje dostawę”, „sprawdza ilość”, „odkłada towar”. Test: czy możesz powiedzieć „teraz zrób to”, a potem zobaczyć rezultat?</p></details>
+      <label className="bos-guided-field"><strong>Po czym poznasz, że zrobił to prawidłowo?</strong><span>Prawidłowe wykonanie opisuje rezultat, nie powtarza nazwy czynności.</span>
+      <textarea name="execution" required placeholder="np. Ilość i stan zgadzają się z dokumentem, a niezgodność została zgłoszona" disabled={!canAdd} rows={3} style={{padding:10}}/></label>
       <textarea name="readyWhen" placeholder="Co dodatkowo sprawdzić przy SPRAWDŹ? (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <textarea name="hint" placeholder="Podpowiedź / wskazówka (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
-      <label><input type="checkbox" name="isCritical" disabled={!canAdd}/> K — czynność krytyczna</label><aside className="bos-context-guide is-compact"><strong>KIEDY OZNACZYĆ K?</strong><p>Zapytaj: co się stanie, jeśli pracownik zrobi tę czynność źle? K oznacza ryzyko poważnych konsekwencji, nie samo znaczenie czynności.</p></aside>
+      <label className="bos-guided-check"><input type="checkbox" name="isCritical" disabled={!canAdd}/><span><strong>K — błąd może mieć poważne konsekwencje</strong><small>K nie oznacza „ważne”.</small></span></label><details className="bos-guidance-inline"><summary>? Kiedy oznaczyć K</summary><p>Zapytaj: co się stanie, jeśli pracownik zrobi tę czynność źle? K stosuj przy realnym ryzyku zagrożenia, istotnej straty, uszkodzenia, naruszenia danych, poważnego problemu z klientem albo zatrzymania pracy.</p></details>
       <div><button type="submit" className="bos-standard-primary-action" disabled={!canAdd}>{canAdd?"DODAJ CZYNNOŚĆ":"OSIĄGNIĘTO LIMIT 18"}</button></div>
     </form></section>}
 
@@ -174,7 +187,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
 
     <section id="warunki-startu" className="bos-standard-history">
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZED STARTEM</span><h2>Warunki rozpoczęcia</h2>
-        <p>Elementy, które muszą być dostępne lub przygotowane przed rozpoczęciem wdrożenia.</p></div>
+        <p>Dodaj tylko to, co rzeczywiście musi być przygotowane, aby pracownik mógł rozpocząć naukę lub daną czynność.</p><details className="bos-guidance-inline"><summary>? Co zalicza się do warunków</summary><p>Narzędzia i urządzenia, dostępy i systemy, materiały i dokumenty, instrukcje firmy oraz miejsce i wyposażenie. BOS nie zastępuje wymaganych badań, BHP, uprawnień ani formalnych dopuszczeń.</p></details></div>
         <span className="bos-dashboard-count">{current.startRequirements.length} warunki</span></div>
       {isDraft&&<div className="bos-standard-detail-head"><form action={addStartRequirement} style={{display:"grid",gap:10,width:"100%"}}>
         <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWY WARUNEK</span>
@@ -207,7 +220,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
     </section>
 
     <section id="kryteria-gotowosci" className="bos-standard-history">
-      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · KRYTERIUM GOTOWOŚCI</strong><p>Kryterium opisuje gotowość do całej roli, a nie pojedynczą czynność. Wszystkie czynności mogą być zaliczone, a kryterium końcowe nadal niespełnione. Decyzję o gotowości podejmuje człowiek.</p></aside>
+      <aside className="bos-guidance"><div><span className="bos-guidance-eyebrow">KRYTERIUM GOTOWOŚCI</span><strong>Po czym poznasz, że możesz przestać prowadzić tę osobę krok po kroku?</strong><p>Dokończ myśl: „Pozwolę tej osobie pracować bez prowadzenia krok po kroku, kiedy będzie potrafiła…” Zapisz zachowanie albo wynik możliwy do sprawdzenia.</p></div><details><summary>? Pokaż przykład</summary><p><b>Za ogólnie:</b> „Jest samodzielny.” <b>Lepiej:</b> „Samodzielnie kompletuje standardowe zamówienie zgodnie ze Standardem i przekazuje je bez braków.”</p></details></aside>
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">SPRAWDŹ</span><h2>Kryteria gotowości</h2>
         <p>Od 1 do 3 kryteriów końcowych określających, jak potwierdzić gotowość pracownika.</p></div>
         <span className="bos-dashboard-count">{current.readinessCriteria.length}/3</span></div>
