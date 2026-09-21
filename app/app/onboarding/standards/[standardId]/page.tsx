@@ -169,8 +169,8 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <h2>Standard nie ma jeszcze zdefiniowanych czynności.</h2><p>{isDraft?"Dodaj pierwszą czynność powyżej.":"Ta wersja nie zawiera czynności."}</p></div></section>:
     <section className="bos-standard-task-table" aria-label="Czynności Standardu Stanowiska">
       <div className="bos-standard-task-head"><span>LP.</span><span>CZYNNOŚĆ</span><span>PRAWIDŁOWE WYKONANIE</span><span>CO SPRAWDZIĆ PRZY SPRAWDŹ</span></div>
-      {current.tasks.map((task,index)=><div key={task.id}>
-        <div className="bos-standard-task-row"><span>{String(index+1).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong><p>{task.execution}</p><p>{task.readyWhen||"—"}</p></div>
+      {current.tasks.map((task,index)=><details className="bos-task-editor-card" key={task.id}>
+        <summary className="bos-standard-task-row bos-task-editor-summary"><span>{String(index+1).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong><p>{task.execution}</p><p>{task.readyWhen||"—"}</p>{isDraft&&<b className="bos-task-edit-label">EDYTUJ</b>}</summary>
         {task.hint&&<div className="bos-standard-detail-head" style={{paddingTop:10,paddingBottom:10}}><p><strong>Podpowiedź:</strong> {task.hint}</p></div>}
         {isDraft&&<div className="bos-standard-detail-head bos-editor-action-layout" style={{paddingTop:12,paddingBottom:18}}>
           <form action={editTask} style={{display:"grid",gap:8,width:"100%"}}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="taskId" value={task.id}/>
@@ -184,7 +184,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
             <form action={removeTask}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="taskId" value={task.id}/><button type="submit">USUŃ</button></form>
           </div>
         </div>}
-      </div>)}
+      </details>)}
     </section>}
     </section>
 

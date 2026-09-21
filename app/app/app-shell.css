@@ -3415,3 +3415,7 @@
 .bos-standard-task-table .bos-editor-action-layout>div:last-child{grid-row:1}
 @media(max-width:760px){.bos-editor-action-layout{grid-template-columns:minmax(0,1fr) 76px!important;column-gap:12px!important}.bos-editor-action-layout>div:last-child button{font-size:8px;padding:7px 4px}}
 @media(max-width:520px){.bos-editor-action-layout{grid-template-columns:1fr!important}.bos-editor-action-layout>div:first-child,.bos-editor-action-layout>form,.bos-editor-action-layout>div:last-child{grid-column:1!important;grid-row:auto!important}.bos-editor-action-layout>div:last-child{flex-direction:row!important}.bos-editor-action-layout>div:last-child form{flex:1}}
+
+/* 2.2I — Collapsible existing task editor; mobile geometry unchanged */
+.bos-task-editor-card{border:0;border-bottom:1px solid var(--app-line);background:transparent}.bos-task-editor-card>summary{cursor:pointer;list-style:none}.bos-task-editor-card>summary::-webkit-details-marker{display:none}.bos-task-editor-summary{position:relative}.bos-task-edit-label{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:8px;letter-spacing:.55px;color:#805d27}.bos-task-editor-card[open] .bos-task-edit-label{color:var(--app-muted)}.bos-task-editor-card[open] .bos-task-edit-label:after{content:" · ZAMKNIJ"}.bos-task-editor-card[open]>.bos-standard-detail-head{border-top:1px solid var(--app-line)}
+@media(max-width:760px){.bos-task-edit-label{position:static;transform:none;grid-column:2;justify-self:start;margin-top:5px}.bos-task-editor-summary{padding-right:0}}
