@@ -3419,3 +3419,8 @@
 /* 2.2I — Collapsible existing task editor; mobile geometry unchanged */
 .bos-task-editor-card{border:0;border-bottom:1px solid var(--app-line);background:transparent}.bos-task-editor-card>summary{cursor:pointer;list-style:none}.bos-task-editor-card>summary::-webkit-details-marker{display:none}.bos-task-editor-summary{position:relative}.bos-task-edit-label{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:8px;letter-spacing:.55px;color:#805d27}.bos-task-editor-card[open] .bos-task-edit-label{color:var(--app-muted)}.bos-task-editor-card[open] .bos-task-edit-label:after{content:" · ZAMKNIJ"}.bos-task-editor-card[open]>.bos-standard-detail-head{border-top:1px solid var(--app-line)}
 @media(max-width:760px){.bos-task-edit-label{position:static;transform:none;grid-column:2;justify-self:start;margin-top:5px}.bos-task-editor-summary{padding-right:0}}
+
+/* 2.2J — Dashboard direct Standard access */
+.bos-onboarding-standard-direct{display:inline-flex;width:fit-content;color:var(--app-navy);font:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}
+.bos-onboarding-standard-direct:hover,.bos-onboarding-standard-direct:focus-visible{color:#805d27;border-bottom-color:#b98732}
+.bos-onboarding-standard-direct:focus-visible{outline:2px solid #b98732;outline-offset:3px}
