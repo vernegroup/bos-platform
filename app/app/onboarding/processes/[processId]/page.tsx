@@ -8,7 +8,7 @@ async function confirmStage(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const standardTaskId=String(formData.get("standardTaskId")??""); const stage=String(formData.get("stage")??"") as OnboardingTaskStage;
   if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap BOS.");
-  await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
+  await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
 async function confirmStart(formData:FormData) {
   "use server";
@@ -99,7 +99,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           const state = process.tasks.find((item: { standardTaskId: string }) => item.standardTaskId === task.id);
           if (!state) return null;
           return (
-            <article className="bos-process-task-row" key={task.id}>
+            <article className="bos-process-task-row" id={`task-${task.id}`} key={task.id}>
               <span>{String(task.order).padStart(2, "0")}{task.isCritical ? " · K" : ""}</span>
               <div><strong>{task.name}</strong><p>{task.execution}</p>{task.isCritical&&<small className="bos-context-inline">K — błąd w tej czynności może mieć poważne konsekwencje. K nie oznacza po prostu „ważne”.</small>}{task.hint&&<small>WSKAZÓWKA: {task.hint}</small>}</div>
               <p>{task.readyWhen}</p>
