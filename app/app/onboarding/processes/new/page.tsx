@@ -19,14 +19,14 @@ async function startOnboarding(fd:FormData){
   const standardChoice=text(fd,"standardVersion");
   const [standardId,standardVersionId]=standardChoice.split(":");
   const buddyUserId=text(fd,"buddyUserId");
-  await createProcess({
+  const processId=await createProcess({
     organizationId:access.organization.id,productId:text(fd,"productId"),
     employeeId,standardId,standardVersionId,
     ownerUserId:text(fd,"ownerUserId"),trainerUserId:text(fd,"trainerUserId"),evaluatorUserId:text(fd,"evaluatorUserId"),
     buddyUserId:buddyUserId||undefined,startedOn:text(fd,"startedOn"),targetOn:text(fd,"targetOn")||undefined,
     createdByUserId:access.user.id
   });
-  redirect("/app/onboarding/processes");
+  redirect(`/app/onboarding/processes/${processId}`);
 }
 
 export default async function NewProcessPage(){
