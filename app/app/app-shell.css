@@ -3306,3 +3306,39 @@
 .bos-close-decision-form textarea{min-height:82px;padding:10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:10px;resize:vertical}.bos-close-decisions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bos-close-decisions button,.bos-reopen-form button{min-height:38px;border:1px solid var(--bos-line);background:transparent;font-size:9px;font-weight:700}.bos-close-decisions button:disabled{opacity:.4}
 .bos-reopen-form{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px}.bos-reopen-form input{padding:10px;border:1px solid var(--bos-line);background:transparent;font:inherit;font-size:9px}
 @media(max-width:600px){.bos-close-decisions{grid-template-columns:1fr}.bos-reopen-form{grid-template-columns:1fr}}
+
+/* 2.2 — Standard editor smoke-test corrections */
+.bos-onboarding-shell{font-size:16px}
+.bos-onboarding-shell .bos-app-kicker,
+.bos-onboarding-shell .bos-dashboard-section-kicker{font-size:11px;line-height:1.35}
+.bos-onboarding-shell .bos-app-intro p,
+.bos-onboarding-shell .bos-standard-detail-head p,
+.bos-onboarding-shell .bos-context-guide p{font-size:14px;line-height:1.55}
+.bos-onboarding-shell .bos-context-guide strong{font-size:11px}
+.bos-onboarding-shell .bos-standard-back,
+.bos-onboarding-shell .bos-standard-tabs span,
+.bos-onboarding-shell .bos-standard-tabs a{font-size:11px}
+.bos-onboarding-shell :where(input,select,textarea){font-size:16px;padding:12px 14px!important}
+.bos-onboarding-shell :where(input,select){min-height:48px}
+.bos-onboarding-shell textarea{min-height:76px}
+.bos-onboarding-shell button,
+.bos-onboarding-shell .bos-standard-primary-action{min-height:44px;padding:0 16px;font-size:11px;letter-spacing:.45px}
+.bos-onboarding-shell label{font-size:14px;line-height:1.45}
+.bos-onboarding-shell input[type="checkbox"]{width:22px;min-height:22px;vertical-align:middle;margin-right:8px}
+.bos-onboarding-shell .bos-dashboard-count{font-size:11px}
+.bos-onboarding-shell .bos-standard-detail-head{gap:20px}
+.bos-onboarding-shell .bos-standard-editor-row{
+  min-height:96px;padding:18px 0;border-bottom:1px solid var(--app-line);
+  display:grid;grid-template-columns:180px minmax(0,1fr) auto;gap:20px;align-items:start;
+}
+.bos-onboarding-shell .bos-standard-editor-row>div:first-child{padding-top:12px}
+.bos-onboarding-shell .bos-standard-editor-row>form{display:grid;gap:10px;width:100%;min-width:0}
+.bos-onboarding-shell .bos-standard-editor-row>div:last-child{display:flex;gap:8px;flex-wrap:wrap;padding-top:0}
+@media(max-width:850px){
+ .bos-onboarding-shell .bos-standard-editor-row{grid-template-columns:140px minmax(0,1fr)}
+ .bos-onboarding-shell .bos-standard-editor-row>div:last-child{grid-column:2}
+}
+@media(max-width:600px){
+ .bos-onboarding-shell .bos-standard-editor-row{grid-template-columns:1fr;padding:16px 8px}
+ .bos-onboarding-shell .bos-standard-editor-row>div:last-child{grid-column:1}
+}

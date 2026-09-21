@@ -188,7 +188,7 @@ export async function updateDraftTask(input:{
   requirePersistedOnboarding();
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const name=input.name.trim(), execution=input.execution.trim(), readyWhen=input.readyWhen.trim();
-  if(!name || !execution || !readyWhen) throw new Error("Czynność, prawidłowe wykonanie i kryterium gotowości są wymagane.");
+  if(!name || !execution) throw new Error("Czynność i prawidłowe wykonanie są wymagane.");
   const rows=await sql`UPDATE standard_tasks st SET name=${name},execution=${execution},ready_when=${readyWhen},
       hint=${input.hint?.trim()||null},is_critical=${Boolean(input.isCritical)}
     FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
