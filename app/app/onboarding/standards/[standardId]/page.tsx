@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   createDraftReadinessCriterion, createDraftStartRequirement, createDraftTask, deleteDraftReadinessCriterion,
   deleteDraftStartRequirement, deleteDraftTask, getStandard, moveDraftReadinessCriterion, moveDraftStartRequirement,
@@ -16,6 +17,8 @@ async function updateDraft(formData: FormData) {
   const access = await requireBOSAccess();
   const standardId=text(formData,"standardId");
   await updateDraftStandard({organizationId:access.organization.id,standardId,name:text(formData,"name"),area:text(formData,"area")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 async function addTask(formData: FormData) {
@@ -23,6 +26,8 @@ async function addTask(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await createDraftTask({organizationId:access.organization.id,standardId,name:text(formData,"name"),execution:text(formData,"execution"),
     readyWhen:text(formData,"readyWhen"),hint:text(formData,"hint"),isCritical:formData.get("isCritical")==="on"});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 async function editTask(formData: FormData) {
@@ -30,12 +35,16 @@ async function editTask(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await updateDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId"),name:text(formData,"name"),
     execution:text(formData,"execution"),readyWhen:text(formData,"readyWhen"),hint:text(formData,"hint"),isCritical:formData.get("isCritical")==="on"});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 async function removeTask(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await deleteDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 async function reorderTask(formData: FormData) {
@@ -44,6 +53,8 @@ async function reorderTask(formData: FormData) {
   const direction=text(formData,"direction");
   if(direction!=="UP" && direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId"),direction});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 
@@ -53,6 +64,8 @@ async function addStartRequirement(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const category=text(formData,"category") as "TOOLS"|"ACCESS"|"MATERIALS"|"INSTRUCTIONS"|"WORKPLACE"|"OTHER";
   await createDraftStartRequirement({organizationId:access.organization.id,standardId,category,requirement:text(formData,"requirement")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
 }
 async function editStartRequirement(formData: FormData) {
@@ -60,12 +73,16 @@ async function editStartRequirement(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const category=text(formData,"category") as "TOOLS"|"ACCESS"|"MATERIALS"|"INSTRUCTIONS"|"WORKPLACE"|"OTHER";
   await updateDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId"),category,requirement:text(formData,"requirement")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
 }
 async function removeStartRequirement(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await deleteDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
 }
 async function reorderStartRequirement(formData: FormData) {
@@ -73,6 +90,8 @@ async function reorderStartRequirement(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId"); const direction=text(formData,"direction");
   if(direction!=="UP"&&direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId"),direction});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#warunki-startu`);
 }
 
@@ -82,6 +101,8 @@ async function addReadinessCriterion(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const verificationMethod=text(formData,"verificationMethod") as "OBSERVATION"|"INDEPENDENT_TASK"|"WORK_SAMPLE"|"CONTROL_QUESTIONS"|"KNOWLEDGE_TEST"|"OTHER";
   await createDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterion:text(formData,"criterion"),verificationMethod,verificationMethodOther:text(formData,"verificationMethodOther")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
 }
 async function editReadinessCriterion(formData: FormData) {
@@ -89,12 +110,16 @@ async function editReadinessCriterion(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const verificationMethod=text(formData,"verificationMethod") as "OBSERVATION"|"INDEPENDENT_TASK"|"WORK_SAMPLE"|"CONTROL_QUESTIONS"|"KNOWLEDGE_TEST"|"OTHER";
   await updateDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId"),criterion:text(formData,"criterion"),verificationMethod,verificationMethodOther:text(formData,"verificationMethodOther")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
 }
 async function removeReadinessCriterion(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await deleteDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId")});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
 }
 async function reorderReadinessCriterion(formData: FormData) {
@@ -102,6 +127,8 @@ async function reorderReadinessCriterion(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId"); const direction=text(formData,"direction");
   if(direction!=="UP"&&direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId"),direction});
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}#kryteria-gotowosci`);
 }
 
@@ -113,6 +140,8 @@ async function publishStandard(formData: FormData) {
   if(!qualityCheckPassed) redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent("Zaznacz wszystkie cztery odpowiedzi TAK w teście jakości.")}#gotowosc-publikacji`);
   try { await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed}); }
   catch(error) { const message=error instanceof Error?error.message:"Standard nie spełnia warunków publikacji."; redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent(message)}#gotowosc-publikacji`); }
+  revalidatePath(`/app/onboarding/standards/${standardId}`);
+  revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 
