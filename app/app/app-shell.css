@@ -3403,3 +3403,15 @@
 .bos-onboarding-process-direct{display:inline-flex;width:fit-content;color:var(--app-navy);font-size:10px;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}
 .bos-onboarding-process-direct:hover,.bos-onboarding-process-direct:focus-visible{color:#805d27;border-bottom-color:#b98732}
 .bos-onboarding-process-direct:focus-visible{outline:2px solid #b98732;outline-offset:3px}
+
+/* 2.2H — Editor action layout */
+.bos-editor-action-layout{display:grid!important;grid-template-columns:minmax(0,1fr) 92px!important;column-gap:20px!important;align-items:start!important}
+.bos-editor-action-layout>div:first-child{grid-column:1}
+.bos-editor-action-layout>form{grid-column:1;min-width:0;width:100%!important}
+.bos-editor-action-layout>div:last-child{grid-column:2!important;grid-row:1 / span 3!important;display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;gap:8px!important;padding-top:0!important;align-self:start}
+.bos-editor-action-layout>div:last-child form{width:100%}
+.bos-editor-action-layout>div:last-child button{width:100%;min-height:44px;padding:8px 6px;line-height:1.15;white-space:normal}
+.bos-standard-task-table .bos-editor-action-layout>form{grid-row:1}
+.bos-standard-task-table .bos-editor-action-layout>div:last-child{grid-row:1}
+@media(max-width:760px){.bos-editor-action-layout{grid-template-columns:minmax(0,1fr) 76px!important;column-gap:12px!important}.bos-editor-action-layout>div:last-child button{font-size:8px;padding:7px 4px}}
+@media(max-width:520px){.bos-editor-action-layout{grid-template-columns:1fr!important}.bos-editor-action-layout>div:first-child,.bos-editor-action-layout>form,.bos-editor-action-layout>div:last-child{grid-column:1!important;grid-row:auto!important}.bos-editor-action-layout>div:last-child{flex-direction:row!important}.bos-editor-action-layout>div:last-child form{flex:1}}

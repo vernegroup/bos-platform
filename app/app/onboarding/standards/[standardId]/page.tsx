@@ -172,7 +172,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       {current.tasks.map((task,index)=><div key={task.id}>
         <div className="bos-standard-task-row"><span>{String(index+1).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong><p>{task.execution}</p><p>{task.readyWhen||"—"}</p></div>
         {task.hint&&<div className="bos-standard-detail-head" style={{paddingTop:10,paddingBottom:10}}><p><strong>Podpowiedź:</strong> {task.hint}</p></div>}
-        {isDraft&&<div className="bos-standard-detail-head" style={{paddingTop:12,paddingBottom:18}}>
+        {isDraft&&<div className="bos-standard-detail-head bos-editor-action-layout" style={{paddingTop:12,paddingBottom:18}}>
           <form action={editTask} style={{display:"grid",gap:8,width:"100%"}}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="taskId" value={task.id}/>
             <input name="name" required maxLength={240} defaultValue={task.name} style={{padding:8}}/><textarea name="execution" required defaultValue={task.execution} rows={2} style={{padding:8}}/>
             <textarea name="readyWhen" defaultValue={task.readyWhen} placeholder="Co dodatkowo sprawdzić przy SPRAWDŹ? (opcjonalnie)" rows={2} style={{padding:8}}/><textarea name="hint" defaultValue={task.hint} rows={2} style={{padding:8}}/>
@@ -203,7 +203,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         <div><button type="submit" className="bos-standard-primary-action">DODAJ WARUNEK</button></div>
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
-      current.startRequirements.map((requirement,index)=><div className="bos-standard-editor-row" key={requirement.id}>
+      current.startRequirements.map((requirement,index)=><div className="bos-standard-editor-row bos-editor-action-layout" key={requirement.id}>
         <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {requirement.category}</span>
           {!isDraft&&<p>{requirement.requirement}</p>}</div>
         {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
@@ -240,7 +240,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         <div><button type="submit" className="bos-standard-primary-action" disabled={!canAddCriterion}>{canAddCriterion?"DODAJ KRYTERIUM":"OSIĄGNIĘTO LIMIT 3"}</button></div>
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
-      current.readinessCriteria.map((criterion,index)=><div className="bos-standard-editor-row" key={criterion.id}>
+      current.readinessCriteria.map((criterion,index)=><div className="bos-standard-editor-row bos-editor-action-layout" key={criterion.id}>
         <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span>
           {!isDraft&&<><p>{criterion.criterion}</p>{criterion.verificationMethodOther&&<p>{criterion.verificationMethodOther}</p>}</>}</div>
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
