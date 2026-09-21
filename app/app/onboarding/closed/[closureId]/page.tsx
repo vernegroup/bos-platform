@@ -74,7 +74,8 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
       <footer className="bos-outcome-footer"><p>Rekord historyczny. Karta zachowuje dokładną wersję Standardu użytą podczas wdrożenia. BOS dokumentuje wdrożenie operacyjne i nie zastępuje wymaganych szkoleń, badań, uprawnień ani formalności.</p><span>BOS ONBOARDING</span></footer>
     </section>
 
-    <div className="bos-outcome-actions"><Link href={`/app/onboarding/employees/${closure.employeeId??""}`} aria-disabled={!closure.employeeId}>HISTORIA PRACOWNIKA →</Link><button type="button" disabled title="Eksport PDF będzie etapem 2.4B">POBIERZ PDF · 2.4B</button></div>
+    <div className="bos-outcome-actions"><Link href={`/app/onboarding/employees/${closure.employeeId??""}`} aria-disabled={!closure.employeeId}>HISTORIA PRACOWNIKA →</Link><button type="button" className="bos-outcome-print" onClick={undefined}>POBIERZ / ZAPISZ PDF</button></div>
+    <script dangerouslySetInnerHTML={{__html:`document.addEventListener("click",function(e){var b=e.target.closest(".bos-outcome-print");if(b){window.print();}})`}} />
 
     {closure.isLatest&&<section className="bos-process-card"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">HISTORIA DECYZJI</span><h2>Wznowienie procesu</h2></div><span className="bos-dashboard-count">DECYZJA #{closure.decisionSequence}</span></div>
       <p>Wznowienie nie usuwa tej Karty Zakończenia. Rekord pozostaje w historii, a proces wraca do pracy z zachowanym postępem.</p>
