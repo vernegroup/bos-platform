@@ -1,6 +1,9 @@
 import "server-only";
 import { db, hasDatabase } from "@/lib/db";
 export * from "@/lib/bos/core/standardRepository";
+export * from "@/lib/bos/core/processPrimitives";
+import { hasStandardTaskId } from "@/lib/bos/core/processPrimitives";
+import type { ProcessRecord, OnboardingTaskStage } from "@/lib/bos/core/processPrimitives";
 import { onboardingProcesses } from "@/data/onboardingProcesses";
 import { onboardingClosures } from "@/data/onboardingClosures";
 
@@ -18,45 +21,6 @@ const datePL = (value: string | Date | null) => {
 function requirePersistedOnboarding() {
   if (!hasDatabase()) throw new Error("Database is required for persisted onboarding operations.");
 }
-
-type PersistedTaskProgress = {
-  standardTaskId?: string;
-  status?: string;
-  completedAt?: string | Date | null;
-  note?: string | null;
-  explainedAt?: string | Date | null;
-  shownAt?: string | Date | null;
-  togetherAt?: string | Date | null;
-  soloAt?: string | Date | null;
-  checkedAt?: string | Date | null;
-  explainedBy?: string | null; shownBy?: string | null; togetherBy?: string | null; soloBy?: string | null; checkedBy?: string | null;
-};
-
-function hasStandardTaskId(task: PersistedTaskProgress): task is PersistedTaskProgress & { standardTaskId: string } {
-  return Boolean(task.standardTaskId);
-}
-
-export type ProcessTaskRecord = {
-  standardTaskId: string;
-  status: "GOTOWE"|"W TOKU"|"DO WYKONANIA";
-  explainedAt?: string | Date;
-  shownAt?: string | Date;
-  togetherAt?: string | Date;
-  soloAt?: string | Date;
-  checkedAt?: string | Date;
-  completedAt?: string;
-  note?: string;
-  explainedBy?: string; shownBy?: string; togetherBy?: string; soloBy?: string; checkedBy?: string;
-};
-export type ProcessStartCheckRecord = { requirementId:string; isSatisfied:boolean; checkedAt?:string|Date; note?:string };
-export type ProcessReadinessCheckRecord = { criterionId:string; isPassed:boolean; checkedAt?:string|Date; checkedBy?:string; note?:string };
-export type ProcessRecord = {
-  id:string; employeeId?:string; employee:string; standardId:string; standardVersion:string; startedAt:string; targetDate:string; owner:string;
-  status:"PLANOWANE"|"W TOKU"|"WSTRZYMANE";
-  tasks:ProcessTaskRecord[];
-  startChecks:ProcessStartCheckRecord[];
-  readinessChecks:ProcessReadinessCheckRecord[];
-};
 
 export async function listProcesses(organizationId?:string): Promise<ProcessRecord[]> {
   if (!hasDatabase()) return onboardingProcesses.map(process=>({...process,status:"W TOKU" as const,startChecks:[],readinessChecks:[],tasks:process.tasks.map(task=>({
@@ -102,11 +66,6 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
 
 export async function getProcess(processId:string, organizationId?:string) {
   const all=await listProcesses(organizationId); return all.find(p=>p.id===processId) ?? null;
-}
-
-export function getProcessProgress(process: ProcessRecord) {
-  const completed=process.tasks.filter((t: { status: string })=>t.status==="GOTOWE").length;
-  return {completed,total:process.tasks.length,percent:process.tasks.length?Math.round(completed/process.tasks.length*100):0};
 }
 
 export async function listClosures(organizationId?:string) {
@@ -220,8 +179,6 @@ export async function updateTaskNote(input:{organizationId?:string;processId:str
     WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} RETURNING id`;
   if(!rows[0]) throw new Error("Nie znaleziono czynności w tym procesie.");
 }
-
-export type OnboardingTaskStage = "EXPLAINED"|"SHOWN"|"TOGETHER"|"SOLO"|"CHECKED";
 
 export async function confirmTaskStage(input:{organizationId?:string;processId:string;standardTaskId:string;stage:OnboardingTaskStage;userId:string}) {
   requirePersistedOnboarding();
