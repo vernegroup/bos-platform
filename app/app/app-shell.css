@@ -3516,3 +3516,42 @@
 
 /* Standard editor smoke fixes */
 .bos-standard-task-table{border:1px solid #d7d0c3;background:#fff}.bos-task-editor-card{background:#fff;border-bottom:2px solid #e1d9ca!important}.bos-task-editor-card>.bos-task-editor-summary{min-height:72px;background:#fff;box-shadow:inset 3px 0 0 #d5b16a}.bos-task-editor-card>.bos-task-editor-summary:hover{background:#fbf8f1}.bos-task-editor-card>.bos-task-editor-summary strong{font-weight:800;color:#102f45}.bos-task-editor-card[open]>.bos-task-editor-summary{background:#f7f2e8;box-shadow:inset 4px 0 0 #b98732}.bos-saved-editor-card{margin:10px 0;border:1px solid #d8d0c2;background:#fff}.bos-saved-editor-card>summary{list-style:none;cursor:pointer}.bos-saved-editor-card>summary::-webkit-details-marker{display:none}.bos-saved-editor-summary{position:relative;min-height:62px;padding:14px 118px 14px 18px;display:grid;gap:5px;align-content:center;border-left:3px solid #d5b16a}.bos-saved-editor-summary:hover{background:#fbf8f1}.bos-saved-editor-summary>strong{font-size:11px;color:#102f45}.bos-saved-editor-summary>small{font-size:8px;color:var(--app-muted)}.bos-saved-edit-label{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:8px;letter-spacing:.55px;color:#805d27}.bos-saved-editor-card[open]>.bos-saved-editor-summary{background:#f7f2e8;border-left-color:#b98732}.bos-saved-editor-card[open] .bos-saved-edit-label:after{content:" · ZAMKNIJ"}.bos-saved-editor-card>.bos-standard-editor-row{margin:0;border:0;border-top:1px solid #ddd5c8;background:#fff}.bos-publish-error{width:100%;padding:16px 18px;border:1px solid #b45b4d;border-left:4px solid #9b4035;background:#fff6f4;color:#6f2f28}.bos-publish-error strong{display:block;font-size:12px}.bos-publish-error p{margin:6px 0 3px;font-size:10px}.bos-publish-error span{font-size:8px;color:#7d625e}@media(max-width:760px){.bos-saved-editor-summary{min-height:58px;padding:12px 76px 12px 13px}.bos-saved-edit-label{right:12px}.bos-task-editor-card>.bos-task-editor-summary{min-height:62px}}
+
+
+/* 2.2M — Process Card usability: task identity must be as readable as stage controls. */
+.bos-process-task-row[id^="task-"]{scroll-margin-top:96px}
+.bos-process-task-row[id^="task-"]>div:nth-of-type(1)>strong{
+  display:block;
+  color:var(--app-navy);
+  font-size:15px;
+  font-weight:800;
+  line-height:1.25;
+  letter-spacing:.01em;
+}
+.bos-process-task-row[id^="task-"]>div:nth-of-type(1)>p{
+  margin-top:7px;
+  color:#425568;
+  font-size:11px;
+  font-weight:600;
+  line-height:1.5;
+}
+.bos-process-task-row[id^="task-"]>div:nth-of-type(1)>small{
+  margin-top:5px;
+  color:#5e6c78;
+  font-size:9px;
+  line-height:1.5;
+}
+.bos-process-task-row[id^="task-"]>div:nth-of-type(1)>.bos-context-inline{
+  padding:5px 7px;
+  border-left:3px solid var(--app-accent);
+  background:#faf6ed;
+  color:#6f5126;
+  font-size:9px;
+  font-weight:700;
+}
+@media(max-width:600px){
+  .bos-process-task-row[id^="task-"]{scroll-margin-top:76px}
+  .bos-process-task-row[id^="task-"]>div:nth-of-type(1)>strong{font-size:14px}
+  .bos-process-task-row[id^="task-"]>div:nth-of-type(1)>p{font-size:10px}
+  .bos-process-task-row[id^="task-"]>div:nth-of-type(1)>small{font-size:8px}
+}
