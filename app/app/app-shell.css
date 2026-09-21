@@ -3424,3 +3424,48 @@
 .bos-onboarding-standard-direct{display:inline-flex;width:fit-content;color:var(--app-navy);font:inherit;font-weight:700;text-decoration:none;border-bottom:1px solid transparent;transition:color .15s,border-color .15s}
 .bos-onboarding-standard-direct:hover,.bos-onboarding-standard-direct:focus-visible{color:#805d27;border-bottom-color:#b98732}
 .bos-onboarding-standard-direct:focus-visible{outline:2px solid #b98732;outline-offset:3px}
+
+
+/* 2.2L — Readiness visual state and touch-friendly decision CTA */
+.bos-readiness-status.is-pass{
+  font-weight:800;
+}
+.bos-readiness-pass{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:44px;
+  padding:10px 14px;
+}
+.bos-decision-cta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:12px 18px;
+  border:1px solid var(--app-line);
+  text-decoration:none;
+  font-weight:800;
+  letter-spacing:.35px;
+}
+.bos-decision-cta.is-ready{
+  border-color:#287a4b;
+  background:#287a4b;
+  color:#fff;
+  box-shadow:0 8px 20px rgba(0,0,0,.12);
+}
+@media(max-width:760px){
+  .bos-process-next-action{
+    width:100%;
+  }
+  .bos-decision-cta{
+    box-sizing:border-box;
+    width:100%;
+    min-height:56px;
+    padding:15px 18px;
+    text-align:center;
+  }
+  .bos-readiness-pass{
+    min-height:48px;
+  }
+}

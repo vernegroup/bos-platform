@@ -126,17 +126,17 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-process-card">
-        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">OCENA GOTOWOŚCI</span><h2>Readiness Gate</h2></div><span className="bos-dashboard-count">{readinessPassed}/{version.readinessCriteria.length} kryteriów</span></div>
+        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">OCENA GOTOWOŚCI</span><h2>Readiness Gate</h2></div><span className={`bos-dashboard-count bos-readiness-status ${readinessGate?"is-pass":""}`}>{readinessGate?"✓ KRYTERIA POTWIERDZONE":"KRYTERIA DO POTWIERDZENIA"}</span></div>
         <div className="bos-readiness-gates">
           <div className={tasksGate?"is-pass":""}><span>01</span><strong>Wszystkie czynności</strong><b>{tasksGate?"TAK":"NIE"}</b></div>
           <div className={criticalGate?"is-pass":""}><span>02</span><strong>Wszystkie K: SAM + SPRAWDŹ</strong><b>{criticalGate?"TAK":"NIE"}</b></div>
-          <div className={readinessGate?"is-pass":""}><span>03</span><strong>Kryteria gotowości</strong><b>{readinessGate?"TAK":"NIE"}</b></div>
+          <div className={readinessGate?"is-pass":""}><span>03</span><strong>Kryteria gotowości</strong><b>{readinessGate?"✓":"NIE"}</b></div>
           <div className={readyForDecision?"is-pass":""}><span>04</span><strong>Gotowe do decyzji człowieka</strong><b>{readyForDecision?"TAK":"NIE"}</b></div>
         </div>
         <aside className="bos-context-guide"><strong>4×TAK · TEST JAKOŚCI KRYTERIUM</strong><p>Przed potwierdzeniem sprawdź: czy rezultat jest obserwowalny? Czy da się go sprawdzić w realnej pracy? Czy dwie osoby powinny dojść do podobnej oceny? Czy kryteria obejmują wszystkie czynności K? To kontrola jakości oceny — nie automatyczna decyzja o pracowniku.</p></aside>
         <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id}>
           <div><span>{String(c.order).padStart(2,"0")} · {c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>}</div>
-          {passed?<b className="bos-readiness-pass">POTWIERDZONE ✓</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
+          {passed?<b className="bos-readiness-pass">✓ KRYTERIUM POTWIERDZONE</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
         </article>})}</div>
       </section>
 
@@ -149,7 +149,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         </div>
         <div className="bos-process-next-action">
           <span>{progress.percent}%</span>
-          <Link href={`/app/onboarding/processes/${process.id}/close`}>{readyForDecision ? "PRZEJDŹ DO DECYZJI →" : "JESZCZE NIE / STOP →"}</Link>
+          <Link className={`bos-decision-cta ${readyForDecision?"is-ready":""}`} href={`/app/onboarding/processes/${process.id}/close`}>{readyForDecision ? "PRZEJDŹ DO DECYZJI →" : "JESZCZE NIE / STOP →"}</Link>
         </div>
       </section>
     </>
