@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { confirmReadinessCriterion, confirmStartRequirement, confirmTaskStage, getProcess, getProcessProgress, getStandard, updateTaskNote, type OnboardingTaskStage } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
@@ -8,21 +9,21 @@ async function confirmStage(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const standardTaskId=String(formData.get("standardTaskId")??""); const stage=String(formData.get("stage")??"") as OnboardingTaskStage;
   if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap BOS.");
-  await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
+  await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
 async function confirmStart(formData:FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const requirementId=String(formData.get("requirementId")??"");
-  await confirmStartRequirement({organizationId:access.organization.id,processId,requirementId,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
+  await confirmStartRequirement({organizationId:access.organization.id,processId,requirementId,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}`);
 }
 async function saveNote(formData:FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const standardTaskId=String(formData.get("standardTaskId")??""); const note=String(formData.get("note")??"");
-  await updateTaskNote({organizationId:access.organization.id,processId,standardTaskId,note,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
+  await updateTaskNote({organizationId:access.organization.id,processId,standardTaskId,note,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
 async function confirmReadiness(formData:FormData) {
   "use server"; const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const criterionId=String(formData.get("criterionId")??""); const note=String(formData.get("note")??"");
-  await confirmReadinessCriterion({organizationId:access.organization.id,processId,criterionId,userId:access.user.id,note}); redirect(`/app/onboarding/processes/${processId}`);
+  await confirmReadinessCriterion({organizationId:access.organization.id,processId,criterionId,userId:access.user.id,note}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}#readiness-${criterionId}`);
 }
 const stageLabels=[["EXPLAINED","WYJAŚNIJ","explainedAt","explainedBy"],["SHOWN","POKAŻ","shownAt","shownBy"],["TOGETHER","RAZEM","togetherAt","togetherBy"],["SOLO","SAM","soloAt","soloBy"],["CHECKED","SPRAWDŹ","checkedAt","checkedBy"]] as const;
 const shortDate=(value?:string|Date)=>value?new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit"}).format(new Date(value)):"";
@@ -134,8 +135,8 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <div className={readyForDecision?"is-pass":""}><span>04</span><strong>Gotowe do decyzji człowieka</strong><b>{readyForDecision?"TAK":"NIE"}</b></div>
         </div>
         <aside className="bos-context-guide"><strong>4×TAK · TEST JAKOŚCI KRYTERIUM</strong><p>Przed potwierdzeniem sprawdź: czy rezultat jest obserwowalny? Czy da się go sprawdzić w realnej pracy? Czy dwie osoby powinny dojść do podobnej oceny? Czy kryteria obejmują wszystkie czynności K? To kontrola jakości oceny — nie automatyczna decyzja o pracowniku.</p></aside>
-        <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id}>
-          <div><span>{String(c.order).padStart(2,"0")} · {c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>}</div>
+        <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id} id={`readiness-${c.id}`}>
+          <div><span>{String(c.order).padStart(2,"0")} · {c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<><small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>{check?.note&&<p className="bos-readiness-evidence"><b>Zapisany fakt:</b> {check.note}</p>}</>}</div>
           {passed?<b className="bos-readiness-pass">✓ KRYTERIUM POTWIERDZONE</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
         </article>})}</div>
       </section>
