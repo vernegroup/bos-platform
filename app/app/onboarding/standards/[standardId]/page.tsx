@@ -143,13 +143,15 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <input name="area" maxLength={160} defaultValue={standard.area} placeholder="Obszar" style={{padding:10}}/>
       <div><button type="submit" className="bos-standard-primary-action">ZAPISZ DRAFT</button></div></div></form>}
 
-    <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><span className="is-active">CZYNNOŚCI</span><span>SZCZEGÓŁY</span><span>PLIKI</span><a href="#historia">HISTORIA WERSJI</a></nav>
+    <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><a href="#czynnosci" className="is-active">1. CZYNNOŚCI</a><a href="#warunki-startu">2. WARUNKI STARTU</a><a href="#kryteria-gotowosci">3. GOTOWOŚĆ</a><a href="#gotowosc-publikacji">4. PUBLIKACJA</a><a href="#historia">HISTORIA</a></nav>
     <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":"AKTYWNA WERSJA"}</span>
       <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p>
       {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
       {!isDraft&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
 
+    <section id="czynnosci" className="bos-standard-editor-section">
+      <div className="bos-editor-step-head"><span>1</span><div><strong>Zdefiniuj czynności stanowiska</strong><p>Zacznij od realnej pracy. Każda pozycja ma mówić, co pracownik robi i jaki rezultat oznacza prawidłowe wykonanie.</p></div></div>
     {isDraft&&<section className="bos-standard-detail-head" aria-label="Dodaj czynność"><form action={addTask} style={{display:"grid",gap:10,width:"100%"}}>
       <input type="hidden" name="standardId" value={standard.id}/><span className="bos-dashboard-section-kicker">NOWA CZYNNOŚĆ</span>
       <label className="bos-guided-field"><strong>Co pracownik ma zrobić?</strong><span>Wpisz czynność, którą można wykonać i zobaczyć jej rezultat.</span>
@@ -184,8 +186,10 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         </div>}
       </div>)}
     </section>}
+    </section>
 
-    <section id="warunki-startu" className="bos-standard-history">
+    <section id="warunki-startu" className="bos-standard-history bos-standard-editor-section">
+      <div className="bos-editor-step-head"><span>2</span><div><strong>Przygotuj warunki startu</strong><p>Sprawdź, co musi być gotowe zanim rozpoczniesz właściwe wdrożenie. Dzięki temu brak dostępu lub narzędzia nie zatrzyma nauki w połowie.</p></div></div>
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZED STARTEM</span><h2>Warunki rozpoczęcia</h2>
         <p>Dodaj tylko to, co rzeczywiście musi być przygotowane, aby pracownik mógł rozpocząć naukę lub daną czynność.</p><details className="bos-guidance-inline"><summary>? Co zalicza się do warunków</summary><p>Narzędzia i urządzenia, dostępy i systemy, materiały i dokumenty, instrukcje firmy oraz miejsce i wyposażenie. BOS nie zastępuje wymaganych badań, BHP, uprawnień ani formalnych dopuszczeń.</p></details></div>
         <span className="bos-dashboard-count">{current.startRequirements.length} warunki</span></div>
@@ -219,7 +223,8 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       </div>)}
     </section>
 
-    <section id="kryteria-gotowosci" className="bos-standard-history">
+    <section id="kryteria-gotowosci" className="bos-standard-history bos-standard-editor-section">
+      <div className="bos-editor-step-head"><span>3</span><div><strong>Ustal kryterium gotowości</strong><p>To końcowy test roli. Nie oceniaj „wrażenia” — zapisz wynik albo zachowanie, które można rzeczywiście sprawdzić.</p></div></div>
       <aside className="bos-guidance"><div><span className="bos-guidance-eyebrow">KRYTERIUM GOTOWOŚCI</span><strong>Po czym poznasz, że możesz przestać prowadzić tę osobę krok po kroku?</strong><p>Dokończ myśl: „Pozwolę tej osobie pracować bez prowadzenia krok po kroku, kiedy będzie potrafiła…” Zapisz zachowanie albo wynik możliwy do sprawdzenia.</p></div><details><summary>? Pokaż przykład</summary><p><b>Za ogólnie:</b> „Jest samodzielny.” <b>Lepiej:</b> „Samodzielnie kompletuje standardowe zamówienie zgodnie ze Standardem i przekazuje je bez braków.”</p></details></aside>
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">SPRAWDŹ</span><h2>Kryteria gotowości</h2>
         <p>Od 1 do 3 kryteriów końcowych określających, jak potwierdzić gotowość pracownika.</p></div>
@@ -256,7 +261,8 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       </div>)}
     </section>
 
-    {isDraft&&<section id="gotowosc-publikacji" className="bos-standard-history">
+    {isDraft&&<section id="gotowosc-publikacji" className="bos-standard-history bos-standard-editor-section">
+      <div className="bos-editor-step-head"><span>4</span><div><strong>Sprawdź i opublikuj Standard</strong><p>Publikacja zamraża tę wersję Standardu. Aktywne wdrożenie zawsze pozostaje przypisane do wersji, z którą zostało rozpoczęte.</p></div></div>
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">KONTROLA KOMPLETNOŚCI</span><h2>Gotowość do publikacji</h2>
         <p>System sprawdza dane Standardu przed udostępnieniem go do użycia w onboardingu.</p></div>
         <span className="bos-dashboard-count">{completeness.complete?"GOTOWY":"BLOKADA"}</span></div>
@@ -264,7 +270,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
         {completeness.complete
           ? <div style={{display:"grid",gap:12}}><div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
               <form action={publishStandard} style={{display:"grid",gap:8}}><input type="hidden" name="standardId" value={standard.id}/>
-                <aside className="bos-context-guide"><strong>TEST KRYTERIUM · 4×TAK</strong><p>Przed publikacją potwierdź jakość Kryterium Gotowości. Ten test dotyczy definicji Standardu, nie oceny konkretnego pracownika.</p></aside>
+                <aside className="bos-guidance bos-guidance-test"><div><span className="bos-guidance-eyebrow">TEST 4×TAK</span><strong>Sprawdź jakość definicji, nie pracownika</strong><p>Każde TAK potwierdza, że kryterium nadaje się do użycia przez managera podczas realnego wdrożenia.</p></div><details><summary>? Dlaczego 4 pytania</summary><p>Kryterium ma być obserwowalne, możliwe do sprawdzenia w realnej pracy, wystarczająco jednoznaczne dla różnych osób oraz obejmować czynności K istotne dla gotowości do roli.</p></details></aside>
                 <label><input type="checkbox" name="observable" required/> TAK — kryterium opisuje zachowanie lub wynik, który można zaobserwować.</label>
                 <label><input type="checkbox" name="realWork" required/> TAK — kryterium można sprawdzić w rzeczywistej pracy.</label>
                 <label><input type="checkbox" name="repeatable" required/> TAK — dwie osoby powinny dojść do podobnej oceny.</label>

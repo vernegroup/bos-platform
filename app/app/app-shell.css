@@ -3354,3 +3354,21 @@
 .bos-guidance-inline{margin:0;padding:9px 0 0}.bos-guidance-inline p{margin:8px 0 0!important;max-width:850px;color:var(--app-muted);font-size:13px!important;line-height:1.55!important}
 .bos-guided-field{display:grid;gap:6px}.bos-guided-field>strong{font-size:14px}.bos-guided-field>span{color:var(--app-muted);font-size:12px;line-height:1.45}.bos-guided-check{display:flex!important;gap:8px;align-items:flex-start}.bos-guided-check span{display:grid;gap:2px}.bos-guided-check small{color:var(--app-muted);font-size:11px}
 @media(max-width:700px){.bos-guided-flow{grid-template-columns:1fr}.bos-guided-flow a{border-right:0;border-bottom:1px solid var(--app-line)}.bos-guided-flow a:last-child{border-bottom:0}.bos-guidance{grid-template-columns:1fr;gap:14px}}
+
+/* 2.2B — Guided Standard Editor */
+.bos-standard-tabs{position:sticky;top:58px;z-index:20;background:rgba(250,249,246,.96);backdrop-filter:blur(10px)}
+.bos-standard-tabs a{scroll-behavior:smooth}
+.bos-standard-editor-section{scroll-margin-top:125px;margin-top:34px}
+.bos-editor-step-head{margin:0 0 18px;padding:18px 0;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line);display:grid;grid-template-columns:42px minmax(0,1fr);gap:14px;align-items:start}
+.bos-editor-step-head>span{width:32px;height:32px;display:grid;place-items:center;border:1px solid #c7a66c;color:#8b6428;font-size:12px;font-weight:800}
+.bos-editor-step-head strong{display:block;font-size:17px;color:var(--app-navy)}.bos-editor-step-head p{margin:5px 0 0;max-width:780px;color:var(--app-muted);font-size:13px;line-height:1.55}
+.bos-standard-task-table>div:not(.bos-standard-task-head){border-bottom:1px solid var(--app-line)}
+.bos-standard-task-table .bos-standard-detail-head{background:#fff;padding-left:18px!important;padding-right:18px!important}
+.bos-standard-task-table .bos-standard-detail-head>form{min-width:0}
+.bos-standard-editor-row{grid-template-columns:1fr!important;background:#fff;padding:18px!important;margin:10px 0;border:1px solid var(--app-line)!important}
+.bos-standard-editor-row>div:first-child{padding-top:0!important}.bos-standard-editor-row>form{max-width:none!important}
+.bos-standard-editor-row>div:last-child{grid-column:1!important;padding-top:2px!important}
+.bos-standard-editor-row>div:last-child button{min-height:38px}
+.bos-guidance-test{margin-top:0}
+#warunki-startu>.bos-dashboard-section-head,#kryteria-gotowosci>.bos-dashboard-section-head,#gotowosc-publikacji>.bos-dashboard-section-head{margin-top:8px}
+@media(max-width:600px){.bos-standard-tabs{top:58px;overflow-x:auto;white-space:nowrap}.bos-standard-tabs a{flex:0 0 auto}.bos-editor-step-head{grid-template-columns:34px minmax(0,1fr)}}
