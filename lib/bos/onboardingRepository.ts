@@ -91,7 +91,7 @@ export type ProcessTaskRecord = {
 export type ProcessStartCheckRecord = { requirementId:string; isSatisfied:boolean; checkedAt?:string|Date; note?:string };
 export type ProcessReadinessCheckRecord = { criterionId:string; isPassed:boolean; checkedAt?:string|Date; checkedBy?:string; note?:string };
 export type ProcessRecord = {
-  id:string; employee:string; standardId:string; standardVersion:string; startedAt:string; targetDate:string; owner:string;
+  id:string; employeeId?:string; employee:string; standardId:string; standardVersion:string; startedAt:string; targetDate:string; owner:string;
   status:"PLANOWANE"|"W TOKU"|"WSTRZYMANE";
   tasks:ProcessTaskRecord[];
   startChecks:ProcessStartCheckRecord[];
@@ -162,7 +162,7 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
   }))}));
   const sql=db(); const orgId=tenantId(organizationId);
   const rows=await sql`
-    SELECT p.id,p.employee_name_snapshot,p.standard_id,sv.version_label,p.started_on,p.target_on,
+    SELECT p.id,p.employee_id,p.employee_name_snapshot,p.standard_id,sv.version_label,p.started_on,p.target_on,
       u.display_name owner,p.status,
       COALESCE(json_agg(json_build_object('standardTaskId',tp.standard_task_id,'explainedAt',tp.explained_at,
         'shownAt',tp.shown_at,'togetherAt',tp.together_at,'soloAt',tp.solo_at,'checkedAt',tp.checked_at,'note',tp.note,
@@ -181,7 +181,7 @@ export async function listProcesses(organizationId?:string): Promise<ProcessReco
     LEFT JOIN users ut ON ut.id=tp.together_by_user_id LEFT JOIN users uo ON uo.id=tp.solo_by_user_id LEFT JOIN users uc ON uc.id=tp.checked_by_user_id
     WHERE p.organization_id=${orgId} AND p.status IN ('PLANNED','IN_PROGRESS','PAUSED','READY_TO_CLOSE')
     GROUP BY p.id,sv.version_label,u.display_name ORDER BY p.started_on DESC`;
-  return rows.map(r=>({id:r.id,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
+  return rows.map(r=>({id:r.id,employeeId:r.employee_id??undefined,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
     startedAt:datePL(r.started_on),targetDate:r.target_on?datePL(r.target_on):"",owner:r.owner,status:r.status==="PLANNED"?"PLANOWANE" as const:r.status==="PAUSED"?"WSTRZYMANE" as const:"W TOKU" as const,
     startChecks:((r.start_checks??[]) as Array<{requirementId:string;isSatisfied:boolean;checkedAt?:string;note?:string}>).map(x=>({requirementId:x.requirementId,isSatisfied:x.isSatisfied,checkedAt:x.checkedAt??undefined,note:x.note??undefined})),
     readinessChecks:((r.readiness_checks??[]) as Array<{criterionId:string;isPassed:boolean;checkedAt?:string;checkedBy?:string;note?:string}>).map(x=>({criterionId:x.criterionId,isPassed:x.isPassed,checkedAt:x.checkedAt??undefined,checkedBy:x.checkedBy??undefined,note:x.note??undefined})),
