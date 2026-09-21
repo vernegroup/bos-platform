@@ -58,7 +58,7 @@ function requirePersistedOnboarding() {
 }
 
 export async function listStandards(organizationId?: string) {
-  if (!hasDatabase()) return onboardingStandards;
+  if (!hasDatabase()) return onboardingStandards.map(s=>({...s,taskCount:s.versions.find(v=>v.version===s.currentVersion)?.tasks.length??0}));
   const sql = db(); const orgId = tenantId(organizationId);
   const rows = await sql`
     SELECT s.id,s.name,s.area,s.status,s.current_version_id,
