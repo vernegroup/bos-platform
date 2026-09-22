@@ -157,7 +157,7 @@ export async function updateDraftStandard(input:{
     UPDATE standards s SET name=${name},area=${input.area?.trim()||null},updated_at=now()
     FROM standard_versions sv
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
-      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
     RETURNING s.id`;
   if(!rows[0]) throw new Error("Można edytować wyłącznie roboczy Standard.");
   await sql`UPDATE standard_versions sv SET role_description=${roleDescription},updated_at=now() FROM standards s WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status=\'DRAFT\'`;
