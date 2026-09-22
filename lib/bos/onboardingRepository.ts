@@ -94,7 +94,16 @@ export async function getClosure(closureId:string, organizationId?:string) {
   const all=await listClosures(organizationId); return all.find(c=>c.id===closureId) ?? null;
 }
 
-export async function getClosureOutcome(closureId:string, organizationId?:string) {
+type ClosureOutcomeSnapshot={
+  snapshotAvailable:boolean;
+  position:string;
+  department:string;
+  tasks:Array<{standardTaskId:string;explainedAt?:string;shownAt?:string;togetherAt?:string;soloAt?:string;checkedAt?:string;note?:string}>;
+  startChecks:Array<{requirementId:string;isSatisfied:boolean;checkedAt?:string}>;
+  readinessChecks:Array<{criterionId:string;isPassed:boolean;checkedAt?:string;note?:string}>;
+};
+
+export async function getClosureOutcome(closureId:string, organizationId?:string):Promise<ClosureOutcomeSnapshot|null> {
   requirePersistedOnboarding();
   const sql=db(); const orgId=tenantId(organizationId);
   const [closure]=await sql`
