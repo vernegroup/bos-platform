@@ -82,7 +82,7 @@ export async function listClosures(organizationId?:string) {
     JOIN standard_versions sv ON sv.id=c.standard_version_id AND sv.organization_id=c.organization_id
     JOIN users owner ON owner.id=p.owner_user_id JOIN users verifier ON verifier.id=c.verified_by_user_id
     WHERE c.organization_id=${orgId} ORDER BY c.verified_at DESC,c.decision_sequence DESC`;
-  return rows.map(r=>{const snapshot=r.outcome_snapshot as any;const snapshotTasks=Array.isArray(snapshot?.tasks)?snapshot.tasks:null;return ({id:r.id,processId:r.onboarding_process_id,employeeId:r.employee_id??undefined,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
+  return rows.map(r=>{const raw=r.outcome_snapshot as any;const snapshot=typeof raw==="string"?JSON.parse(raw):raw;const snapshotTasks=Array.isArray(snapshot?.tasks)?snapshot.tasks:null;return ({id:r.id,processId:r.onboarding_process_id,employeeId:r.employee_id??undefined,employee:r.employee_name_snapshot,standardId:r.standard_id,standardVersion:r.version_label,
     startedAt:datePL(r.started_on),closedAt:datePL(r.verified_at),owner:r.owner,verifiedBy:r.verified_by,
     result:r.decision==="READY"?"GOTOWY" as const:r.decision==="NOT_YET"?"JESZCZE NIE" as const:"STOP" as const,
     decision:r.decision as "READY"|"NOT_YET"|"STOP",decisionSequence:r.decision_sequence,reopenReason:r.reopen_reason??undefined,isLatest:Boolean(r.is_latest),
@@ -111,7 +111,8 @@ export async function getClosureOutcome(closureId:string, organizationId?:string
     FROM onboarding_closures c
     WHERE c.id=${closureId} AND c.organization_id=${orgId} LIMIT 1`;
   if(!closure) return null;
-  const snapshot=closure.outcome_snapshot as any;
+  const raw=closure.outcome_snapshot as any;
+  const snapshot=typeof raw==="string"?JSON.parse(raw):raw;
   if(!snapshot) return {snapshotAvailable:false,position:"",department:"",tasks:[],startChecks:[],readinessChecks:[]};
   return {
     snapshotAvailable:true,
@@ -160,7 +161,7 @@ export async function closeProcess(input:{organizationId?:string;processId:strin
     const [snapshotColumn]=await tx`SELECT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='onboarding_closures' AND column_name='outcome_snapshot') available`;
     const [closure]=snapshotColumn?.available
       ? await tx`INSERT INTO onboarding_closures(organization_id,onboarding_process_id,standard_id,standard_version_id,employee_name_snapshot,decision,verified_by_user_id,summary,recommendations,decision_sequence,outcome_snapshot)
-          VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.decision}::onboarding_decision_result,${input.verifiedByUserId},${summary},${recommendations},${seq.sequence},${outcomeSnapshot}::jsonb) RETURNING id`
+          VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.decision}::onboarding_decision_result,${input.verifiedByUserId},${summary},${recommendations},${seq.sequence},((${outcomeSnapshot}::jsonb #>> '{}')::jsonb)) RETURNING id`
       : await tx`INSERT INTO onboarding_closures(organization_id,onboarding_process_id,standard_id,standard_version_id,employee_name_snapshot,decision,verified_by_user_id,summary,recommendations,decision_sequence)
           VALUES(${organizationId},${process.id},${process.standard_id},${process.standard_version_id},${process.employee_name_snapshot},${input.decision}::onboarding_decision_result,${input.verifiedByUserId},${summary},${recommendations},${seq.sequence}) RETURNING id`;
     await tx`UPDATE onboarding_processes SET status=${input.decision==="NOT_YET"?"PAUSED":"CLOSED"}::onboarding_process_status,closed_at=${input.decision==="NOT_YET"?null:new Date()},updated_at=now() WHERE id=${process.id} AND organization_id=${organizationId}`;
