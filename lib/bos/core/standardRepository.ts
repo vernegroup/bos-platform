@@ -279,7 +279,7 @@ export async function deleteDraftStartRequirement(input:{organizationId:string;s
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const rows=await sql`DELETE FROM standard_start_requirements sr USING standards s,standard_versions sv
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
-      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
       AND sr.id=${input.requirementId} AND sr.organization_id=${organizationId} AND sr.standard_version_id=sv.id RETURNING sr.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnego warunku rozpoczęcia.");
 }
@@ -357,7 +357,7 @@ export async function deleteDraftReadinessCriterion(input:{organizationId:string
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const rows=await sql`DELETE FROM standard_readiness_criteria rc USING standards s,standard_versions sv
     WHERE s.id=${input.standardId} AND s.organization_id=${organizationId}
-      AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
+      AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
       AND rc.id=${input.criterionId} AND rc.organization_id=${organizationId} AND rc.standard_version_id=sv.id RETURNING rc.id`;
   if(!rows[0]) throw new Error("Nie znaleziono edytowalnego kryterium gotowości.");
 }
