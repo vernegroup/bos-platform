@@ -37,7 +37,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <div><span>PRACOWNIK</span><strong>{closure.employee}</strong></div>
         <div><span>STANOWISKO</span><strong>{outcome.position||standard.name}</strong></div>
         <div><span>STANDARD</span><strong>{standard.name}</strong></div>
-        <div><span>WERSJA STANDARDU</span><strong>{closure.standardVersion}</strong></div>
+        <div><span>WERSJA STANDARDU</span><strong><Link href={`/app/onboarding/standards/${closure.standardId}?version=${encodeURIComponent(closure.standardVersion)}`}>{closure.standardVersion} →</Link></strong></div>
         <div><span>DATA ROZPOCZĘCIA</span><strong>{closure.startedAt}</strong></div>
         <div><span>DATA DECYZJI</span><strong>{closure.closedAt}</strong></div>
         <div><span>OSOBA WDRAŻAJĄCA</span><strong>{closure.owner}</strong></div>
@@ -52,7 +52,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
           {version.tasks.map(task=>{const x=outcome.tasks.find(t=>t.standardTaskId===task.id);return <div className="bos-outcome-task-row" key={task.id}>
             <span>{String(task.order).padStart(2,"0")}{task.isCritical?" · K":""}</span><strong>{task.name}</strong>
             <b>{mark(x?.explainedAt)}</b><b>{mark(x?.shownAt)}</b><b>{mark(x?.togetherAt)}</b>
-            <b title={shortDate(x?.soloAt)}>{mark(x?.soloAt)}</b><b title={shortDate(x?.checkedAt)}>{mark(x?.checkedAt)}</b>
+            <b>{x?.soloAt?<>✓ <small>{shortDate(x.soloAt)}</small></>:mark(x?.soloAt)}</b><b>{x?.checkedAt?<>✓ <small>{shortDate(x.checkedAt)}</small></>:mark(x?.checkedAt)}</b>
             {x?.note&&<small>{x.note}</small>}
           </div>})}
         </div>

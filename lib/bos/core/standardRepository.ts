@@ -47,6 +47,7 @@ export type StandardVersionRecord = {
   status: StandardVersionStatus;
   date: string;
   note: string;
+  roleDescription: string;
   publishedBy?: string;
   tasks: StandardTaskRecord[];
   startRequirements: StartRequirementRecord[];
@@ -79,7 +80,7 @@ export async function getStandard(standardId: string, organizationId?: string): 
   if (!hasDatabase()) {
     const fallback=onboardingStandards.find(s=>s.id===standardId); if(!fallback) return null;
     return {id:fallback.id,name:fallback.name,area:fallback.area,status:fallback.status,currentVersion:fallback.currentVersion,updatedAt:fallback.updatedAt,versions:fallback.versions.map((v,index)=>({
-      id:`fallback-${fallback.id}-${index}`,version:v.version,versionNumber:Number(v.version.replace(/^v/,""))||index+1,status:"PUBLISHED" as const,date:v.date,note:v.note,
+      id:`fallback-${fallback.id}-${index}`,version:v.version,versionNumber:Number(v.version.replace(/^v/,""))||index+1,status:"PUBLISHED" as const,date:v.date,note:v.note,roleDescription:"",
       tasks:v.tasks.map(t=>({...t,hint:"",isCritical:false})),startRequirements:[],readinessCriteria:[]
     }))};
   }
@@ -87,7 +88,7 @@ export async function getStandard(standardId: string, organizationId?: string): 
   const standards = await sql`SELECT id,name,area,status,current_version_id FROM standards WHERE id=${standardId} AND organization_id=${orgId} LIMIT 1`;
   if (!standards[0]) return null;
   const versions = await sql`SELECT sv.id,sv.version_number,sv.version_label,sv.status,sv.published_at,sv.created_at,sv.change_note,
-      publisher.display_name published_by
+      COALESCE(to_jsonb(sv)->>'role_description','') role_description,publisher.display_name published_by
     FROM standard_versions sv
     LEFT JOIN users publisher ON publisher.id=sv.published_by_user_id
     WHERE sv.standard_id=${standardId} AND sv.organization_id=${orgId} ORDER BY sv.version_number DESC`;
@@ -98,7 +99,7 @@ export async function getStandard(standardId: string, organizationId?: string): 
     const criteria = await sql`SELECT id,position,criterion,verification_method,verification_method_other FROM standard_readiness_criteria WHERE standard_version_id=${v.id} AND organization_id=${orgId} ORDER BY position`;
     mapped.push({
       id:v.id,version:v.version_label,versionNumber:v.version_number,status:v.status as StandardVersionStatus,
-      date:datePL(v.published_at??v.created_at),note:v.change_note??"",publishedBy:v.published_by??undefined,
+      date:datePL(v.published_at??v.created_at),note:v.change_note??"",roleDescription:v.role_description??"",publishedBy:v.published_by??undefined,
       tasks:tasks.map(t=>({id:t.id,order:t.position,name:t.name,execution:t.execution,readyWhen:t.ready_when,hint:t.hint??"",isCritical:t.is_critical})),
       startRequirements:requirements.map(r=>({id:r.id,order:r.position,category:r.category,requirement:r.requirement})),
       readinessCriteria:criteria.map(r=>({id:r.id,order:r.position,criterion:r.criterion,verificationMethod:r.verification_method,verificationMethodOther:r.verification_method_other??undefined}))
@@ -145,11 +146,13 @@ export async function updateDraftStandard(input:{
   standardId:string;
   name:string;
   area?:string;
+  roleDescription?:string;
 }) {
   requirePersistedOnboarding();
   const sql=db(); const organizationId=tenantId(input.organizationId);
   const name=input.name.trim();
   if(!name) throw new Error("Nazwa Standardu jest wymagana.");
+  const roleDescription=input.roleDescription?.trim()||"";
   const rows=await sql`
     UPDATE standards s SET name=${name},area=${input.area?.trim()||null},updated_at=now()
     FROM standard_versions sv
@@ -157,6 +160,7 @@ export async function updateDraftStandard(input:{
       AND sv.id=s.current_version_id AND sv.organization_id=s.organization_id AND sv.status='DRAFT'
     RETURNING s.id`;
   if(!rows[0]) throw new Error("Można edytować wyłącznie roboczy Standard.");
+  await sql`UPDATE standard_versions sv SET role_description=${roleDescription},updated_at=now() FROM standards s WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.standard_id=s.id AND sv.organization_id=s.organization_id AND sv.status=\'DRAFT\'`;
 }
 
 
@@ -387,10 +391,11 @@ export async function moveDraftReadinessCriterion(input:{organizationId:string;s
 export type StandardCompletenessResult = { complete:boolean; reasons:string[] };
 
 export function validateStandardCompleteness(input:{
-  name:string; tasks:StandardTaskRecord[]; startRequirements:StartRequirementRecord[]; readinessCriteria:ReadinessCriterionRecord[];
+  name:string; roleDescription?:string; tasks:StandardTaskRecord[]; startRequirements:StartRequirementRecord[]; readinessCriteria:ReadinessCriterionRecord[];
 }): StandardCompletenessResult {
   const reasons:string[]=[];
   if(!input.name.trim()) reasons.push("Uzupełnij nazwę Standardu.");
+  if(!input.roleDescription?.trim()) reasons.push("Opisz stanowisko własnymi słowami.");
   if(input.tasks.length<1) reasons.push("Dodaj co najmniej 1 czynność.");
   if(input.tasks.length>18) reasons.push("Standard może zawierać maksymalnie 18 czynności.");
   const taskPositions=input.tasks.map(x=>x.order);
@@ -425,7 +430,7 @@ export async function getDraftStandardCompleteness(input:{organizationId:string;
   if(!standard) throw new Error("Nie znaleziono Standardu.");
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0];
   if(!current||current.status!=="DRAFT") throw new Error("Walidacja przed publikacją dotyczy wyłącznie roboczej wersji Standardu.");
-  return validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
+  return validateStandardCompleteness({name:standard.name,roleDescription:current.roleDescription,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
 }
 
 
@@ -436,7 +441,7 @@ export async function createDraftStandardVersion(input:{
   const sql=db(); const organizationId=tenantId(input.organizationId); const changeNote=input.changeNote.trim();
   if(!changeNote) throw new Error("Opis zmiany jest wymagany.");
   return sql.begin(async tx=>{
-    const [standard]=await tx`SELECT s.id,s.status standard_status,s.current_version_id,sv.id source_version_id,sv.version_number,sv.status version_status
+    const [standard]=await tx`SELECT s.id,s.status standard_status,s.current_version_id,sv.id source_version_id,sv.version_number,sv.status version_status,COALESCE(to_jsonb(sv)->>\'role_description\',\'\') role_description
       FROM standards s JOIN standard_versions sv ON sv.id=s.current_version_id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} FOR UPDATE OF s,sv`;
     if(!standard) throw new Error("Nie znaleziono Standardu.");
@@ -459,6 +464,7 @@ export async function createDraftStandardVersion(input:{
       ) VALUES(
         ${organizationId},${standard.id},${versionNumber},${"v"+versionNumber},'DRAFT',${changeNote},${input.createdByUserId}
       ) RETURNING id,version_label`;
+    await tx`UPDATE standard_versions SET role_description=${standard.role_description??""} WHERE id=${draft.id} AND organization_id=${organizationId}`;
 
     await tx`INSERT INTO standard_tasks(organization_id,standard_version_id,position,name,execution,ready_when,hint,is_critical)
       SELECT organization_id,${draft.id},position,name,execution,ready_when,hint,is_critical
@@ -480,7 +486,7 @@ export async function publishDraftStandard(input:{organizationId:string;standard
   if(!input.qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
-    const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status
+    const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status,COALESCE(to_jsonb(sv)->>\'role_description\',\'\') role_description
       FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
       ORDER BY sv.version_number DESC LIMIT 1 FOR UPDATE OF s,sv`;
@@ -498,6 +504,7 @@ export async function publishDraftStandard(input:{organizationId:string;standard
       WHERE organization_id=${organizationId} AND standard_version_id=${standard.version_id} ORDER BY position`;
     const completeness=validateStandardCompleteness({
       name:standard.name,
+      roleDescription:standard.role_description??"",
       tasks:tasks.map(t=>({id:t.id,order:t.position,name:t.name,execution:t.execution,readyWhen:t.ready_when,hint:t.hint??"",isCritical:t.is_critical})),
       startRequirements:requirements.map(x=>({id:x.id,order:x.position,category:x.category,requirement:x.requirement})),
       readinessCriteria:criteria.map(x=>({id:x.id,order:x.position,criterion:x.criterion,verificationMethod:x.verification_method,verificationMethodOther:x.verification_method_other??undefined}))

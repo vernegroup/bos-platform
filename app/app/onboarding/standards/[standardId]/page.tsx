@@ -16,7 +16,7 @@ async function updateDraft(formData: FormData) {
   "use server";
   const access = await requireBOSAccess();
   const standardId=text(formData,"standardId");
-  await updateDraftStandard({organizationId:access.organization.id,standardId,name:text(formData,"name"),area:text(formData,"area")});
+  await updateDraftStandard({organizationId:access.organization.id,standardId,name:text(formData,"name"),area:text(formData,"area"),roleDescription:text(formData,"roleDescription")});
   revalidatePath(`/app/onboarding/standards/${standardId}`);
   revalidatePath("/app/onboarding");
   redirect(`/app/onboarding/standards/${standardId}`);
@@ -136,7 +136,7 @@ async function reorderReadinessCriterion(formData: FormData) {
 async function publishStandard(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
-  const qualityCheckPassed=["observable","realWork","repeatable","coversCritical"].every(key=>formData.get(key)==="on");
+  const qualityCheckPassed=["roleClear","tasksObservable","criticalCorrect","orderAndStart","observable","realWork","repeatable","coversCritical"].every(key=>formData.get(key)==="on");
   if(!qualityCheckPassed) redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent("Zaznacz wszystkie cztery odpowiedzi TAK w teście jakości.")}#gotowosc-publikacji`);
   try { await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed}); }
   catch(error) { const message=error instanceof Error?error.message:"Standard nie spełnia warunków publikacji."; redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent(message)}#gotowosc-publikacji`); }
@@ -145,12 +145,12 @@ async function publishStandard(formData: FormData) {
   redirect(`/app/onboarding/standards/${standardId}`);
 }
 
-export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>,searchParams:Promise<{publishError?:string}>}) {
-  const access=await requireBOSAccess(); const {standardId}=await params; const {publishError}=await searchParams;
+export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>,searchParams:Promise<{publishError?:string;version?:string}>}) {
+  const access=await requireBOSAccess(); const {standardId}=await params; const {publishError,version:requestedVersion}=await searchParams;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
-  const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
+  const current=(requestedVersion?standard.versions.find(v=>v.version===requestedVersion):undefined)??standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
-  const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
+  const completeness=validateStandardCompleteness({name:standard.name,roleDescription:current.roleDescription,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
     <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
@@ -171,11 +171,12 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <div style={{display:"grid",gap:10,width:"100%",maxWidth:720}}><span className="bos-dashboard-section-kicker">WERSJA ROBOCZA — DANE PODSTAWOWE</span>
       <input name="name" required maxLength={160} defaultValue={standard.name} style={{padding:10}}/>
       <input name="area" maxLength={160} defaultValue={standard.area} placeholder="Obszar" style={{padding:10}}/>
+      <label className="bos-guided-field"><strong>Opis stanowiska własnymi słowami</strong><span>Napisz krótko, czym ta osoba rzeczywiście zajmuje się w tej firmie.</span><textarea name="roleDescription" required maxLength={1000} defaultValue={current.roleDescription} rows={3} placeholder="np. Przyjmuje dostawy, kompletuje zamówienia i wydaje towar." style={{padding:10}}/></label>
       <div><button type="submit" className="bos-standard-primary-action">ZAPISZ DRAFT</button></div></div></form>}
 
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><a href="#czynnosci" className="is-active">1. CZYNNOŚCI</a><a href="#warunki-startu">2. WARUNKI STARTU</a><a href="#kryteria-gotowosci">3. GOTOWOŚĆ</a><a href="#gotowosc-publikacji">4. PUBLIKACJA</a><a href="#historia">HISTORIA</a></nav>
     <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":"AKTYWNA WERSJA"}</span>
-      <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p>
+      <h2>{current.version}</h2><p>{current.roleDescription||"Brak opisu stanowiska w tej wersji."}</p><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p>
       {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
       {!isDraft&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
@@ -301,11 +302,15 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
         {completeness.complete
           ? <div style={{display:"grid",gap:12}}><div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
               <form action={publishStandard} style={{display:"grid",gap:8}}><input type="hidden" name="standardId" value={standard.id}/>
-                <aside className="bos-guidance bos-guidance-test"><div><span className="bos-guidance-eyebrow">TEST 4×TAK</span><strong>Sprawdź jakość definicji, nie pracownika</strong><p>Każde TAK potwierdza, że kryterium nadaje się do użycia przez managera podczas realnego wdrożenia.</p></div><details><summary>? Dlaczego 4 pytania</summary><p>Kryterium ma być obserwowalne, możliwe do sprawdzenia w realnej pracy, wystarczająco jednoznaczne dla różnych osób oraz obejmować czynności K istotne dla gotowości do roli.</p></details></aside>
+                <aside className="bos-guidance bos-guidance-test"><div><span className="bos-guidance-eyebrow">TEST 4×TAK</span><strong>Sprawdź jakość definicji, nie pracownika</strong><p>Publikacja potwierdza jakość całego Standardu, a następnie jakość kryterium gotowości.</p></div><details><summary>? Dlaczego 4 pytania</summary><p>Najpierw sprawdź opis roli, czynności, oznaczenia K, kolejność i warunki startu. Kryterium ma być obserwowalne, realne, powtarzalne i obejmować wszystkie czynności K.</p></details></aside>
+                <label><input type="checkbox" name="roleClear" required/> TAK — opis stanowiska jasno mówi, czym ta osoba rzeczywiście zajmuje się w firmie.</label>
+                <label><input type="checkbox" name="tasksObservable" required/> TAK — każdą czynność można pokazać, wykonać i sprawdzić.</label>
+                <label><input type="checkbox" name="criticalCorrect" required/> TAK — K oznaczono tylko tam, gdzie błąd może mieć poważne konsekwencje.</label>
+                <label><input type="checkbox" name="orderAndStart" required/> TAK — kolejność uczenia i warunki rozpoczęcia odpowiadają rzeczywistej pracy.</label>
                 <label><input type="checkbox" name="observable" required/> TAK — kryterium opisuje zachowanie lub wynik, który można zaobserwować.</label>
                 <label><input type="checkbox" name="realWork" required/> TAK — kryterium można sprawdzić w rzeczywistej pracy.</label>
                 <label><input type="checkbox" name="repeatable" required/> TAK — dwie osoby powinny dojść do podobnej oceny.</label>
-                <label><input type="checkbox" name="coversCritical" required/> TAK — kryterium obejmuje czynności K istotne dla gotowości do roli.</label>
+                <label><input type="checkbox" name="coversCritical" required/> TAK — kryterium obejmuje wszystkie czynności oznaczone K.</label>
                 <button type="submit" className="bos-standard-primary-action">OPUBLIKUJ STANDARD</button>
               </form>
               <p>Publikacja zamknie edycję tej wersji. Dalsze zmiany będą wymagały utworzenia nowej wersji.</p>
@@ -320,7 +325,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
 
     <section id="historia" className="bos-standard-history"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">WERSJONOWANIE</span><h2>Historia wersji</h2></div>
       <span className="bos-dashboard-count">{standard.versions.length} wersje</span></div>
-      {standard.versions.map(version=><div className="bos-standard-version-row" key={version.version}><strong>{version.version}</strong><time>{version.date}</time><p>{version.note}</p>
+      {standard.versions.map(version=><div className="bos-standard-version-row" key={version.version}><strong><Link href={`/app/onboarding/standards/${standard.id}?version=${encodeURIComponent(version.version)}`}>{version.version}</Link></strong><time>{version.date}</time><p>{version.note}</p>
         <span>{version.tasks.length} czynności</span><b>{version.version===standard.currentVersion?"AKTYWNA":"ARCHIWALNA"}</b></div>)}</section>
   </>;
 }
