@@ -25,10 +25,10 @@ export default async function EmployeeHistoryPage({params}:{params:Promise<{empl
   </div>
   <section className="bos-process-list bos-operational-list">
    <div className="bos-process-list-head"><span>STANDARD</span><span>WERSJA</span><span>START</span><span>STATUS</span><span>DECYZJA</span><span>WERYFIKACJA</span><span /></div>
-   {history.onboarding.map(item=><Link href={`/app/onboarding/processes/${item.processId}`} className="bos-process-list-row" key={item.processId}>
+   {history.onboarding.map(item=>{const href=item.processStatus==="CLOSED"&&item.latestClosureId?`/app/onboarding/closed/${item.latestClosureId}`:`/app/onboarding/processes/${item.processId}`;return <Link href={href} className="bos-process-list-row" key={item.processId}>
     <strong>{item.standardName}</strong><b>{item.standardVersion}</b><span>{datePL(item.startedOn)}</span><span>{statusPL(item.processStatus)}</span>
     <span>{decisionPL(item.latestDecision)}{item.decisionCount>1?` · #${item.decisionCount}`:""}</span><span>{datePL(item.latestDecisionAt)}</span><i aria-hidden="true">→</i>
-   </Link>)}
+   </Link>})}
    {!history.onboarding.length&&<div className="bos-operational-empty"><strong>Brak historii wdrożeń</strong><p>Ten pracownik nie ma jeszcze procesu Onboarding w BOS.</p></div>}
   </section>
  </>;

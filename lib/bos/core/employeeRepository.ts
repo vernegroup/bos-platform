@@ -42,7 +42,7 @@ export async function setEmployeeStatus(input:{organizationId:string;employeeId:
 export type EmployeeOnboardingHistoryItem={
  processId:string; standardId:string; standardName:string; standardVersionId:string; standardVersion:string;
  startedOn:string; targetOn?:string; processStatus:string; owner:string;
- latestDecision?:"READY"|"NOT_YET"|"STOP"; latestDecisionAt?:string; latestDecisionBy?:string; decisionCount:number;
+ latestDecision?:"READY"|"NOT_YET"|"STOP"; latestDecisionAt?:string; latestDecisionBy?:string; latestClosureId?:string; decisionCount:number;
 };
 export type EmployeeOperationalHistory={employee:EmployeeRecord;onboarding:EmployeeOnboardingHistoryItem[]};
 
@@ -53,14 +53,14 @@ export async function getEmployeeOperationalHistory(input:{organizationId:string
  const rows=await sql`
   SELECT p.id process_id,p.standard_id,s.name standard_name,p.standard_version_id,sv.version_label,
     p.started_on,p.target_on,p.status process_status,owner.display_name owner,
-    lc.decision latest_decision,lc.verified_at latest_decision_at,verifier.display_name latest_decision_by,
+    lc.id latest_closure_id,lc.decision latest_decision,lc.verified_at latest_decision_at,verifier.display_name latest_decision_by,
     (SELECT count(*)::int FROM onboarding_closures c2 WHERE c2.organization_id=p.organization_id AND c2.onboarding_process_id=p.id) decision_count
   FROM onboarding_processes p
   JOIN standards s ON s.id=p.standard_id AND s.organization_id=p.organization_id
   JOIN standard_versions sv ON sv.id=p.standard_version_id AND sv.organization_id=p.organization_id
   JOIN users owner ON owner.id=p.owner_user_id
   LEFT JOIN LATERAL (
-    SELECT c.decision,c.verified_at,c.verified_by_user_id
+    SELECT c.id,c.decision,c.verified_at,c.verified_by_user_id
     FROM onboarding_closures c
     WHERE c.organization_id=p.organization_id AND c.onboarding_process_id=p.id
     ORDER BY c.decision_sequence DESC,c.verified_at DESC LIMIT 1
@@ -73,6 +73,6 @@ export async function getEmployeeOperationalHistory(input:{organizationId:string
   standardVersion:r.version_label,startedOn:String(r.started_on),targetOn:r.target_on?String(r.target_on):undefined,
   processStatus:r.process_status,owner:r.owner,latestDecision:r.latest_decision??undefined,
   latestDecisionAt:r.latest_decision_at?String(r.latest_decision_at):undefined,latestDecisionBy:r.latest_decision_by??undefined,
-  decisionCount:r.decision_count??0
+  latestClosureId:r.latest_closure_id??undefined,decisionCount:r.decision_count??0
  }))};
 }

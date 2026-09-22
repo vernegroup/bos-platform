@@ -20,6 +20,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
   const version=standard?.versions.find(item=>item.version===closure.standardVersion);
   if(!standard||!version) notFound();
   const resultClass=closure.result==="GOTOWY"?"is-ready":closure.result==="STOP"?"is-stop":"is-not-yet";
+  const isInterim=closure.result==="JESZCZE NIE";
   const critical=version.tasks.filter(t=>t.isCritical);
   const criticalDone=critical.filter(t=>{const x=outcome.tasks.find(p=>p.standardTaskId===t.id);return x?.soloAt&&x?.checkedAt}).length;
   const readinessDone=version.readinessCriteria.filter(c=>outcome.readinessChecks.find(x=>x.criterionId===c.id)?.isPassed).length;
@@ -28,7 +29,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
     <div className="bos-standard-back"><Link href="/app/onboarding/closed">← ZAKOŃCZONE WDROŻENIA</Link></div>
     <section className="bos-outcome-shell">
       <header className="bos-outcome-head">
-        <div><span>BOS · BUSINESS OPERATING STANDARDS</span><h1>KARTA ZAKOŃCZENIA WDROŻENIA</h1><p>PRZYGOTUJ → PRZEPROWADŹ → ZAMKNIJ</p></div>
+        <div><span>BOS · BUSINESS OPERATING STANDARDS</span><h1>{isInterim?"KARTA DECYZJI — JESZCZE NIE":"KARTA ZAKOŃCZENIA WDROŻENIA"}</h1><p>PRZYGOTUJ → PRZEPROWADŹ → ZAMKNIJ</p></div>
         <div className={`bos-outcome-result ${resultClass}`}><span>DECYZJA</span><strong>{closure.result}</strong></div>
       </header>
 
@@ -43,8 +44,9 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <div><span>OSOBA OCENIAJĄCA</span><strong>{closure.verifiedBy}</strong></div>
       </section>
 
-      <section className="bos-outcome-section">
-        <div className="bos-outcome-title"><span>01</span><div><strong>KARTA POSTĘPU</strong><small>Przebieg według wersji Standardu użytej w tym wdrożeniu</small></div></div>
+      {!outcome.snapshotAvailable&&<div className="bos-operational-empty"><strong>Historyczny snapshot niedostępny</strong><p>Ten rekord powstał przed wprowadzeniem niezmiennych snapshotów decyzji. BOS nie pokazuje bieżącego stanu procesu jako stanu historycznego, ponieważ mógł on ulec zmianie po tej decyzji.</p></div>}
+      {outcome.snapshotAvailable&&<section className="bos-outcome-section">
+        <div className="bos-outcome-title"><span>01</span><div><strong>KARTA POSTĘPU</strong><small>Stan zapisany dokładnie w chwili tej decyzji</small></div></div>
         <div className="bos-outcome-task-table">
           <div className="bos-outcome-task-head"><span>NR</span><span>CZYNNOŚĆ</span><span>WYJAŚNIJ</span><span>POKAŻ</span><span>RAZEM</span><span>SAM</span><span>SPRAWDŹ</span></div>
           {version.tasks.map(task=>{const x=outcome.tasks.find(t=>t.standardTaskId===task.id);return <div className="bos-outcome-task-row" key={task.id}>
@@ -54,16 +56,16 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
             {x?.note&&<small>{x.note}</small>}
           </div>})}
         </div>
-        <div className="bos-outcome-facts"><span>WYMAGANE CZYNNOŚCI <b>{closure.completedTasks}/{closure.totalTasks} ✓</b></span><span>CZYNNOŚCI K <b>{criticalDone}/{critical.length} ✓</b></span></div>
-      </section>
+        <div className="bos-outcome-facts"><span>WYMAGANE CZYNNOŚCI <b>{closure.completedTasks}/{closure.totalTasks} {closure.totalTasks>0&&closure.completedTasks===closure.totalTasks?"✓":"—"}</b></span><span>CZYNNOŚCI K <b>{criticalDone}/{critical.length} {criticalDone===critical.length?"✓":"—"}</b></span></div>
+      </section>}
 
-      <section className="bos-outcome-section">
+      {outcome.snapshotAvailable&&<section className="bos-outcome-section">
         <div className="bos-outcome-title"><span>02</span><div><strong>KRYTERIA GOTOWOŚCI</strong><small>Wyniki końcowej weryfikacji</small></div></div>
         <div className="bos-outcome-readiness">
           {version.readinessCriteria.map(c=>{const x=outcome.readinessChecks.find(v=>v.criterionId===c.id);return <div key={c.id} className={x?.isPassed?"is-pass":""}><span>{x?.isPassed?"✓":"—"}</span><div><strong>{c.criterion}</strong><small>{c.verificationMethod}{x?.checkedAt?` · ${shortDate(x.checkedAt)}`:""}</small>{x?.note&&<p>{x.note}</p>}</div></div>})}
         </div>
         <div className="bos-outcome-facts"><span>KRYTERIA POTWIERDZONE <b>{readinessDone===version.readinessCriteria.length&&version.readinessCriteria.length>0?"✓":"—"}</b></span></div>
-      </section>
+      </section>}
 
       <section className="bos-outcome-section">
         <div className="bos-outcome-title"><span>03</span><div><strong>DECYZJA KOŃCOWA</strong><small>Wynik wewnętrznej oceny operacyjnej</small></div></div>
@@ -72,7 +74,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <div className="bos-outcome-signoff"><div><span>OSOBA DOKONUJĄCA WEWNĘTRZNEJ OCENY</span><strong>{closure.verifiedBy}</strong></div><div><span>DATA</span><strong>{closure.closedAt}</strong></div></div>
       </section>
 
-      <footer className="bos-outcome-footer"><p>Rekord historyczny. Karta zachowuje dokładną wersję Standardu użytą podczas wdrożenia. BOS dokumentuje wdrożenie operacyjne i nie zastępuje wymaganych szkoleń, badań, uprawnień ani formalności.</p><span>BOS ONBOARDING</span></footer>
+      <footer className="bos-outcome-footer"><p>Rekord historyczny. {outcome.snapshotAvailable?"Karta zachowuje stan procesu z chwili decyzji oraz dokładną wersję Standardu.":"Szczegółowy stan procesu z chwili tej starszej decyzji nie był jeszcze utrwalany jako snapshot."} BOS dokumentuje wdrożenie operacyjne i nie zastępuje wymaganych szkoleń, badań, uprawnień ani formalności.</p><span>BOS ONBOARDING</span></footer>
     </section>
 
     <div className="bos-outcome-actions"><Link href={`/app/onboarding/employees/${closure.employeeId??""}`} aria-disabled={!closure.employeeId}>HISTORIA PRACOWNIKA →</Link><PrintOutcomeButton /></div>
