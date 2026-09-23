@@ -137,7 +137,7 @@ async function publishStandard(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const qualityCheckPassed=["roleClear","tasksObservable","criticalCorrect","orderAndStart","observable","realWork","repeatable","coversCritical"].every(key=>formData.get(key)==="on");
-  if(!qualityCheckPassed) redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent("Zaznacz wszystkie cztery odpowiedzi TAK w teście jakości.")}#gotowosc-publikacji`);
+  if(!qualityCheckPassed) redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent("Zaznacz wszystkie odpowiedzi TAK w kontroli jakości.")}#gotowosc-publikacji`);
   try { await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed}); }
   catch(error) { const message=error instanceof Error?error.message:"Standard nie spełnia warunków publikacji."; redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent(message)}#gotowosc-publikacji`); }
   revalidatePath(`/app/onboarding/standards/${standardId}`);
@@ -158,7 +158,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <Link href="/app/onboarding/processes"><span>02</span><strong>PRZEPROWADŹ</strong><small>Karta Postępu</small></Link>
       <Link href="/app/onboarding/closed"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
     </nav>
-    <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
+    <section className="bos-app-intro"><div><div className="bos-app-kicker">STANDARD STANOWISKA</div><h1>{standard.name}</h1>
       <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
       <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
     <aside className="bos-guidance bos-guidance-primary">
@@ -172,7 +172,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <input name="name" required maxLength={160} defaultValue={standard.name} style={{padding:10}}/>
       <input name="area" maxLength={160} defaultValue={standard.area} placeholder="Obszar" style={{padding:10}}/>
       <label className="bos-guided-field"><strong>Opis stanowiska własnymi słowami</strong><span>Napisz krótko, czym ta osoba rzeczywiście zajmuje się w tej firmie.</span><textarea name="roleDescription" required maxLength={1000} defaultValue={current.roleDescription} rows={3} placeholder="np. Przyjmuje dostawy, kompletuje zamówienia i wydaje towar." style={{padding:10}}/></label>
-      <div><button type="submit" className="bos-standard-primary-action">ZAPISZ DRAFT</button></div></div></form>}
+      <div><button type="submit" className="bos-standard-primary-action">ZAPISZ WERSJĘ ROBOCZĄ</button></div></div></form>}
 
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><a href="#czynnosci" className="is-active">1. CZYNNOŚCI</a><a href="#warunki-startu">2. WARUNKI STARTU</a><a href="#kryteria-gotowosci">3. GOTOWOŚĆ</a><a href="#gotowosc-publikacji">4. PUBLIKACJA</a><a href="#historia">HISTORIA</a></nav>
     <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":"AKTYWNA WERSJA"}</span>

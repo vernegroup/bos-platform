@@ -22,18 +22,19 @@ export default async function NewVersionPage({params}:{params:Promise<{standardI
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const canCreate=current.status==="PUBLISHED";
+  const statusLabel=current.status==="PUBLISHED"?"OPUBLIKOWANA":current.status==="DRAFT"?"ROBOCZA":"ARCHIWALNA";
   return <>
     <div className="bos-standard-back"><Link href={`/app/onboarding/standards/${standard.id}`}>← WRÓĆ DO STANDARDU</Link></div>
-    <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / WERSJONOWANIE</div>
+    <section className="bos-app-intro"><div><div className="bos-app-kicker">WERSJONOWANIE STANDARDU</div>
       <h1>Nowa wersja standardu</h1>
       <p>{standard.name} · źródło {current.version}</p></div>
-      <div className="bos-app-build-state"><span>ŹRÓDŁO</span><strong>{current.status}</strong></div>
+      <div className="bos-app-build-state"><span>ŹRÓDŁO</span><strong>{statusLabel}</strong></div>
     </section>
     <section className="bos-standard-detail-head">
       <div style={{display:"grid",gap:10,width:"100%",maxWidth:760}}>
         <span className="bos-dashboard-section-kicker">KOPIA OPUBLIKOWANEJ WERSJI</span>
         <h2>{canCreate?`Utwórz v${current.versionNumber+1}`:"Nowa wersja jest niedostępna"}</h2>
-        <p>Nowy DRAFT otrzyma kopię czynności, warunków rozpoczęcia i kryteriów gotowości. Opublikowana wersja źródłowa pozostanie niezmieniona, a rozpoczęte onboardingi zachowają swoje dotychczasowe powiązanie.</p>
+        <p>Nowa wersja robocza otrzyma kopię czynności, warunków rozpoczęcia i kryteriów gotowości. Opublikowana wersja źródłowa pozostanie niezmieniona, a rozpoczęte onboardingi zachowają swoje dotychczasowe powiązanie.</p>
         {canCreate?<form action={createVersion} style={{display:"grid",gap:10}}>
           <input type="hidden" name="standardId" value={standard.id}/>
           <textarea name="changeNote" required rows={3} maxLength={1000} placeholder="Opisz, co ma zostać zmienione w nowej wersji." style={{padding:10}}/>

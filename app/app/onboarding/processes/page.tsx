@@ -2,26 +2,4 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listProcesses,listStandards,getProcessProgress } from "@/lib/bos/onboardingRepository";
 export const dynamic="force-dynamic";
-
-export default async function ProcessesPage(){
- const access=await requireBOSAccess();const org=access.organization.id;
- const [processes,standards]=await Promise.all([listProcesses(org),listStandards(org)]);
- const ready=processes.filter(p=>getProcessProgress(p).percent===100).length;
- return <>
-  <section className="bos-app-intro bos-onboarding-view-head">
-   <div><div className="bos-app-kicker">02 / PRZEPROWADŹ</div><h1>Wdrożenia</h1><p>Każdy proces realizuje konkretną wersję Standardu Stanowiska i zachowuje ją do momentu zamknięcia.</p></div>
-   <Link href="/app/onboarding/processes/new" className="bos-standard-primary-action">+ NOWE WDROŻENIE</Link>
-  </section>
-  <div className="bos-onboarding-commandbar">
-   <div><span>W TOKU</span><strong>{processes.length}</strong></div>
-   <div><span>GOTOWE DO ZAMKNIĘCIA</span><strong>{ready}</strong></div>
-   <div><span>STANDARDY W UŻYCIU</span><strong>{new Set(processes.map(p=>p.standardId)).size}</strong></div>
-  </div>
-  <section className="bos-process-list bos-operational-list">
-   <div className="bos-process-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>CEL</span><span>POSTĘP</span><span /></div>
-   {processes.map(p=>{const s=standards.find(x=>x.id===p.standardId);const g=getProcessProgress(p);return <div className="bos-process-list-row" key={p.id}><strong>{p.employeeId?<Link href={`/app/onboarding/employees/${p.employeeId}`} title="Historia pracownika">{p.employee} ↗</Link>:p.employee}</strong><span>{s?.name??"Standard"}</span><b>{p.standardVersion}</b><span>{p.startedAt}</span><span>{p.targetDate||"—"}</span><div className="bos-process-list-progress" role="progressbar" aria-label={`Postęp wdrożenia ${p.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={g.percent}><div><i style={{width:`${g.percent}%`}} /></div><em>{g.completed}/{g.total} · {g.percent}%</em></div><Link href={`/app/onboarding/processes/${p.id}`} aria-label={`Otwórz wdrożenie ${p.employee}`}>→</Link></div>})}
-   {!processes.length&&<div className="bos-operational-empty"><strong>Brak aktywnych wdrożeń</strong><p>Uruchom proces na podstawie opublikowanego Standardu Stanowiska.</p></div>}
-  </section>
-  <div className="bos-onboarding-rule-note"><span>POWIĄZANIE</span><p>Zmiana bieżącej wersji standardu nie zmienia wersji przypisanej do rozpoczętego procesu.</p></div>
- </>;
-}
+export default async function ProcessesPage(){const access=await requireBOSAccess();const org=access.organization.id;const [processes,standards]=await Promise.all([listProcesses(org),listStandards(org)]);const ready=processes.filter(p=>getProcessProgress(p).percent===100).length;return <><section className="bos-app-intro bos-onboarding-view-head"><div><div className="bos-app-kicker">PRZEPROWADŹ</div><h1>Wdrożenia</h1><p>Każdy proces realizuje konkretną wersję Standardu Stanowiska i zachowuje ją do momentu zamknięcia.</p></div><Link href="/app/onboarding/processes/new" className="bos-standard-primary-action">+ NOWE WDROŻENIE</Link></section><div className="bos-onboarding-commandbar"><div><span>W TOKU</span><strong>{processes.length}</strong></div><div><span>GOTOWE DO ZAMKNIĘCIA</span><strong>{ready}</strong></div><div><span>STANDARDY W UŻYCIU</span><strong>{new Set(processes.map(p=>p.standardId)).size}</strong></div></div><section className="bos-process-list bos-operational-list"><div className="bos-process-list-head"><span>PRACOWNIK</span><span>STANDARD</span><span>WERSJA</span><span>START</span><span>CEL</span><span>POSTĘP</span><span /></div>{processes.map(p=>{const s=standards.find(x=>x.id===p.standardId);const g=getProcessProgress(p);return <div className="bos-process-list-row" key={p.id}><strong>{p.employeeId?<Link href={`/app/onboarding/employees/${p.employeeId}`} title="Historia pracownika">{p.employee} ↗</Link>:p.employee}</strong><span>{s?.name??"Standard"}</span><b>{p.standardVersion}</b><span>{p.startedAt}</span><span>{p.targetDate||"—"}</span><div className="bos-process-list-progress" role="progressbar" aria-label={`Postęp wdrożenia ${p.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={g.percent}><div><i style={{width:`${g.percent}%`}} /></div><em>{g.completed}/{g.total} · {g.percent}%</em></div><Link href={`/app/onboarding/processes/${p.id}`} aria-label={`Otwórz wdrożenie ${p.employee}`}>→</Link></div>})}{!processes.length&&<div className="bos-operational-empty"><strong>Brak aktywnych wdrożeń</strong><p>Uruchom proces na podstawie opublikowanego Standardu Stanowiska.</p></div>}</section><div className="bos-onboarding-rule-note"><span>POWIĄZANIE</span><p>Zmiana bieżącej wersji standardu nie zmienia wersji przypisanej do rozpoczętego procesu.</p></div></>;}
