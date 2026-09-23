@@ -142,15 +142,17 @@ async function publishStandard(formData: FormData) {
   catch(error) { const message=error instanceof Error?error.message:"Standard nie spełnia warunków publikacji."; redirect(`/app/onboarding/standards/${standardId}?publishError=${encodeURIComponent(message)}#gotowosc-publikacji`); }
   revalidatePath(`/app/onboarding/standards/${standardId}`);
   revalidatePath("/app/onboarding");
-  redirect(`/app/onboarding/standards/${standardId}`);
+  redirect(`/app/onboarding/standards/${standardId}?published=1`);
 }
 
-export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>,searchParams:Promise<{publishError?:string;version?:string}>}) {
-  const access=await requireBOSAccess(); const {standardId}=await params; const {publishError,version:requestedVersion}=await searchParams;
+export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>,searchParams:Promise<{publishError?:string;version?:string;published?:string}>}) {
+  const access=await requireBOSAccess(); const {standardId}=await params; const {publishError,version:requestedVersion,published}=await searchParams;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=(requestedVersion?standard.versions.find(v=>v.version===requestedVersion):undefined)??standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   const completeness=validateStandardCompleteness({name:standard.name,roleDescription:current.roleDescription,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
+  const qrTarget=`https://standardybiznesu.pl/q/${standard.id}`;
+  const qrImage=`https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=16&data=${encodeURIComponent(qrTarget)}`;
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
     <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
@@ -179,7 +181,9 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <h2>{current.version}</h2><p>{current.roleDescription||"Brak opisu stanowiska w tej wersji."}</p><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p>
       {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
-      {!isDraft&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
+      {!isDraft&&<div className="bos-standard-head-actions"><Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link><a href="#kod-qr" className="bos-standard-secondary-action">KOD QR STANOWISKA</a></div>}</section>
+    {!isDraft&&<section id="kod-qr" className="bos-standard-qr-panel"><div className="bos-standard-qr-copy"><span className="bos-dashboard-section-kicker">KOD QR STANOWISKA</span><h2>Ten kod pozostaje aktualny przy kolejnych wersjach Standardu</h2><p>Umieść go przy stanowisku pracy. Po zeskanowaniu manager przejdzie przez logowanie BOS i wróci bezpośrednio do tego Standardu. Kod wskazuje Standard, nie pracownika ani konkretną wersję.</p><div className="bos-standard-qr-actions"><a className="bos-standard-primary-action" href={qrImage} target="_blank" rel="noreferrer">POBIERZ QR</a><Link className="bos-standard-secondary-action" href={`/app/onboarding/standards/${standard.id}/qr-print`} target="_blank">DRUKUJ KARTĘ A4 / A6</Link></div></div><img className="bos-standard-qr-image" src={qrImage} width="210" height="210" alt={`Kod QR Standardu: ${standard.name}`}/></section>}
+    {published==="1"&&!isDraft&&<aside className="bos-standard-publish-success" role="status"><div><span>STANDARD OPUBLIKOWANY</span><strong>Kod QR stanowiska jest gotowy</strong><p>Możesz go pobrać lub wydrukować jako kartę do umieszczenia przy stanowisku pracy. Przy kolejnych wersjach Standardu ten sam kod pozostanie aktualny.</p></div><div><a href={qrImage} target="_blank" rel="noreferrer">POBIERZ QR</a><Link href={`/app/onboarding/standards/${standard.id}/qr-print`} target="_blank">DRUKUJ KARTĘ</Link><a href="#czynnosci">PRZEJDŹ DO STANDARDU</a></div></aside>}
 
     <section id="czynnosci" className="bos-standard-editor-section">
       <div className="bos-editor-step-head"><span>1</span><div><strong>Zdefiniuj czynności stanowiska</strong><p>Zacznij od realnej pracy. Każda pozycja ma mówić, co pracownik robi i jaki rezultat oznacza prawidłowe wykonanie.</p></div></div>
