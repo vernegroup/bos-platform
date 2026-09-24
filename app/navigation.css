@@ -256,3 +256,48 @@
 }
 @media(max-width:700px){.bos-topbar-primary-links{display:none}.bos-topbar-secondary-links{display:flex;align-items:center;gap:14px}.bos-topbar-secondary-links .bos-topbar-link{font-size:9px}.bos-topbar-right{display:flex}.bos-topbar-login{order:1}.bos-topbar-secondary-links{order:2}}
 @media(max-width:460px){.bos-topbar-secondary-links{display:none}.bos-topbar-login{min-height:40px;padding:0 14px}}
+
+/* PUBLIC HERO HEADER FIX — public navigation belongs to the spatial scene. */
+.bos-public-root .bos-topbar{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  z-index:20;
+  background:linear-gradient(180deg,rgba(1,2,4,.82),rgba(1,2,4,.3) 72%,transparent);
+  border:0;
+  color:#f4f1ea;
+}
+.bos-public-root .bos-topbar-container{background:transparent}
+.bos-public-root .bos-topbar-line{background:rgba(255,255,255,.08);opacity:.45}
+.bos-public-root .bos-logo-bos{color:#f4f1ea}
+.bos-public-root .bos-logo-divider{color:rgba(255,255,255,.32)}
+.bos-public-root .bos-logo-title{color:rgba(232,237,242,.72)}
+.bos-public-root .bos-topbar-secondary-links .bos-topbar-link{color:rgba(239,242,246,.72)}
+.bos-public-root .bos-topbar-secondary-links .bos-topbar-link:hover,
+.bos-public-root .bos-topbar-secondary-links .bos-topbar-link:focus-visible{color:#fff}
+.bos-public-root .bos-topbar-login{
+  min-width:0;
+  min-height:44px;
+  padding:0 22px;
+  border:1px solid rgba(210,164,91,.7);
+  background:rgba(1,2,4,.16);
+  color:#f3efe7;
+  box-shadow:none;
+}
+.bos-public-root .bos-topbar-login:hover,
+.bos-public-root .bos-topbar-login:focus-visible{
+  transform:none;
+  border-color:#d2a45b;
+  background:rgba(210,164,91,.1);
+  color:#fff;
+  box-shadow:none;
+}
+@media(min-width:701px){
+  .bos-public-root .bos-topbar-container{min-height:96px}
+  .bos-public-root .bos-topbar-login{font-size:10px;letter-spacing:1.3px}
+}
+@media(max-width:700px){
+  .bos-public-root .bos-topbar{background:linear-gradient(180deg,rgba(1,2,4,.94),rgba(1,2,4,.55) 75%,transparent)}
+  .bos-public-root .bos-topbar-login{min-height:38px;padding:0 14px}
+}

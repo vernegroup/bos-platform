@@ -40,7 +40,7 @@ export default function PublicHero() {
       <div className="bos-public-hero__sticky">
         <div className="bos-public-hero__copy">
           <span className="bos-public-hero__eyebrow">STANDARDY OPERACYJNE BIZNESU</span>
-          <h1 id="bos-home-title">Porządek<br /><em>ma strukturę.</em></h1>
+          <h1 id="bos-home-title"><span>Porządek</span><br /><em>ma strukturę.</em></h1>
           <p>BOS porządkuje powtarzalną pracę firmy w system, który można wdrożyć, kontrolować i rozwijać.</p>
           <div className="bos-public-hero__cta">
             <a href="#produkty">POZNAJ BOS <span aria-hidden="true">→</span></a>
