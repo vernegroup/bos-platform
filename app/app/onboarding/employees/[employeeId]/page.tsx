@@ -16,7 +16,7 @@ export default async function EmployeeHistoryPage({params}:{params:Promise<{empl
   <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA</Link></div>
   <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / HISTORIA PRACOWNIKA</div>
    <h1>{history.employee.displayName}</h1><p>Historia wdrożeń wynika z zapisanych procesów i decyzji. Nie jest osobnym, ręcznie edytowanym dossier.</p></div>
-   <div className="bos-app-build-state"><span>EMPLOYEE CORE</span><strong>{history.employee.status}</strong></div>
+   <div className="bos-app-build-state"><span>PRACOWNIK</span><strong>{history.employee.status==="ACTIVE"?"AKTYWNY":history.employee.status==="INACTIVE"?"NIEAKTYWNY":history.employee.status}</strong></div>
   </section>
   <div className="bos-onboarding-commandbar">
    <div><span>WDROŻENIA</span><strong>{history.onboarding.length}</strong></div>

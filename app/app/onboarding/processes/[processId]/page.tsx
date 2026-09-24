@@ -67,7 +67,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-process-summary">
-        <div><span>STANDARD</span><Link href={`/app/onboarding/standards/${standard.id}`}>{standard.name} {process.standardVersion} ↗</Link></div>
+        <div><span>STANDARD</span><Link href={`/app/onboarding/standards/${standard.id}?version=${encodeURIComponent(process.standardVersion)}`}>{standard.name} {process.standardVersion} ↗</Link></div>
         <div><span>START</span><strong>{process.startedAt}</strong></div>
         <div><span>CEL</span><strong>{process.targetDate}</strong></div>
         <div><span>POSTĘP CZYNNOŚCI</span><strong>{progress.percent}%</strong></div><div><span>K — KRYTYCZNE</span><strong>{criticalCompleted}/{criticalTasks.length}</strong></div>
@@ -80,7 +80,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <span className="bos-dashboard-count">{process.startChecks.filter(x=>x.isSatisfied).length} z {version.startRequirements.length} potwierdzonych</span></div>
         {version.startRequirements.length===0?<div className="bos-operational-empty"><strong>Brak dodatkowych warunków rozpoczęcia</strong><p>Standard nie definiuje warunków wymagających potwierdzenia.</p></div>:
           <div className="bos-start-check-list">{version.startRequirements.map(req=>{const check=process.startChecks.find(x=>x.requirementId===req.id);const done=Boolean(check?.isSatisfied);return <div className="bos-start-check-row" key={req.id}>
-            <span>{String(req.order).padStart(2,"0")}</span><div><strong>{req.requirement}</strong><small>{req.category}</small></div>
+            <span>{String(req.order).padStart(2,"0")}</span><div><strong>{req.requirement}</strong><small>{{TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"}[req.category]??req.category}</small></div>
             <form action={confirmStart}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="requirementId" value={req.id}/><button className={done?"is-done":""} disabled={done}>{done?"POTWIERDZONE ✓":"POTWIERDŹ"}</button></form>
           </div>})}</div>}
         {!startComplete&&<div className="bos-operational-empty"><strong>Realizacja jeszcze zablokowana</strong><p>Potwierdź wszystkie warunki rozpoczęcia. Dopiero wtedy proces przejdzie z PLANOWANE do W TOKU i odblokuje etapy BOS.</p></div>}
@@ -136,12 +136,12 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         </div>
         <aside className="bos-context-guide"><strong>4×TAK · TEST JAKOŚCI KRYTERIUM</strong><p>Przed potwierdzeniem sprawdź: czy rezultat jest obserwowalny? Czy da się go sprawdzić w realnej pracy? Czy dwie osoby powinny dojść do podobnej oceny? Czy kryteria obejmują wszystkie czynności K? To kontrola jakości oceny — nie automatyczna decyzja o pracowniku.</p></aside>
         <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id} id={`readiness-${c.id}`}>
-          <div><span>{String(c.order).padStart(2,"0")} · {c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<><small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>{check?.note&&<p className="bos-readiness-evidence"><b>Zapisany fakt:</b> {check.note}</p>}</>}</div>
+          <div><span>{String(c.order).padStart(2,"0")} · {{OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"}[c.verificationMethod]??c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<><small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>{check?.note&&<p className="bos-readiness-evidence"><b>Zapisany fakt:</b> {check.note}</p>}</>}</div>
           {passed?<b className="bos-readiness-pass">✓ KRYTERIUM POTWIERDZONE</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
         </article>})}</div>
       </section>
 
-      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · HANDOVER</strong><p>Przy przekazaniu procesu następna osoba powinna oprzeć się na zapisanych etapach, datach i faktach. Nie zaczynaj wdrożenia od początku tylko dlatego, że zmienił się prowadzący.</p></aside>
+      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · PRZEKAZANIE</strong><p>Przy przekazaniu procesu następna osoba powinna oprzeć się na zapisanych etapach, datach i faktach. Nie zaczynaj wdrożenia od początku tylko dlatego, że zmienił się prowadzący.</p></aside>
       <section className="bos-process-next">
         <div>
           <span className="bos-dashboard-section-kicker">NASTĘPNY KROK</span>

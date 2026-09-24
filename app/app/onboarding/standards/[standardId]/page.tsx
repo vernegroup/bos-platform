@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import {
   createDraftReadinessCriterion, createDraftStartRequirement, createDraftTask, deleteDraftReadinessCriterion,
   deleteDraftStartRequirement, deleteDraftTask, getStandard, moveDraftReadinessCriterion, moveDraftStartRequirement,
@@ -151,7 +152,10 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
   const current=(requestedVersion?standard.versions.find(v=>v.version===requestedVersion):undefined)??standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   const completeness=validateStandardCompleteness({name:standard.name,roleDescription:current.roleDescription,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
-  const qrTarget=`https://standardybiznesu.pl/q/${standard.id}`;
+  const requestHeaders=await headers();
+  const host=requestHeaders.get("x-forwarded-host")??requestHeaders.get("host")??"standardybiznesu.pl";
+  const protocol=requestHeaders.get("x-forwarded-proto")??(host.includes("localhost")?"http":"https");
+  const qrTarget=`${protocol}://${host}/q/${standard.id}`;
   const qrImage=`https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=16&data=${encodeURIComponent(qrTarget)}`;
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
@@ -161,8 +165,8 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <Link href="/app/onboarding/closed"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
     </nav>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">STANDARD STANOWISKA</div><h1>{standard.name}</h1>
-      <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
-      <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
+      <p>{standard.area} · {current.version===standard.currentVersion?"aktywna wersja":"wersja archiwalna"} {current.version} · aktualizacja {standard.updatedAt}</p></div>
+      <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status==="DRAFT"?"ROBOCZY":standard.status==="PUBLISHED"?"OPUBLIKOWANY":standard.status==="ARCHIVED"?"ARCHIWALNY":standard.status}</strong></div></section>
     <aside className="bos-guidance bos-guidance-primary">
       <div><span className="bos-guidance-eyebrow">TERAZ · PRZYGOTUJ</span><strong>Zbuduj wzorzec stanowiska</strong>
       <p>Po tej części Standard ma odpowiadać na trzy pytania: czego nauczyć, na co szczególnie uważać i po czym poznać gotowość.</p></div>
@@ -239,7 +243,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
       current.startRequirements.map((requirement,index)=><details className="bos-saved-editor-card" key={requirement.id}>
-        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {requirement.category}</span><strong>{requirement.requirement}</strong>{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
+        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {{TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"}[requirement.category]??requirement.category}</span><strong>{requirement.requirement}</strong>{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
         <div className="bos-standard-editor-row bos-editor-action-layout">
         {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/>
@@ -276,7 +280,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
       current.readinessCriteria.map((criterion,index)=><details className="bos-saved-editor-card" key={criterion.id}>
-        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span><strong>{criterion.criterion}</strong>{criterion.verificationMethodOther&&<small>{criterion.verificationMethodOther}</small>}{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
+        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {{OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"}[criterion.verificationMethod]??criterion.verificationMethod}</span><strong>{criterion.criterion}</strong>{criterion.verificationMethodOther&&<small>{criterion.verificationMethodOther}</small>}{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
         <div className="bos-standard-editor-row bos-editor-action-layout">
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/>

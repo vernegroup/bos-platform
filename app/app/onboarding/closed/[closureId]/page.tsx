@@ -44,7 +44,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <div><span>OSOBA OCENIAJĄCA</span><strong>{closure.verifiedBy}</strong></div>
       </section>
 
-      {!outcome.snapshotAvailable&&<div className="bos-operational-empty"><strong>Historyczny snapshot niedostępny</strong><p>Ten rekord powstał przed wprowadzeniem niezmiennych snapshotów decyzji. BOS nie pokazuje bieżącego stanu procesu jako stanu historycznego, ponieważ mógł on ulec zmianie po tej decyzji.</p></div>}
+      {!outcome.snapshotAvailable&&<div className="bos-operational-empty"><strong>Historyczny zapis szczegółowy niedostępny</strong><p>Ten rekord powstał przed wprowadzeniem niezmiennych zapisów stanu decyzji. BOS nie pokazuje bieżącego stanu procesu jako stanu historycznego, ponieważ mógł on ulec zmianie po tej decyzji.</p></div>}
       {outcome.snapshotAvailable&&<section className="bos-outcome-section">
         <div className="bos-outcome-title"><span>01</span><div><strong>KARTA POSTĘPU</strong><small>Stan zapisany dokładnie w chwili tej decyzji</small></div></div>
         <div className="bos-outcome-task-table">
@@ -74,7 +74,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <div className="bos-outcome-signoff"><div><span>OSOBA DOKONUJĄCA WEWNĘTRZNEJ OCENY</span><strong>{closure.verifiedBy}</strong></div><div><span>DATA</span><strong>{closure.closedAt}</strong></div></div>
       </section>
 
-      <footer className="bos-outcome-footer"><p>Rekord historyczny. {outcome.snapshotAvailable?"Karta zachowuje stan procesu z chwili decyzji oraz dokładną wersję Standardu.":"Szczegółowy stan procesu z chwili tej starszej decyzji nie był jeszcze utrwalany jako snapshot."} BOS dokumentuje wdrożenie operacyjne i nie zastępuje wymaganych szkoleń, badań, uprawnień ani formalności.</p><span>BOS ONBOARDING</span></footer>
+      <footer className="bos-outcome-footer"><p>Rekord historyczny. {outcome.snapshotAvailable?"Karta zachowuje stan procesu z chwili decyzji oraz dokładną wersję Standardu.":"Szczegółowy stan procesu z chwili tej starszej decyzji nie był jeszcze utrwalany jako zapis historyczny."} BOS dokumentuje wdrożenie operacyjne i nie zastępuje wymaganych szkoleń, badań, uprawnień ani formalności.</p><span>BOS ONBOARDING</span></footer>
     </section>
 
     <div className="bos-outcome-actions"><Link href={`/app/onboarding/employees/${closure.employeeId??""}`} aria-disabled={!closure.employeeId}>HISTORIA PRACOWNIKA →</Link><PrintOutcomeButton /></div>
