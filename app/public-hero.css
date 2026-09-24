@@ -2,21 +2,21 @@
 .bos-public-root .bos-home{background:transparent}
 .bos-public-hero{
   position:relative;
-  height:100vh;
-  min-height:680px;
+  height:78vh;
+  min-height:560px;
   color:#f5f3ee;
 }
 .bos-public-hero__sticky{
   position:relative;
-  height:100vh;
-  min-height:680px;
+  height:78vh;
+  min-height:560px;
   overflow:hidden;
 }
 .bos-public-wordmark{
   position:absolute;
   z-index:5;
-  left:clamp(72px,8vw,150px);
-  top:50%;
+  left:clamp(28px,4.2vw,78px);
+  top:48%;
   display:flex;
   align-items:baseline;
   gap:clamp(18px,2vw,38px);
@@ -59,7 +59,7 @@
 }
 .bos-public-hero__marker{
   position:absolute;
-  left:clamp(72px,8vw,150px);
+  left:clamp(28px,4.2vw,78px);
   bottom:34px;
   display:flex;
   align-items:center;

@@ -2,13 +2,13 @@
 .bos-product-rail{
   position:relative;
   min-height:auto;
-  padding:clamp(76px,10vh,110px) 0 clamp(78px,10vh,115px);
+  padding:clamp(44px,6vh,68px) 0 clamp(54px,7vh,78px);
   color:#f4f2ed;
   overflow:hidden;
 }
 .bos-product-rail__intro{
-  width:min(78vw,1180px);
-  margin:0 auto clamp(48px,6vh,70px);
+  width:auto;
+  margin:0 clamp(28px,4.2vw,78px) clamp(38px,5vh,58px);
 }
 .bos-product-rail__intro>span{color:rgba(224,229,235,.38);font-size:8px;font-weight:800;letter-spacing:.3em}
 .bos-product-rail__intro h2{
@@ -30,10 +30,10 @@
   gap:clamp(34px,4.6vw,88px);
   width:max-content;
   min-width:100%;
-  padding:0 max(7vw,40px);
+  padding:0 clamp(28px,4.2vw,78px);
 }
 .bos-product-rail__track:after{
-  content:"";position:absolute;left:7vw;right:7vw;bottom:0;height:1px;background:rgba(255,255,255,.13)
+  content:"";position:absolute;left:clamp(28px,4.2vw,78px);right:clamp(28px,4.2vw,78px);bottom:0;height:1px;background:rgba(255,255,255,.13)
 }
 .bos-product-rail__item{
   position:relative;
