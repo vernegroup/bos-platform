@@ -1,172 +1,40 @@
-/* PUBLIC-03 — Dark Spatial Neon.
-   A procedural black room: light reveals geometry, never a bitmap background. */
-
-:root {
-  --bos-public-scroll: 0;
-  --bos-public-mouse-x: 0;
-  --bos-public-mouse-y: 0;
-  --bos-public-black: #010204;
-  --bos-public-navy: #030a14;
-  --bos-public-gold: #bd9147;
-}
-
-.bos-public-root {
-  position: relative;
-  isolation: isolate;
-  min-height: 100vh;
-  background: var(--bos-public-black);
-  color: #fff;
-}
-
-.bos-public-content { position: relative; z-index: 2; }
-
-.bos-public-scene {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  perspective: 1100px;
-  background: #010204;
-}
-
-.bos-public-scene > * { position: absolute; }
-
-.bos-public-scene__base {
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 48%, rgba(5,18,31,.72) 0%, rgba(2,7,14,.72) 38%, rgba(1,2,4,.98) 78%),
-    linear-gradient(180deg,#02050a 0%,#010204 100%);
-}
-
-.bos-public-scene__volume {
-  width: 62vw;
-  height: 62vw;
-  border-radius: 50%;
-  filter: blur(110px);
-  opacity: .12;
-  will-change: transform;
-}
-.bos-public-scene__volume--one {
-  left: -30vw; top: 5vh;
-  background: rgba(0,145,255,.48);
-  transform: translate3d(calc(var(--bos-public-mouse-x) * -1.2vw),calc(var(--bos-public-scroll) * -7vh + var(--bos-public-mouse-y) * -1vh),-80px);
-}
-.bos-public-scene__volume--two {
-  right: -34vw; bottom: -20vh;
-  background: rgba(112,48,210,.34);
-  transform: translate3d(calc(var(--bos-public-mouse-x) * .8vw),calc(var(--bos-public-scroll) * 9vh + var(--bos-public-mouse-y) * .7vh),-160px);
-}
-
-.bos-public-scene__plane {
-  left: -30vw;
-  width: 160vw;
-  height: 110vh;
-  opacity: .14;
-  transform-origin: 50% 0;
-  background-image:
-    linear-gradient(rgba(90,142,184,.12) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(90,142,184,.12) 1px,transparent 1px);
-  background-size: 9vw 9vw;
-  mask-image: linear-gradient(to bottom,transparent,#000 18%,#000 58%,transparent 86%);
-}
-.bos-public-scene__plane--floor {
-  top: 54vh;
-  transform: rotateX(72deg) translate3d(calc(var(--bos-public-mouse-x) * -.6vw),calc(var(--bos-public-scroll) * -5vh + var(--bos-public-mouse-y) * -.5vh),0);
-}
-.bos-public-scene__plane--ceiling {
-  bottom: 51vh;
-  transform-origin: 50% 100%;
-  transform: rotateX(-72deg) translate3d(calc(var(--bos-public-mouse-x) * .4vw),calc(var(--bos-public-scroll) * 3vh + var(--bos-public-mouse-y) * .35vh),0);
-  opacity: .06;
-}
-
-.bos-public-scene__frame {
-  inset: 11vh 7vw 9vh;
-  border-left: 1px solid rgba(76,132,174,.08);
-  border-right: 1px solid rgba(76,132,174,.08);
-  transform: perspective(900px) rotateX(.5deg);
-  box-shadow: inset 16vw 0 20vw rgba(0,0,0,.18), inset -16vw 0 20vw rgba(0,0,0,.18);
-}
-
-.bos-public-scene__lights { inset: 0; transform-style: preserve-3d; }
-.bos-public-light {
-  position: absolute;
-  display: block;
-  height: 2px;
-  width: clamp(90px,12vw,240px);
-  border-radius: 999px;
-  opacity: .54;
-  transform-origin: center;
-  will-change: transform,opacity;
-}
-.bos-public-light::after {
-  content:"";
-  position:absolute;
-  inset:-9px -5px;
-  border-radius:inherit;
-  background:inherit;
-  filter:blur(13px);
-  opacity:.46;
-}
-.bos-public-light--cyan { background:linear-gradient(90deg,transparent,#3ce8ff 24%,#8cf5ff 55%,transparent); box-shadow:0 0 10px rgba(60,232,255,.45); }
-.bos-public-light--blue { background:linear-gradient(90deg,transparent,#176cff 28%,#58a2ff 58%,transparent); box-shadow:0 0 10px rgba(23,108,255,.42); }
-.bos-public-light--violet { background:linear-gradient(90deg,transparent,#8b4dff 28%,#c09cff 60%,transparent); box-shadow:0 0 11px rgba(139,77,255,.4); }
-.bos-public-light--magenta { background:linear-gradient(90deg,transparent,#e340b7 26%,#ff83d8 58%,transparent); box-shadow:0 0 11px rgba(227,64,183,.38); }
-.bos-public-light--amber { background:linear-gradient(90deg,transparent,#bd9147 27%,#e2c184 58%,transparent); box-shadow:0 0 10px rgba(189,145,71,.4); }
-
-.bos-public-light--near { filter:blur(.25px); height:3px; opacity:.58; }
-.bos-public-light--mid { opacity:.42; transform:scale(.78); }
-.bos-public-light--far { opacity:.27; transform:scale(.48); filter:blur(.15px); }
-
-/* Motion stays restrained: depth is perceived from differential movement, not animation spectacle. */
-.bos-public-scene__volume,
-.bos-public-scene__plane,
-.bos-public-light { backface-visibility:hidden; }
-
-
-.bos-public-light--n1 { left:-2vw; top:23vh; transform:rotate(-7deg) translate3d(calc(var(--bos-public-scroll) * -5vw + var(--bos-public-mouse-x) * -2.4vw),calc(var(--bos-public-mouse-y) * -1.6vh),180px); }
-.bos-public-light--n2 { left:17vw; top:69vh; transform:rotate(4deg) scale(.48) translate3d(calc(var(--bos-public-scroll) * -2vw + var(--bos-public-mouse-x) * -.45vw),calc(var(--bos-public-mouse-y) * -.3vh),-240px); }
-.bos-public-light--n3 { right:14vw; top:29vh; transform:rotate(-3deg) scale(.78) translate3d(calc(var(--bos-public-scroll) * 3vw + var(--bos-public-mouse-x) * 1vw),calc(var(--bos-public-mouse-y) * .7vh),-40px); }
-.bos-public-light--n4 { right:-3vw; top:64vh; transform:rotate(8deg) translate3d(calc(var(--bos-public-scroll) * 6vw + var(--bos-public-mouse-x) * 2.7vw),calc(var(--bos-public-mouse-y) * 1.8vh),210px); }
-.bos-public-light--n5 { left:47vw; top:78vh; transform:rotate(-2deg) scale(.48) translate3d(calc(var(--bos-public-mouse-x) * -.35vw),calc(var(--bos-public-scroll) * 2vh + var(--bos-public-mouse-y) * -.25vh),-300px); }
-.bos-public-light--n6 { left:39vw; top:35vh; transform:rotate(2deg) scale(.78) translate3d(calc(var(--bos-public-mouse-x) * .8vw),calc(var(--bos-public-scroll) * -3vh + var(--bos-public-mouse-y) * .55vh),-70px); }
-.bos-public-light--n7 { left:28vw; top:52vh; transform:rotate(-10deg) translate3d(calc(var(--bos-public-scroll) * -4vw + var(--bos-public-mouse-x) * -2vw),calc(var(--bos-public-mouse-y) * 1.3vh),150px); }
-.bos-public-light--n8 { right:32vw; top:16vh; transform:rotate(6deg) scale(.48) translate3d(calc(var(--bos-public-scroll) * 2vw + var(--bos-public-mouse-x) * .4vw),calc(var(--bos-public-mouse-y) * -.3vh),-280px); }
-
-.bos-public-scene__vignette {
-  inset:0;
-  background:
-    radial-gradient(ellipse at center,transparent 36%,rgba(0,0,0,.25) 66%,rgba(0,0,0,.78) 100%),
-    linear-gradient(90deg,rgba(0,0,0,.58),transparent 25%,transparent 75%,rgba(0,0,0,.58));
-}
-.bos-public-scene__grain {
-  inset:0;
-  opacity:.022;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
-}
-
-@media (max-width:800px) {
-  .bos-public-scene { perspective:700px; }
-  .bos-public-scene__plane { left:-85vw; width:270vw; background-size:22vw 22vw; }
-  .bos-public-scene__frame { inset:8vh 5vw; }
-  .bos-public-light { width:30vw; }
-  .bos-public-light--n3 { right:4vw; }
-  .bos-public-light--n6 { left:48vw; }
-  .bos-public-light--n7 { left:8vw; }
-  .bos-public-scene__volume { width:120vw; height:120vw; }
-}
-
-@media (prefers-reduced-motion:reduce) {
-  .bos-public-scene__volume,
-  .bos-public-scene__plane,
-  .bos-public-light { will-change:auto; }
-  .bos-public-light--n1 { transform:rotate(-7deg); }
-  .bos-public-light--n2 { transform:rotate(4deg) scale(.48); }
-  .bos-public-light--n3 { transform:rotate(-3deg) scale(.78); }
-  .bos-public-light--n4 { transform:rotate(8deg); }
-  .bos-public-light--n5 { transform:rotate(-2deg) scale(.48); }
-  .bos-public-light--n6 { transform:rotate(2deg) scale(.78); }
-  .bos-public-light--n7 { transform:rotate(-10deg); }
-  .bos-public-light--n8 { transform:rotate(6deg) scale(.48); }
-}
+/* SCENE REDESIGN — abstract architectural darkness.
+   No grid, no literal room, no bitmap. Sparse light implies a structure larger than the viewport. */
+:root{--bos-public-scroll:0;--bos-public-mouse-x:0;--bos-public-mouse-y:0;--bos-public-black:#010204;--bos-public-navy:#030711;--bos-public-gold:#bd9147}
+.bos-public-root{position:relative;isolation:isolate;min-height:100vh;background:var(--bos-public-black);color:#fff}
+.bos-public-content{position:relative;z-index:2}
+.bos-public-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#010204;perspective:1400px}
+.bos-public-scene>*{position:absolute}
+.bos-public-scene__base{inset:0;background:radial-gradient(ellipse at 58% 43%,rgba(8,17,31,.74),rgba(2,5,10,.9) 43%,#010204 78%),linear-gradient(115deg,#010204,#030711 49%,#010204)}
+.bos-public-scene__mist{width:72vw;height:72vw;border-radius:50%;filter:blur(150px);opacity:.1;will-change:transform}
+.bos-public-scene__mist--left{left:-42vw;top:-12vh;background:#116a93;transform:translate3d(calc(var(--bos-public-mouse-x)*-1vw),calc(var(--bos-public-scroll)*-6vh),-160px)}
+.bos-public-scene__mist--right{right:-46vw;bottom:-28vh;background:#58217c;transform:translate3d(calc(var(--bos-public-mouse-x)*.8vw),calc(var(--bos-public-scroll)*8vh),-220px)}
+.bos-public-scene__architecture{inset:-20%;transform-style:preserve-3d;transform:translate3d(calc(var(--bos-public-mouse-x)*-.25vw),calc(var(--bos-public-mouse-y)*-.2vh),-120px)}
+.bos-public-edge{position:absolute;display:block;background:linear-gradient(90deg,transparent,rgba(123,171,203,.16),transparent);box-shadow:0 0 28px rgba(55,124,171,.08)}
+.bos-public-edge--left{width:1px;height:125vh;left:20%;top:-8%;transform:rotate(13deg);background:linear-gradient(transparent,rgba(89,148,188,.2),transparent)}
+.bos-public-edge--right{width:1px;height:120vh;right:16%;top:2%;transform:rotate(-9deg);background:linear-gradient(transparent,rgba(122,83,165,.15),transparent)}
+.bos-public-edge--top{height:1px;width:105vw;left:7%;top:27%;transform:rotate(-8deg)}
+.bos-public-edge--deep{height:1px;width:65vw;left:27%;top:63%;opacity:.5;transform:rotate(5deg)}
+.bos-public-scene__beams{inset:0;transform-style:preserve-3d}
+.bos-public-beam{position:absolute;display:block;height:1px;width:clamp(130px,20vw,390px);border-radius:50%;opacity:.42;transform-origin:center;will-change:transform}
+.bos-public-beam:after{content:"";position:absolute;inset:-14px -8px;background:inherit;filter:blur(18px);opacity:.3;border-radius:50%}
+.bos-public-beam--ice{background:linear-gradient(90deg,transparent,#54dcf1 35%,#b9f6ff 54%,transparent);box-shadow:0 0 8px rgba(84,220,241,.35)}
+.bos-public-beam--blue{background:linear-gradient(90deg,transparent,#276ee8 38%,#76aaff 56%,transparent)}
+.bos-public-beam--violet{background:linear-gradient(90deg,transparent,#7048c8 36%,#b69be9 55%,transparent)}
+.bos-public-beam--rose{background:linear-gradient(90deg,transparent,#c83f8e 38%,#ef88bd 55%,transparent)}
+.bos-public-beam--gold{background:linear-gradient(90deg,transparent,#9b7136 36%,#d8b473 54%,transparent)}
+.bos-public-beam--near{height:2px;opacity:.48}.bos-public-beam--mid{opacity:.31}.bos-public-beam--far{opacity:.18;filter:blur(.25px)}
+.bos-public-beam--n1{left:-7vw;top:18vh;transform:rotate(-18deg) translate3d(calc(var(--bos-public-scroll)*-8vw + var(--bos-public-mouse-x)*-2.6vw),calc(var(--bos-public-mouse-y)*-1.6vh),240px)}
+.bos-public-beam--n2{right:4vw;top:13vh;transform:rotate(-7deg) scale(.5) translate3d(calc(var(--bos-public-scroll)*2vw + var(--bos-public-mouse-x)*.4vw),0,-320px)}
+.bos-public-beam--n3{left:31vw;top:34vh;transform:rotate(9deg) scale(.76) translate3d(calc(var(--bos-public-scroll)*-3vw + var(--bos-public-mouse-x)*-.8vw),calc(var(--bos-public-mouse-y)*.5vh),-60px)}
+.bos-public-beam--n4{right:-11vw;top:48vh;transform:rotate(-22deg) translate3d(calc(var(--bos-public-scroll)*9vw + var(--bos-public-mouse-x)*3vw),calc(var(--bos-public-mouse-y)*1.8vh),280px)}
+.bos-public-beam--n5{left:9vw;top:73vh;transform:rotate(5deg) scale(.48) translate3d(calc(var(--bos-public-scroll)*-1vw),0,-360px)}
+.bos-public-beam--n6{right:24vw;top:72vh;transform:rotate(-4deg) scale(.76) translate3d(calc(var(--bos-public-scroll)*4vw + var(--bos-public-mouse-x)*.9vw),calc(var(--bos-public-mouse-y)*.6vh),-80px)}
+.bos-public-beam--n7{left:17vw;top:52vh;transform:rotate(24deg) translate3d(calc(var(--bos-public-scroll)*-7vw + var(--bos-public-mouse-x)*-2.2vw),calc(var(--bos-public-mouse-y)*1.4vh),220px)}
+.bos-public-beam--n8{right:38vw;top:22vh;transform:rotate(13deg) scale(.46) translate3d(calc(var(--bos-public-scroll)*2vw),0,-390px)}
+.bos-public-beam--n9{right:5vw;top:84vh;transform:rotate(16deg) scale(.7) translate3d(calc(var(--bos-public-scroll)*5vw + var(--bos-public-mouse-x)*1.1vw),calc(var(--bos-public-mouse-y)*.8vh),-20px)}
+.bos-public-scene__haze{inset:0;background:linear-gradient(108deg,transparent 14%,rgba(13,31,47,.08) 36%,transparent 52%),linear-gradient(72deg,transparent 51%,rgba(62,31,79,.06) 70%,transparent 86%);filter:blur(22px)}
+.bos-public-scene__vignette{inset:0;background:radial-gradient(ellipse at 52% 47%,transparent 30%,rgba(0,0,0,.2) 63%,rgba(0,0,0,.84) 100%),linear-gradient(90deg,rgba(0,0,0,.62),transparent 22%,transparent 78%,rgba(0,0,0,.64))}
+.bos-public-scene__grain{inset:0;opacity:.018;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+@media(max-width:800px){.bos-public-scene{perspective:850px}.bos-public-scene__mist{width:135vw;height:135vw}.bos-public-beam{width:42vw}.bos-public-edge--left{left:9%}.bos-public-edge--right{right:6%}.bos-public-edge--top{width:150vw;left:-15%}.bos-public-beam--n3{left:45vw}.bos-public-beam--n7{left:2vw}.bos-public-beam--n9{right:-8vw}}
+@media(prefers-reduced-motion:reduce){.bos-public-scene__mist,.bos-public-beam{will-change:auto}.bos-public-beam--n1{transform:rotate(-18deg)}.bos-public-beam--n2{transform:rotate(-7deg) scale(.5)}.bos-public-beam--n3{transform:rotate(9deg) scale(.76)}.bos-public-beam--n4{transform:rotate(-22deg)}.bos-public-beam--n5{transform:rotate(5deg) scale(.48)}.bos-public-beam--n6{transform:rotate(-4deg) scale(.76)}.bos-public-beam--n7{transform:rotate(24deg)}.bos-public-beam--n8{transform:rotate(13deg) scale(.46)}.bos-public-beam--n9{transform:rotate(16deg) scale(.7)}}
