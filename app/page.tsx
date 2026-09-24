@@ -1,5 +1,3 @@
-import Image from "next/image";
-import Link from "next/link";
 
 import "./styles.css";
 import "./product-stage.css";
@@ -9,13 +7,15 @@ import "./footer.css";
 import "./mobile.css";
 import "./product-alignment.css";
 import "./public-scene.css";
+import "./public-hero.css";
 
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import BOSSupport from "../components/BOSSupport/BOSSupport";
-import BOSIntro, { BOSIntroTrigger } from "../components/home/BOSIntro";
+import BOSIntro from "../components/home/BOSIntro";
 import ProductDetailsModal from "../components/home/ProductDetailsModal";
 import PublicScene from "../components/home/PublicScene";
+import PublicHero from "../components/home/PublicHero";
 
 export default function HomePage() {
   return (
@@ -26,24 +26,7 @@ export default function HomePage() {
         <TopBar />
 
         <main className="bos-home">
-          <section className="bos-home-hero" aria-labelledby="bos-home-title">
-            <div className="bos-page-width bos-home-hero-grid">
-              <div className="bos-home-hero-copy">
-                <span className="bos-home-hero-kicker">SYSTEMY OPERACYJNE DLA MŚP</span>
-                <h1 id="bos-home-title">Uporządkowana firma</h1>
-                <p className="bos-home-hero-lead">gotowe rozwiązania do codziennej pracy organizacji.</p>
-                <p className="bos-home-hero-description">BOS porządkuje powtarzalne procesy firmy i zamienia je w rozwiązania, z których zespół może korzystać w codziennej pracy.</p>
-                <div className="bos-home-hero-actions">
-                  <a href="#produkty" className="bos-home-primary-action">POZNAJ PRODUKTY <span aria-hidden="true">→</span></a>
-                  <BOSIntroTrigger />
-                </div>
-                <div className="bos-home-hero-reference">PORZĄDEK · POWTARZALNOŚĆ · TRWAŁY EFEKT</div>
-              </div>
-              <div className="bos-home-hero-visual">
-                <Image src="/images/hero-office.png" alt="Środowisko pracy Business Operating Standards" width={1023} height={840} priority className="bos-home-hero-image" sizes="(max-width: 800px) 100vw, 55vw" />
-              </div>
-            </div>
-          </section>
+          <PublicHero />
 
           <section id="produkty" className="bos-home-products" aria-labelledby="bos-products-title">
             <div className="bos-page-width">
