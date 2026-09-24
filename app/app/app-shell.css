@@ -3616,3 +3616,37 @@
     text-overflow:clip;
   }
 }
+
+/* FIX-4C-03B — Karta Postępu: etapy wykorzystują pełną szerokość także na szerokim desktopie. */
+@media (min-width:1241px){
+  .bos-onboarding-shell .bos-process-task-head{
+    grid-template-columns:48px minmax(275px,.9fr) minmax(240px,.75fr) minmax(0,1.65fr);
+  }
+  .bos-onboarding-shell .bos-process-task-row{
+    grid-template-columns:48px minmax(275px,.9fr) minmax(240px,.75fr) minmax(0,1.65fr);
+  }
+  .bos-onboarding-shell .bos-process-stage-flow{
+    min-width:0;
+    align-items:stretch;
+  }
+  .bos-onboarding-shell .bos-process-stage{
+    flex:1 1 100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) 150px;
+  }
+  .bos-onboarding-shell .bos-stage-guidance{min-width:0}
+  .bos-onboarding-shell .bos-process-stage form{width:150px}
+  .bos-onboarding-shell .bos-process-stage button{
+    width:100%;
+    min-width:0;
+    white-space:normal;
+    line-height:1.25;
+  }
+  .bos-onboarding-shell .bos-stage-audit{
+    grid-column:2;
+    max-width:none;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+  }
+}
