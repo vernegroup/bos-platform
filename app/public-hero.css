@@ -5,8 +5,8 @@
   --hero-shift:0;
   --hero-reveal:0;
   position:relative;
-  height:260vh;
-  min-height:1600px;
+  height:185vh;
+  min-height:1120px;
   color:#f5f3ee;
 }
 .bos-public-hero__sticky{
@@ -99,7 +99,7 @@
   background:linear-gradient(90deg,rgba(210,164,91,.75),transparent);
 }
 @media(max-width:800px){
-  .bos-public-hero{height:220vh;min-height:1300px}
+  .bos-public-hero{height:175vh;min-height:1040px}
   .bos-public-hero__sticky{min-height:560px}
   .bos-public-hero__copy{
     left:24px;
@@ -113,7 +113,7 @@
   .bos-public-hero__marker{left:24px;bottom:24px}
 }
 @media(max-width:480px){
-  .bos-public-hero{height:200vh;min-height:1150px}
+  .bos-public-hero{height:165vh;min-height:960px}
   .bos-public-hero__copy{left:20px;width:calc(100vw - 40px)}
   .bos-public-hero__eyebrow{font-size:8px}
   .bos-public-hero h1{font-size:clamp(52px,16vw,76px)}
