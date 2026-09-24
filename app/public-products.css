@@ -1,14 +1,14 @@
 /* PUBLIC-06 / SCALE FIX — product navigation is a rail, not a card section. */
 .bos-product-rail{
   position:relative;
-  min-height:72vh;
-  padding:clamp(90px,13vh,150px) 0 clamp(100px,15vh,170px);
+  min-height:auto;
+  padding:clamp(76px,10vh,110px) 0 clamp(78px,10vh,115px);
   color:#f4f2ed;
   overflow:hidden;
 }
 .bos-product-rail__intro{
   width:min(78vw,1180px);
-  margin:0 auto clamp(72px,10vh,110px);
+  margin:0 auto clamp(48px,6vh,70px);
 }
 .bos-product-rail__intro>span{color:rgba(224,229,235,.38);font-size:8px;font-weight:800;letter-spacing:.3em}
 .bos-product-rail__intro h2{
@@ -91,7 +91,7 @@
 .bos-public-root .bos-product-modal-cta{background:#b8873e;color:#07111d}
 .bos-public-root .bos-product-modal-steps{border-color:rgba(255,255,255,.09)}
 @media(max-width:800px){
-  .bos-product-rail{min-height:65vh;padding:86px 0 110px}
+  .bos-product-rail{min-height:auto;padding:72px 0 84px}
   .bos-product-rail__intro{width:calc(100vw - 48px);margin-bottom:62px}
   .bos-product-rail__intro h2{font-size:clamp(38px,11vw,58px)}
   .bos-product-rail__track{gap:38px;padding-left:24px;padding-right:24px}
