@@ -3582,3 +3582,37 @@
 .bos-onboarding-shell .bos-process-task-row{grid-template-columns:48px minmax(230px,1fr) minmax(220px,1fr);gap:18px}
 .bos-onboarding-shell .bos-process-task-row>.bos-process-stage-flow{grid-column:2 / -1;width:100%;min-width:0}
 }
+
+
+/* FIX-4C-03 — Karta Postępu: czytelny układ etapów na średnim desktopie. */
+@media (min-width:801px) and (max-width:1240px){
+  .bos-onboarding-shell .bos-process-task-head{display:none}
+  .bos-onboarding-shell .bos-process-task-row{
+    grid-template-columns:42px minmax(240px,.8fr) minmax(180px,.6fr) minmax(0,1.65fr);
+    gap:16px;
+  }
+  .bos-onboarding-shell .bos-process-stage-flow{
+    min-width:0;
+    align-items:stretch;
+  }
+  .bos-onboarding-shell .bos-process-stage{
+    flex:1 1 100%;
+    min-width:0;
+    grid-template-columns:minmax(0,1fr) 150px;
+  }
+  .bos-onboarding-shell .bos-stage-guidance{min-width:0}
+  .bos-onboarding-shell .bos-process-stage form{width:150px}
+  .bos-onboarding-shell .bos-process-stage button{
+    width:100%;
+    min-width:0;
+    white-space:normal;
+    line-height:1.25;
+  }
+  .bos-onboarding-shell .bos-stage-audit{
+    grid-column:2;
+    max-width:none;
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+  }
+}
