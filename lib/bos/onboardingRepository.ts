@@ -136,7 +136,6 @@ export async function closeProcess(input:{organizationId?:string;processId:strin
     if(!process) throw new Error("Nie znaleziono procesu.");
     if(!["PLANNED","IN_PROGRESS","PAUSED","READY_TO_CLOSE"].includes(process.status)) throw new Error("Proces nie jest otwarty do decyzji.");
     if(input.decision==="READY") {
-      if(process.status!=="READY_TO_CLOSE") throw new Error("Decyzja GOTOWY wymaga kompletnego Readiness Gate.");
       const [gate]=await tx`SELECT
         count(*) FILTER(WHERE tp.checked_at IS NULL)::int tasks_missing,
         count(*) FILTER(WHERE st.is_critical AND (tp.solo_at IS NULL OR tp.checked_at IS NULL))::int critical_missing
