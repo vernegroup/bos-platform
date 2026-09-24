@@ -3650,3 +3650,69 @@
     text-overflow:clip;
   }
 }
+
+/* ===========================================================
+   APP UI 2.0 FOUNDATION — quiet operational workspace.
+   Public-site drama stays outside the application; product rail
+   is the shared BOS navigation DNA.
+   =========================================================== */
+.bos-app-shell{
+ --app-navy:#111a23;--app-navy-2:#1c2731;--app-gold:#b58a48;--app-paper:#f4f5f4;
+ --app-panel:#fff;--app-line:#dfe2e1;--app-muted:#727b82;--app-soft:#eef0ef;
+ grid-template-columns:164px minmax(0,1fr);background:#f4f5f4;color:#111a23;
+}
+.bos-app-sidebar{padding:16px 11px 14px;background:#101820;box-shadow:none;border-right:1px solid #26313a}
+.bos-app-sidebar-head{min-height:46px;padding:0 10px 12px}
+.bos-app-brand span{font-family:var(--bos-font-heading),Georgia,serif;font-size:23px;font-weight:500;letter-spacing:.02em}
+.bos-app-nav{gap:2px}
+.bos-app-nav-link{min-height:37px;padding:0 10px;border-radius:2px;color:#9ca5ac;font-size:10px;letter-spacing:.01em}
+.bos-app-nav-link:hover,.bos-app-nav-link:focus-visible{background:#17222b;color:#f2f4f5}
+.bos-app-nav-link.is-active{background:#18232c;color:#fff;box-shadow:inset 2px 0 #b58a48}
+.bos-app-main{background:#f4f5f4}
+.bos-app-topbar{height:54px;padding:0 26px;background:rgba(255,255,255,.97);border-bottom:1px solid #dfe2e1;backdrop-filter:blur(10px)}
+.bos-app-search{height:32px;border-radius:2px;background:#f1f2f1;border:1px solid #e2e4e3}
+.bos-app-search:focus-within{border-color:#aeb5b8;box-shadow:0 0 0 2px rgba(17,26,35,.04)}
+.bos-app-account-mark{border-radius:2px;background:#18232c}
+.bos-app-account-dropdown{border-radius:2px;box-shadow:0 14px 36px rgba(17,26,35,.12)}
+.bos-app-workspace{width:min(1280px,calc(100% - 52px));padding:28px 0 60px}
+
+/* Product rail: light current product, grey inactive/planned products. */
+.bos-app-product-rail{height:58px;padding:0 26px;background:#111920;border-bottom:1px solid #27323a;display:flex;align-items:stretch;gap:28px;overflow-x:auto;scrollbar-width:none}
+.bos-app-product-rail::-webkit-scrollbar{display:none}
+.bos-app-product-rail-label{display:flex;align-items:center;color:#b58a48;font-family:var(--bos-font-heading),Georgia,serif;font-size:16px;flex:0 0 auto}
+.bos-app-product-rail-track{display:flex;align-items:stretch;gap:32px;min-width:max-content}
+.bos-app-product-rail-item{position:relative;display:flex;align-items:center;color:#69747d;text-decoration:none;font-size:9px;font-weight:800;letter-spacing:.16em;white-space:nowrap;transition:color .15s ease}
+.bos-app-product-rail-item i{position:absolute;left:0;right:100%;bottom:0;height:2px;background:#c79a50;transition:right .18s ease}
+.bos-app-product-rail-item:hover,.bos-app-product-rail-item:focus-visible{color:#c9ced2}
+.bos-app-product-rail-item.is-active{color:#f6f7f7}
+.bos-app-product-rail-item.is-active i{right:0}
+.bos-app-product-rail-item.is-planned{gap:7px;color:#4f5961;cursor:default}
+.bos-app-product-rail-item small{font-size:6px;font-weight:700;letter-spacing:.1em;color:#3f4950}
+
+/* Flatten cards into operational surfaces. */
+.bos-home-welcome h1,.bos-products-header h1,.bos-product-identity .bos-product-name{color:#111a23}
+.bos-home-kpis,.bos-home-products,.bos-home-updates,.bos-products-grid{gap:1px}
+.bos-home-kpis article,.bos-home-product,.bos-product-card{border-radius:0!important;box-shadow:none!important;background:#fff;border-color:#dfe2e1!important}
+.bos-home-kpis article{min-height:88px}
+.bos-home-product,.bos-product-card{transition:border-color .15s ease,background .15s ease}
+.bos-home-product:hover,.bos-product-card:hover{background:#fafbfa;border-color:#c9cdcb!important}
+.bos-home-section-head,.bos-dashboard-section-head{border-color:#d9dddb}
+.bos-product-card>a,.bos-dashboard-open,.bos-standard-primary-action,.bos-standard-secondary-action{border-radius:1px!important}
+.bos-products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bos-product-shell{--bos-surface:#fff;--bos-surface-soft:#f2f3f2;--bos-border:#dadddb;--bos-text-muted:#707980}
+.bos-product-header{background:#fff;border-color:#dadddb}
+.bos-product-flow{background:#fff;border-color:#dadddb}
+.bos-product-flow-step{border-color:#e1e3e2}
+.bos-product-flow-step:hover,.bos-product-flow-step:focus-visible{background:#f5f6f5}
+.bos-product-workspace{background:transparent}
+.bos-onboarding-shell input,.bos-onboarding-shell textarea,.bos-onboarding-shell select,
+.bos-promotions-shell input,.bos-promotions-shell textarea,.bos-promotions-shell select{border-radius:1px!important;background:#fff!important;border-color:#cfd4d2!important}
+.bos-onboarding-shell button,.bos-promotions-shell button{border-radius:1px!important}
+.bos-onboarding-shell table,.bos-promotions-shell table{background:#fff}
+
+/* Dense states and keyboard focus stay explicit. */
+.bos-app-shell :where(a,button,input,select,textarea):focus-visible{outline:2px solid #b58a48;outline-offset:2px}
+.bos-home-empty,.bos-products-empty{background:#f7f8f7;border:1px solid #dfe2e1;color:#727b82}
+@media(max-width:900px){.bos-app-workspace{width:calc(100% - 36px)}.bos-app-product-rail{padding:0 18px;gap:20px}.bos-app-product-rail-track{gap:24px}.bos-products-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.bos-app-shell{grid-template-columns:1fr}.bos-app-product-rail{height:52px}}
+@media(max-width:520px){.bos-app-workspace{width:calc(100% - 24px)}.bos-app-product-rail{padding:0 12px}.bos-app-product-rail-label{display:none}.bos-app-product-rail-track{gap:20px}}

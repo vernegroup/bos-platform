@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import AppProductRail from "./AppProductRail";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -114,6 +115,7 @@ export default function AppShell({children,account,organizationName}:AppShellPro
           </div>
         </div>
       </header>
+      <AppProductRail />
       <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
       <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>
     </div>
