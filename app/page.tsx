@@ -7,10 +7,12 @@ import "./mobile.css";
 import "./product-alignment.css";
 import "./public-scene.css";
 import "./public-hero.css";
+import "./public-products.css";
 
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import BOSSupport from "../components/BOSSupport/BOSSupport";
+import ProductRail from "../components/home/ProductRail";
 import PublicScene from "../components/home/PublicScene";
 import PublicHero from "../components/home/PublicHero";
 
@@ -22,6 +24,7 @@ export default function HomePage() {
         <TopBar />
         <main className="bos-home">
           <PublicHero />
+          <ProductRail />
         </main>
         <BottomBar />
         <BOSSupport />
