@@ -8,12 +8,13 @@ import "./mobile.css";
 import "./product-alignment.css";
 import "./public-scene.css";
 import "./public-hero.css";
+import "./public-products.css";
 
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
 import BOSSupport from "../components/BOSSupport/BOSSupport";
 import BOSIntro from "../components/home/BOSIntro";
-import ProductDetailsModal from "../components/home/ProductDetailsModal";
+import ProductRail from "../components/home/ProductRail";
 import PublicScene from "../components/home/PublicScene";
 import PublicHero from "../components/home/PublicHero";
 
@@ -28,16 +29,7 @@ export default function HomePage() {
         <main className="bos-home">
           <PublicHero />
 
-          <section id="produkty" className="bos-home-products" aria-labelledby="bos-products-title">
-            <div className="bos-page-width">
-              <h2 id="bos-products-title">Dwa produkty. Jeden system działania.</h2>
-              <div className="bos-home-product-cards">
-                <article className="bos-home-product-card"><div className="bos-home-product-icon" aria-hidden="true">○</div><div><h3>BOS Wdrożenia</h3><span className="bos-home-product-type">System wdrożenia pracownika</span></div><p>Przygotuj, przeprowadź i zamknij wdrożenie w oparciu o jeden standard.</p><ProductDetailsModal product="onboarding" /></article>
-                <aside className="bos-home-register-card" aria-labelledby="bos-register-title"><div className="bos-home-register-icon" aria-hidden="true">◎</div><h3 id="bos-register-title">Zarejestruj się,<br />aby skorzystać</h3><p>Utwórz konto BOS, uzyskaj dostęp do zakupionych produktów i zarządzaj nimi w swojej organizacji.</p><Link className="bos-home-register-action" href="/register">Załóż konto <span aria-hidden="true">→</span></Link><div className="bos-home-register-meta">Jedno konto · Produkty BOS · Panel organizacji</div></aside>
-                <article className="bos-home-product-card"><div className="bos-home-product-icon bos-home-product-icon-promotions" aria-hidden="true">↗</div><div><h3>BOS Awanse</h3><span className="bos-home-product-type">System awansów wewnętrznych</span></div><p>Rozwijaj kompetencje i buduj ścieżki rozwoju w organizacji.</p><ProductDetailsModal product="promotions" /></article>
-              </div>
-            </div>
-          </section>
+          <ProductRail />
 
           <section className="bos-home-why" aria-labelledby="bos-why-title">
             <div className="bos-page-width">

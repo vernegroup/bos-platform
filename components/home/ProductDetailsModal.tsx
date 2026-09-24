@@ -22,11 +22,11 @@ const data={
  }
 } as const;
 
-export default function ProductDetailsModal({product}:{product:ProductKey}){
+export default function ProductDetailsModal({product,variant="default"}:{product:ProductKey;variant?:"default"|"rail"}){
  const [open,setOpen]=useState(false); const [videoFailed,setVideoFailed]=useState(false); const closeRef=useRef<HTMLButtonElement>(null); const d=data[product];
  useEffect(()=>{if(!open)return;setVideoFailed(false);const previous=document.body.style.overflow;document.body.style.overflow="hidden";closeRef.current?.focus();const key=(e:KeyboardEvent)=>{if(e.key==="Escape")setOpen(false)};document.addEventListener("keydown",key);return()=>{document.body.style.overflow=previous;document.removeEventListener("keydown",key)}},[open]);
  return <>
-  <button type="button" className="bos-product-more" onClick={()=>setOpen(true)}>Dowiedz się więcej <span aria-hidden="true">→</span></button>
+  <button type="button" className={variant==="rail"?"bos-product-rail__reveal":"bos-product-more"} onClick={()=>setOpen(true)}>{variant==="rail"?"POZNAJ":"Dowiedz się więcej"} <span aria-hidden="true">→</span></button>
   {open&&<div className="bos-product-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setOpen(false)}}>
    <section className="bos-product-modal" role="dialog" aria-modal="true" aria-labelledby={"modal-"+product}>
     <button ref={closeRef} className="bos-product-modal-close" type="button" aria-label="Zamknij" onClick={()=>setOpen(false)}>×</button>
