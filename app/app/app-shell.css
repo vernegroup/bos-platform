@@ -3751,3 +3751,16 @@
  .bos-onboarding-shell :where(button,a),.bos-promotions-shell :where(button,a){font-size:10px}
  .bos-onboarding-shell td,.bos-onboarding-shell th,.bos-promotions-shell td,.bos-promotions-shell th{padding:8px 6px!important}
 }
+
+/* UI TYPOGRAPHY FIX — application headings are operational, never editorial. */
+.bos-app-shell .bos-app-workspace :where(h1,h2,h3),
+.bos-app-shell .bos-onboarding-shell :where(h1,h2,h3),
+.bos-app-shell .bos-promotions-shell :where(h1,h2,h3){
+  font-family:Arial,"Helvetica Neue",Helvetica,sans-serif!important;
+}
+.bos-app-shell .bos-app-workspace h1,
+.bos-app-shell .bos-onboarding-shell h1,
+.bos-app-shell .bos-promotions-shell h1{
+  font-weight:600;
+  letter-spacing:-.025em;
+}
