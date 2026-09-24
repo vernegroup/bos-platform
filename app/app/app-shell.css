@@ -3764,3 +3764,11 @@
   font-weight:600;
   letter-spacing:-.025em;
 }
+
+/* DASHBOARD WIDTH FIX — tighter operational canvas and product section. */
+.bos-app-workspace{width:min(1080px,calc(100% - 64px));margin-left:auto;margin-right:auto}
+.bos-home-products{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bos-home-product{min-width:0}
+@media(max-width:1180px){.bos-app-workspace{width:min(1000px,calc(100% - 48px))}}
+@media(max-width:900px){.bos-app-workspace{width:calc(100% - 36px)}}
+@media(max-width:620px){.bos-app-workspace{width:calc(100% - 24px)}.bos-home-products{grid-template-columns:1fr}}
