@@ -12,6 +12,8 @@ async function reopen(formData:FormData) {
 const mark=(value?:string|Date)=>value?"✓":"—";
 const shortDate=(value?:string|Date)=>value?new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(value)):"—";
 
+const verificationMethodLabel=(value:string)=>({OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"} as Record<string,string>)[value]??value;
+
 export default async function ClosureDetailPage({ params }: { params: Promise<{ closureId: string }> }) {
   const access=await requireBOSAccess(); const {closureId}=await params;
   const [closure,outcome]=await Promise.all([getClosure(closureId,access.organization.id),getClosureOutcome(closureId,access.organization.id)]);
@@ -62,7 +64,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
       {outcome.snapshotAvailable&&<section className="bos-outcome-section">
         <div className="bos-outcome-title"><span>02</span><div><strong>KRYTERIA GOTOWOŚCI</strong><small>Wyniki końcowej weryfikacji</small></div></div>
         <div className="bos-outcome-readiness">
-          {version.readinessCriteria.map(c=>{const x=outcome.readinessChecks.find(v=>v.criterionId===c.id);return <div key={c.id} className={x?.isPassed?"is-pass":""}><span>{x?.isPassed?"✓":"—"}</span><div><strong>{c.criterion}</strong><small>{c.verificationMethod}{x?.checkedAt?` · ${shortDate(x.checkedAt)}`:""}</small>{x?.note&&<p>{x.note}</p>}</div></div>})}
+          {version.readinessCriteria.map(c=>{const x=outcome.readinessChecks.find(v=>v.criterionId===c.id);return <div key={c.id} className={x?.isPassed?"is-pass":""}><span>{x?.isPassed?"✓":"—"}</span><div><strong>{c.criterion}</strong><small>{verificationMethodLabel(c.verificationMethod)}{x?.checkedAt?` · ${shortDate(x.checkedAt)}`:""}</small>{x?.note&&<p>{x.note}</p>}</div></div>})}
         </div>
         <div className="bos-outcome-facts"><span>KRYTERIA POTWIERDZONE <b>{readinessDone===version.readinessCriteria.length&&version.readinessCriteria.length>0?"✓":"—"}</b></span></div>
       </section>}
