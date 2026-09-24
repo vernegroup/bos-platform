@@ -59,3 +59,24 @@
 .bos-public-beam--n8{right:4vw;top:64vh;width:38vw;transform:rotate(0deg) translate3d(calc(var(--bos-public-scroll)*1.5vw),0,-280px)}
 .bos-public-beam--n9{right:-12vw;top:68vh;width:55vw;transform:rotate(-2deg) translate3d(calc(var(--bos-public-scroll)*2vw),0,-80px)}
 .bos-public-scene__haze{background:linear-gradient(90deg,transparent 18%,rgba(12,61,105,.11) 45%,transparent 72%),linear-gradient(96deg,transparent 52%,rgba(102,35,132,.09) 76%,transparent 96%),linear-gradient(0deg,rgba(7,17,31,.38),transparent 28%);filter:blur(18px)}
+
+/* BALANCE FIX — compact luminous structure on the right, dark breathing room on the left. */
+.bos-public-scene__architecture{
+  inset:2% -2% 8% 38%;
+  transform:translate3d(calc(var(--bos-public-mouse-x)*-.18vw),calc(var(--bos-public-mouse-y)*-.12vh),-330px) scale(.78,.82);
+  transform-origin:72% 50%;
+}
+.bos-public-scene__beams{
+  inset:4% -1% 10% 36%;
+  transform:translate3d(0,0,-250px) scale(.82);
+  transform-origin:74% 52%;
+}
+.bos-public-scene__mist--left{opacity:.08}
+.bos-public-scene__mist--right{right:-14vw;top:13vh;width:52vw;height:52vw;opacity:.13}
+.bos-public-scene__base{background:
+ radial-gradient(ellipse at 73% 47%,rgba(7,25,45,.62),transparent 31%),
+ radial-gradient(ellipse at 84% 50%,rgba(45,13,63,.27),transparent 30%),
+ linear-gradient(180deg,#010205 0%,#020611 54%,#010204 100%)}
+.bos-public-scene__vignette{background:
+ radial-gradient(ellipse at 73% 48%,transparent 18%,rgba(0,0,0,.12) 55%,rgba(0,0,0,.7) 100%),
+ linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.18) 34%,transparent 58%,rgba(0,0,0,.38))}

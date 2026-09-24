@@ -127,3 +127,22 @@
 }
 .bos-public-root .bos-footer-links a:hover,
 .bos-public-root .bos-footer-links a:focus-visible{color:#d2a45b}
+
+/* FOOTER PROPORTION FIX — compact terminal bar, independent from the scene scale. */
+.bos-public-root .bos-bottom-bar{background:#010204;backdrop-filter:none}
+.bos-public-root .bos-bottom-bar .bos-page-width{width:min(92vw,1380px);margin:0 auto}
+.bos-public-root .bos-bottom-bar-inner{
+  min-height:92px;
+  padding:22px 0 18px;
+  grid-template-columns:1.35fr .8fr .65fr;
+  gap:clamp(32px,5vw,72px);
+}
+.bos-public-root .bos-footer-brand-mark{font-size:22px}
+.bos-public-root .bos-footer-brand-name{margin-top:5px;font-size:7px}
+.bos-public-root .bos-footer-title{margin-bottom:6px;font-size:8px}
+.bos-public-root .bos-footer-row{margin-top:2px;font-size:9px;line-height:1.4}
+.bos-public-root .bos-footer-legal{min-height:38px;padding:10px 0 12px;font-size:8px}
+@media(max-width:800px){
+ .bos-public-root .bos-bottom-bar .bos-page-width{width:calc(100vw - 48px)}
+ .bos-public-root .bos-bottom-bar-inner{min-height:auto;padding:24px 0 20px}
+}

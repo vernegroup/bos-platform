@@ -102,3 +102,6 @@
   .bos-public-hero__marker{left:24px;bottom:24px}
 }
 @media(prefers-reduced-motion:reduce){.bos-public-hero__marker{display:none}}
+
+/* CLEANUP: no legacy scroll marker. */
+.bos-public-hero__marker{display:none!important}
