@@ -1,0 +1,129 @@
+/* PUBLIC-02 — fixed spatial foundation for the public BOS home.
+   Content remains untouched until the following PUBLIC stages. */
+
+:root {
+  --bos-public-scroll: 0;
+  --bos-public-navy: #061426;
+  --bos-public-navy-deep: #020913;
+  --bos-public-blue: #0b2743;
+  --bos-public-gold: #bd9147;
+}
+
+.bos-public-root {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  background: var(--bos-public-navy-deep);
+  color: #fff;
+}
+
+.bos-public-content {
+  position: relative;
+  z-index: 2;
+}
+
+.bos-public-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bos-public-navy-deep);
+}
+
+.bos-public-scene > * {
+  position: absolute;
+  inset: 0;
+}
+
+.bos-public-scene__base {
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(17, 59, 91, .62) 0%, rgba(6, 20, 38, .74) 42%, rgba(2, 9, 19, .98) 78%),
+    linear-gradient(180deg, #081a2e 0%, #04101f 58%, #020913 100%);
+}
+
+.bos-public-scene__glow {
+  inset: auto;
+  width: min(62vw, 980px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: .22;
+  will-change: transform;
+}
+
+.bos-public-scene__glow--left {
+  left: -28vw;
+  top: 14vh;
+  background: radial-gradient(circle, rgba(33, 93, 137, .55), transparent 67%);
+  transform: translate3d(0, calc(var(--bos-public-scroll) * -6vh), 0);
+}
+
+.bos-public-scene__glow--right {
+  right: -31vw;
+  top: 46vh;
+  background: radial-gradient(circle, rgba(189, 145, 71, .24), transparent 66%);
+  transform: translate3d(0, calc(var(--bos-public-scroll) * 8vh), 0);
+}
+
+.bos-public-scene__grid {
+  inset: 38vh -18vw -30vh;
+  opacity: .16;
+  transform-origin: 50% 0;
+  transform: perspective(650px) rotateX(67deg) translateY(calc(var(--bos-public-scroll) * -5vh));
+  background-image:
+    linear-gradient(rgba(126, 167, 197, .18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(126, 167, 197, .18) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, transparent, #000 15%, #000 62%, transparent);
+}
+
+.bos-public-scene__horizon {
+  top: 42vh;
+  bottom: auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 7%, rgba(189, 145, 71, .08) 31%, rgba(189, 145, 71, .46) 50%, rgba(189, 145, 71, .08) 69%, transparent 93%);
+  box-shadow: 0 0 38px rgba(189, 145, 71, .12);
+}
+
+.bos-public-scene__signal {
+  inset: 18vh auto auto 50%;
+  width: 1px;
+  height: 56vh;
+  opacity: .42;
+  background: linear-gradient(to bottom, transparent, rgba(189, 145, 71, .62) 48%, transparent);
+  box-shadow: 0 0 18px rgba(189, 145, 71, .18);
+  will-change: transform;
+}
+
+.bos-public-scene__vignette {
+  background:
+    linear-gradient(90deg, rgba(0, 5, 12, .54), transparent 24%, transparent 76%, rgba(0, 5, 12, .54)),
+    linear-gradient(180deg, rgba(0, 5, 12, .12), transparent 52%, rgba(0, 5, 12, .58));
+}
+
+@media (max-width: 800px) {
+  .bos-public-scene__grid {
+    inset-left: -65vw;
+    inset-right: -65vw;
+    background-size: 54px 54px;
+  }
+
+  .bos-public-scene__horizon {
+    top: 36vh;
+  }
+
+  .bos-public-scene__glow {
+    width: 110vw;
+    opacity: .18;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bos-public-scene__glow,
+  .bos-public-scene__grid,
+  .bos-public-scene__signal {
+    transform: none !important;
+    will-change: auto;
+  }
+}
