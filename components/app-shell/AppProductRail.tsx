@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const products=[
+type RailProduct={label:string;href?:string};
+
+const products:RailProduct[]=[
   {label:"ONBOARDING",href:"/app/onboarding"},
   {label:"PROMOTIONS",href:"/app/promotions"},
   {label:"WORK"},
   {label:"PRICING"},
   {label:"COMPLIANCE"},
-] as const;
+];
 
 export default function AppProductRail(){
   const pathname=usePathname();
