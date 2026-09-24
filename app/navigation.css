@@ -301,3 +301,11 @@
   .bos-public-root .bos-topbar{background:linear-gradient(180deg,rgba(1,2,4,.94),rgba(1,2,4,.55) 75%,transparent)}
   .bos-public-root .bos-topbar-login{min-height:38px;padding:0 14px}
 }
+
+/* PUBLIC AUTH PAIR */
+.bos-public-root .bos-topbar-auth{display:flex;align-items:center;gap:10px}
+.bos-public-root .bos-topbar-register{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border:1px solid #d2a45b;background:#d2a45b;color:#080a0e;font-size:10px;font-weight:800;letter-spacing:1.3px;text-decoration:none;text-transform:uppercase;transition:background .18s ease,border-color .18s ease}
+.bos-public-root .bos-topbar-register:hover,.bos-public-root .bos-topbar-register:focus-visible{background:#e1b76e;border-color:#e1b76e}
+@media(min-width:701px){.bos-public-root .bos-topbar-auth{grid-column:2;justify-self:center}.bos-public-root .bos-topbar-login{grid-column:auto;justify-self:auto}}
+@media(max-width:700px){.bos-public-root .bos-topbar-auth{order:1}.bos-public-root .bos-topbar-register{min-height:38px;padding:0 14px;font-size:9px}.bos-public-root .bos-topbar-login{order:initial}}
+@media(max-width:460px){.bos-public-root .bos-topbar-auth{gap:6px}.bos-public-root .bos-topbar-register,.bos-public-root .bos-topbar-login{padding:0 9px;font-size:8px}}

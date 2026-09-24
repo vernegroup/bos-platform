@@ -20,10 +20,15 @@ export default function TopBar() {
           <div className="bos-topbar-primary-links">
           </div>
 
-          <Link className="bos-topbar-login" href="/login">
-            Zaloguj się
-            <span aria-hidden="true">→</span>
-          </Link>
+          <div className="bos-topbar-auth">
+            <Link className="bos-topbar-login" href="/login">
+              Zaloguj się
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="bos-topbar-register" href="/register">
+              Zarejestruj się
+            </Link>
+          </div>
 
           <div className="bos-topbar-secondary-links">
             <a className="bos-topbar-link" href="#produkty">Produkty</a>
