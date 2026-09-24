@@ -36,8 +36,8 @@ export default async function NewProcessPage(){
   return <>
     <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / NOWE WDROŻENIE</div>
-      <h1>Rozpocznij wdrożenie</h1><p>Proces zostanie przypisany do pracownika z Employee Core i dokładnie wybranej opublikowanej wersji Standardu.</p></div>
-      <div className="bos-app-build-state"><span>POWIĄZANIE</span><strong>EMPLOYEE / STANDARDVERSION</strong></div>
+      <h1>Rozpocznij wdrożenie</h1><p>Proces zostanie przypisany do pracownika i dokładnie wybranej opublikowanej wersji Standardu.</p></div>
+      <div className="bos-app-build-state"><span>POWIĄZANIE</span><strong>PRACOWNIK / WERSJA STANDARDU</strong></div>
     </section>
     <section className="bos-process-new">
       {!options.standards.length||!options.members.length||!onboardingProduct?<div className="bos-operational-empty"><strong>Nie można utworzyć wdrożenia</strong>
@@ -54,7 +54,7 @@ export default async function NewProcessPage(){
           <input name="newEmployeeNumber" placeholder="Numer pracownika / opcjonalnie" style={{padding:10}}/>
           <input name="newEmployeePosition" placeholder="Stanowisko / opcjonalnie" style={{padding:10}}/>
           <input name="newEmployeeDepartment" placeholder="Dział / opcjonalnie" style={{padding:10}}/>
-          <small>Nazwa pracownika zostanie zachowana także jako historyczny snapshot procesu.</small></div>
+          <small>Nazwa pracownika zostanie zachowana także w historycznym zapisie procesu.</small></div>
         <div className="bos-process-new-field"><span>02 / STANDARD</span><strong>Opublikowana wersja Standardu</strong>
           <select name="standardVersion" required defaultValue="" style={{padding:10}}><option value="" disabled>Wybierz Standard i wersję</option>
             {options.standards.map(s=><option value={`${s.standardId}:${s.versionId}`} key={s.versionId}>{s.name} · {s.version}{s.area?` · ${s.area}`:""}</option>)}</select></div>

@@ -62,7 +62,7 @@ export default async function NewStandardPage({
       </form>
 
       <div className="bos-onboarding-rule-note">
-        <span>STATUS DRAFT</span>
+        <span>STATUS: WERSJA ROBOCZA</span>
         <p>Utworzenie Standardu nie publikuje go i nie pozwala jeszcze uruchomić na nim onboardingu. Publikacja nastąpi dopiero po przejściu kontroli kompletności.</p>
       </div>
     </>
