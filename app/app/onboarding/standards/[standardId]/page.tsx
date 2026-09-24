@@ -153,8 +153,12 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   const completeness=validateStandardCompleteness({name:standard.name,roleDescription:current.roleDescription,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   const requestHeaders=await headers();
-  const host=requestHeaders.get("x-forwarded-host")??requestHeaders.get("host")??"standardybiznesu.pl";
-  const protocol=requestHeaders.get("x-forwarded-proto")??(host.includes("localhost")?"http":"https");
+  const forwardedHost=requestHeaders.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const requestHost=requestHeaders.get("host")?.split(",")[0]?.trim();
+  const vercelHost=process.env.VERCEL_URL?.trim();
+  const host=forwardedHost||requestHost||vercelHost||"localhost:3000";
+  const forwardedProtocol=requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol=forwardedProtocol||(host.startsWith("localhost")?"http":"https");
   const qrTarget=`${protocol}://${host}/q/${standard.id}`;
   const qrImage=`https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=16&data=${encodeURIComponent(qrTarget)}`;
   return <>
