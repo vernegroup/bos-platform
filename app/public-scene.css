@@ -3,6 +3,8 @@
 
 :root {
   --bos-public-scroll: 0;
+  --bos-public-mouse-x: 0;
+  --bos-public-mouse-y: 0;
   --bos-public-black: #010204;
   --bos-public-navy: #030a14;
   --bos-public-gold: #bd9147;
@@ -48,12 +50,12 @@
 .bos-public-scene__volume--one {
   left: -30vw; top: 5vh;
   background: rgba(0,145,255,.48);
-  transform: translate3d(0,calc(var(--bos-public-scroll) * -7vh),-80px);
+  transform: translate3d(calc(var(--bos-public-mouse-x) * -1.2vw),calc(var(--bos-public-scroll) * -7vh + var(--bos-public-mouse-y) * -1vh),-80px);
 }
 .bos-public-scene__volume--two {
   right: -34vw; bottom: -20vh;
   background: rgba(112,48,210,.34);
-  transform: translate3d(0,calc(var(--bos-public-scroll) * 9vh),-160px);
+  transform: translate3d(calc(var(--bos-public-mouse-x) * .8vw),calc(var(--bos-public-scroll) * 9vh + var(--bos-public-mouse-y) * .7vh),-160px);
 }
 
 .bos-public-scene__plane {
@@ -70,12 +72,12 @@
 }
 .bos-public-scene__plane--floor {
   top: 54vh;
-  transform: rotateX(72deg) translateY(calc(var(--bos-public-scroll) * -5vh));
+  transform: rotateX(72deg) translate3d(calc(var(--bos-public-mouse-x) * -.6vw),calc(var(--bos-public-scroll) * -5vh + var(--bos-public-mouse-y) * -.5vh),0);
 }
 .bos-public-scene__plane--ceiling {
   bottom: 51vh;
   transform-origin: 50% 100%;
-  transform: rotateX(-72deg) translateY(calc(var(--bos-public-scroll) * 3vh));
+  transform: rotateX(-72deg) translate3d(calc(var(--bos-public-mouse-x) * .4vw),calc(var(--bos-public-scroll) * 3vh + var(--bos-public-mouse-y) * .35vh),0);
   opacity: .06;
 }
 
@@ -117,14 +119,20 @@
 .bos-public-light--mid { opacity:.42; transform:scale(.78); }
 .bos-public-light--far { opacity:.27; transform:scale(.48); filter:blur(.15px); }
 
-.bos-public-light--n1 { left:-2vw; top:23vh; transform:rotate(-7deg) translate3d(calc(var(--bos-public-scroll) * -5vw),0,180px); }
-.bos-public-light--n2 { left:17vw; top:69vh; transform:rotate(4deg) scale(.48) translate3d(calc(var(--bos-public-scroll) * -2vw),0,-240px); }
-.bos-public-light--n3 { right:14vw; top:29vh; transform:rotate(-3deg) scale(.78) translate3d(calc(var(--bos-public-scroll) * 3vw),0,-40px); }
-.bos-public-light--n4 { right:-3vw; top:64vh; transform:rotate(8deg) translate3d(calc(var(--bos-public-scroll) * 6vw),0,210px); }
-.bos-public-light--n5 { left:47vw; top:78vh; transform:rotate(-2deg) scale(.48) translate3d(0,calc(var(--bos-public-scroll) * 2vh),-300px); }
-.bos-public-light--n6 { left:39vw; top:35vh; transform:rotate(2deg) scale(.78) translate3d(0,calc(var(--bos-public-scroll) * -3vh),-70px); }
-.bos-public-light--n7 { left:28vw; top:52vh; transform:rotate(-10deg) translate3d(calc(var(--bos-public-scroll) * -4vw),0,150px); }
-.bos-public-light--n8 { right:32vw; top:16vh; transform:rotate(6deg) scale(.48) translate3d(calc(var(--bos-public-scroll) * 2vw),0,-280px); }
+/* Motion stays restrained: depth is perceived from differential movement, not animation spectacle. */
+.bos-public-scene__volume,
+.bos-public-scene__plane,
+.bos-public-light { backface-visibility:hidden; }
+
+
+.bos-public-light--n1 { left:-2vw; top:23vh; transform:rotate(-7deg) translate3d(calc(var(--bos-public-scroll) * -5vw + var(--bos-public-mouse-x) * -2.4vw),calc(var(--bos-public-mouse-y) * -1.6vh),180px); }
+.bos-public-light--n2 { left:17vw; top:69vh; transform:rotate(4deg) scale(.48) translate3d(calc(var(--bos-public-scroll) * -2vw + var(--bos-public-mouse-x) * -.45vw),calc(var(--bos-public-mouse-y) * -.3vh),-240px); }
+.bos-public-light--n3 { right:14vw; top:29vh; transform:rotate(-3deg) scale(.78) translate3d(calc(var(--bos-public-scroll) * 3vw + var(--bos-public-mouse-x) * 1vw),calc(var(--bos-public-mouse-y) * .7vh),-40px); }
+.bos-public-light--n4 { right:-3vw; top:64vh; transform:rotate(8deg) translate3d(calc(var(--bos-public-scroll) * 6vw + var(--bos-public-mouse-x) * 2.7vw),calc(var(--bos-public-mouse-y) * 1.8vh),210px); }
+.bos-public-light--n5 { left:47vw; top:78vh; transform:rotate(-2deg) scale(.48) translate3d(calc(var(--bos-public-mouse-x) * -.35vw),calc(var(--bos-public-scroll) * 2vh + var(--bos-public-mouse-y) * -.25vh),-300px); }
+.bos-public-light--n6 { left:39vw; top:35vh; transform:rotate(2deg) scale(.78) translate3d(calc(var(--bos-public-mouse-x) * .8vw),calc(var(--bos-public-scroll) * -3vh + var(--bos-public-mouse-y) * .55vh),-70px); }
+.bos-public-light--n7 { left:28vw; top:52vh; transform:rotate(-10deg) translate3d(calc(var(--bos-public-scroll) * -4vw + var(--bos-public-mouse-x) * -2vw),calc(var(--bos-public-mouse-y) * 1.3vh),150px); }
+.bos-public-light--n8 { right:32vw; top:16vh; transform:rotate(6deg) scale(.48) translate3d(calc(var(--bos-public-scroll) * 2vw + var(--bos-public-mouse-x) * .4vw),calc(var(--bos-public-mouse-y) * -.3vh),-280px); }
 
 .bos-public-scene__vignette {
   inset:0;
