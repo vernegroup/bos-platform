@@ -3716,3 +3716,38 @@
 @media(max-width:900px){.bos-app-workspace{width:calc(100% - 36px)}.bos-app-product-rail{padding:0 18px;gap:20px}.bos-app-product-rail-track{gap:24px}.bos-products-grid{grid-template-columns:1fr}}
 @media(max-width:800px){.bos-app-shell{grid-template-columns:1fr}.bos-app-product-rail{height:52px}}
 @media(max-width:520px){.bos-app-workspace{width:calc(100% - 24px)}.bos-app-product-rail{padding:0 12px}.bos-app-product-rail-label{display:none}.bos-app-product-rail-track{gap:20px}}
+
+/* UI-POLISH-01 — typography, rhythm and restrained operational states */
+.bos-app-shell{font-size:13px;line-height:1.45}
+.bos-app-workspace :where(h1,h2,h3,p){margin-top:0}
+.bos-app-workspace h1{font-family:var(--bos-font-heading),Georgia,serif;font-size:clamp(22px,2vw,30px);line-height:1.08;font-weight:500;letter-spacing:-.015em}
+.bos-app-workspace h2{font-size:16px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+.bos-app-workspace h3{font-size:13px;line-height:1.3;font-weight:700}
+.bos-app-workspace p{font-size:12px;line-height:1.55;color:#707980}
+.bos-app-workspace :where(.bos-kicker,.bos-eyebrow,[class*="kicker"],[class*="eyebrow"]){font-size:8px!important;line-height:1.25;letter-spacing:.13em;font-weight:800}
+.bos-onboarding-shell,.bos-promotions-shell{font-size:12px;line-height:1.45}
+.bos-onboarding-shell :where(section,article),.bos-promotions-shell :where(section,article){scroll-margin-top:90px}
+.bos-onboarding-shell :where(h1,h2,h3),.bos-promotions-shell :where(h1,h2,h3){overflow-wrap:normal;word-break:normal}
+.bos-onboarding-shell :where(button,a),.bos-promotions-shell :where(button,a){line-height:1.25}
+.bos-onboarding-shell :where(table,ul,ol),.bos-promotions-shell :where(table,ul,ol){font-size:11px}
+.bos-onboarding-shell td,.bos-onboarding-shell th,.bos-promotions-shell td,.bos-promotions-shell th{padding-top:9px!important;padding-bottom:9px!important;vertical-align:middle}
+.bos-onboarding-shell [class*="title"],.bos-promotions-shell [class*="title"]{max-width:100%;overflow-wrap:break-word}
+.bos-onboarding-shell [class*="status"],.bos-promotions-shell [class*="status"]{letter-spacing:.08em}
+.bos-onboarding-shell :where([class*="success"],[class*="ready"],[class*="decision"]),
+.bos-promotions-shell :where([class*="success"],[class*="ready"],[class*="decision"]){box-shadow:none!important}
+.bos-onboarding-shell :where([class*="success"],[class*="ready"]){background:#f8faf8!important;border-color:#cfd8d1!important;color:#315d42!important}
+.bos-onboarding-shell :where([class*="success"],[class*="ready"]) h1,
+.bos-onboarding-shell :where([class*="success"],[class*="ready"]) h2,
+.bos-onboarding-shell :where([class*="success"],[class*="ready"]) h3,
+.bos-onboarding-shell :where([class*="success"],[class*="ready"]) strong{color:#315d42!important}
+.bos-onboarding-shell :where([class*="success"],[class*="ready"]) :where(h1,h2,h3,strong){font-size:inherit}
+.bos-onboarding-shell a,.bos-promotions-shell a{text-underline-offset:3px}
+.bos-onboarding-shell :where(button,[role="button"]),.bos-promotions-shell :where(button,[role="button"]){min-width:0;white-space:normal;overflow-wrap:normal;word-break:normal}
+.bos-onboarding-shell :where([class*="row"],[class*="item"]),.bos-promotions-shell :where([class*="row"],[class*="item"]){min-width:0}
+@media(max-width:700px){
+ .bos-app-workspace{padding-top:20px}
+ .bos-app-workspace h1{font-size:23px}
+ .bos-onboarding-shell,.bos-promotions-shell{font-size:11px}
+ .bos-onboarding-shell :where(button,a),.bos-promotions-shell :where(button,a){font-size:10px}
+ .bos-onboarding-shell td,.bos-onboarding-shell th,.bos-promotions-shell td,.bos-promotions-shell th{padding:8px 6px!important}
+}
