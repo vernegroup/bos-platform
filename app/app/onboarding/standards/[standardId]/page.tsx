@@ -247,7 +247,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
       current.startRequirements.map((requirement,index)=><details className="bos-saved-editor-card" key={requirement.id}>
-        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {{TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"}[requirement.category]??requirement.category}</span><strong>{requirement.requirement}</strong>{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
+        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {({TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"} as Record<string,string>)[requirement.category]??requirement.category}</span><strong>{requirement.requirement}</strong>{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
         <div className="bos-standard-editor-row bos-editor-action-layout">
         {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="requirementId" value={requirement.id}/>
@@ -284,7 +284,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
       current.readinessCriteria.map((criterion,index)=><details className="bos-saved-editor-card" key={criterion.id}>
-        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {{OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"}[criterion.verificationMethod]??criterion.verificationMethod}</span><strong>{criterion.criterion}</strong>{criterion.verificationMethodOther&&<small>{criterion.verificationMethodOther}</small>}{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
+        <summary className="bos-saved-editor-summary"><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {({OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"} as Record<string,string>)[criterion.verificationMethod]??criterion.verificationMethod}</span><strong>{criterion.criterion}</strong>{criterion.verificationMethodOther&&<small>{criterion.verificationMethodOther}</small>}{isDraft&&<b className="bos-saved-edit-label">EDYTUJ</b>}</summary>
         <div className="bos-standard-editor-row bos-editor-action-layout">
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="criterionId" value={criterion.id}/>
