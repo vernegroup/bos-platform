@@ -105,3 +105,25 @@
     grid-column:auto;
   }
 }
+
+
+/* PUBLIC-07 — footer remains legal/informational, visually part of the dark world */
+.bos-public-root .bos-bottom-bar{
+  position:relative;
+  z-index:2;
+  width:100%;
+  background:rgba(1,2,4,.82);
+  border-top:1px solid rgba(255,255,255,.09);
+  color:#eef1f4;
+  backdrop-filter:blur(16px);
+}
+.bos-public-root .bos-footer-brand-mark{color:#d2a45b}
+.bos-public-root .bos-footer-brand-name,
+.bos-public-root .bos-footer-title{color:rgba(244,242,237,.82)}
+.bos-public-root .bos-footer-row{color:rgba(225,231,238,.48)}
+.bos-public-root .bos-footer-legal{
+  border-top-color:rgba(255,255,255,.07);
+  color:rgba(225,231,238,.36);
+}
+.bos-public-root .bos-footer-links a:hover,
+.bos-public-root .bos-footer-links a:focus-visible{color:#d2a45b}

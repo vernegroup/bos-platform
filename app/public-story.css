@@ -1,0 +1,79 @@
+/* PUBLIC-07 — one continuous content journey through the spatial scene */
+.bos-public-story{
+  position:relative;
+  min-height:390vh;
+  color:#f5f3ee;
+}
+.bos-public-story__passage{
+  position:relative;
+  width:min(660px,78vw);
+  padding-top:42vh;
+  padding-bottom:42vh;
+}
+.bos-public-story__passage--left{margin-left:8vw}
+.bos-public-story__passage--right{margin-left:auto;margin-right:9vw}
+.bos-public-story__passage--center{margin-left:31vw}
+.bos-public-story__passage>span{
+  display:block;
+  margin-bottom:24px;
+  color:rgba(214,222,230,.4);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.3em;
+}
+.bos-public-story__passage h2,
+.bos-public-story__closing h2{
+  margin:0;
+  color:#f5f3ee;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(54px,6.5vw,118px);
+  font-weight:400;
+  line-height:.88;
+  letter-spacing:-.045em;
+}
+.bos-public-story__passage p{
+  max-width:480px;
+  margin:34px 0 0;
+  color:rgba(225,231,238,.56);
+  font-size:clamp(13px,1vw,16px);
+  line-height:1.8;
+}
+.bos-public-story__passage--right{text-align:right}
+.bos-public-story__passage--right p{margin-left:auto}
+.bos-public-story__closing{
+  min-height:100vh;
+  padding:26vh 8vw 18vh;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.bos-public-story__closing>p{
+  margin:0 0 22px;
+  color:#d2a45b;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(18px,1.6vw,28px);
+}
+.bos-public-story__closing a{
+  margin-top:46px;
+  min-height:48px;
+  display:inline-flex;
+  align-items:center;
+  gap:24px;
+  border-bottom:1px solid rgba(210,164,91,.75);
+  color:#f5f3ee;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.18em;
+}
+.bos-public-story__closing a span{font-size:16px}
+@media(max-width:800px){
+  .bos-public-story{min-height:310vh}
+  .bos-public-story__passage{width:calc(100vw - 48px);padding-top:32vh;padding-bottom:32vh}
+  .bos-public-story__passage--left,
+  .bos-public-story__passage--right,
+  .bos-public-story__passage--center{margin-left:24px;margin-right:24px;text-align:left}
+  .bos-public-story__passage--right p{margin-left:0}
+  .bos-public-story__passage h2,.bos-public-story__closing h2{font-size:clamp(48px,14vw,78px)}
+  .bos-public-story__closing{padding-left:24px;padding-right:24px}
+}
