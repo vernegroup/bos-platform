@@ -170,7 +170,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
     </nav>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">STANDARD STANOWISKA</div><h1>{standard.name}</h1>
       <p>{standard.area} · {current.version===standard.currentVersion?"aktywna wersja":"wersja archiwalna"} {current.version} · aktualizacja {standard.updatedAt}</p></div>
-      <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status==="DRAFT"?"ROBOCZY":standard.status==="PUBLISHED"?"OPUBLIKOWANY":standard.status==="ARCHIVED"?"ARCHIWALNY":standard.status}</strong></div></section>
+      <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
     <aside className="bos-guidance bos-guidance-primary">
       <div><span className="bos-guidance-eyebrow">TERAZ · PRZYGOTUJ</span><strong>Zbuduj wzorzec stanowiska</strong>
       <p>Po tej części Standard ma odpowiadać na trzy pytania: czego nauczyć, na co szczególnie uważać i po czym poznać gotowość.</p></div>
