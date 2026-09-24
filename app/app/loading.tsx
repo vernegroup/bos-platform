@@ -1,1 +1,1 @@
-export default function BOSAppLoading(){return <section className="bos-system-state bos-system-loading" aria-live="polite" aria-busy="true"><span className="bos-system-state-kicker">BOS / ŁADOWANIE</span><div className="bos-system-loading-lines" aria-hidden="true"><i/><i/><i/></div></section>}
+export default function BOSAppLoading(){return null;}
