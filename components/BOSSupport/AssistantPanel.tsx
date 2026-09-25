@@ -36,12 +36,12 @@ export default function AssistantPanel({ onClose }: AssistantPanelProps) {
     <section className="bos-assistant-panel" id="bos-support-window" role="dialog" aria-modal="false" aria-labelledby="bos-assistant-title" data-voice-session={session?.status ?? "idle"}>
       <header className="bos-assistant-header">
         <div>
-          <span className="bos-assistant-eyebrow">BOS ASSISTANT</span>
+          <span className="bos-assistant-eyebrow">BOS ASSISTANT <span className="bos-assistant-ai-badge" aria-label="Asystent AI">AI</span></span>
           <h2 id="bos-assistant-title">Jak mogę pomóc?</h2>
         </div>
         <button className="bos-assistant-close" type="button" onClick={onClose} aria-label="Zamknij BOS Assistant">×</button>
       </header>
-      <VoiceStateIndicator state={voiceState} />
+      <p className="bos-assistant-ai-disclosure" role="note">Rozmawiasz z systemem AI.</p>\n      <VoiceStateIndicator state={voiceState} />
       <TextChat onVoiceStateChange={setVoiceState} onMicrophoneStreamChange={handleStreamChange} />
     </section>
   );

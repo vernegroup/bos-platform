@@ -86,3 +86,14 @@
 @keyframes bosVoicePulse{0%,100%{opacity:.45}50%{opacity:1}}
 @keyframes bosVoiceBars{0%,100%{height:5px}50%{height:16px}}
 @media(prefers-reduced-motion:reduce){.bos-voice-state-requesting .bos-voice-state-dot,.bos-voice-state-bars i{animation:none}}
+\n
+.bos-voice-notice-backdrop{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(15,23,42,.38);backdrop-filter:blur(2px)}
+.bos-voice-notice{width:min(100%,360px);padding:20px;border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(15,23,42,.2);color:#0f172a}
+.bos-voice-notice-label{font-size:10px;font-weight:800;letter-spacing:.1em;color:#475569}
+.bos-voice-notice h3{margin:7px 0 10px;font-size:18px;line-height:1.25}
+.bos-voice-notice p{margin:0;font-size:13px;line-height:1.5;color:#334155}
+.bos-voice-notice .bos-voice-notice-secondary{margin-top:8px;font-size:12px;color:#64748b}
+.bos-voice-notice-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.bos-voice-notice-actions button{min-height:38px;padding:0 14px;border-radius:10px;font-weight:700;cursor:pointer}
+.bos-voice-notice-cancel{border:1px solid #cbd5e1;background:#fff;color:#334155}
+.bos-voice-notice-start{border:1px solid #0f172a;background:#0f172a;color:#fff}
