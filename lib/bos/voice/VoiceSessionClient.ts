@@ -1,13 +1,14 @@
 import { RealtimeWebRTCTransport } from "./RealtimeWebRTCTransport";
 import type { RealtimeEvent, RealtimeEventEnvelope } from "./RealtimeEvents";
 import { createVadSessionUpdate, reduceVadEvent, type VadConfig, type VadSignal, type VadState } from "./VoiceActivityDetection";
+import { INITIAL_BARGE_IN_STATE, createCancelResponseEvent, createTruncateItemEvent, reduceAssistantPlayback, type BargeInState } from "./BargeInController";
 
 export type VoiceSessionStatus = "idle" | "ready" | "connecting" | "connected" | "microphone-active" | "closing" | "closed" | "error";
 
 export type VoiceSessionSnapshot = {
   id: string | null; status: VoiceSessionStatus; startedAt: number | null; endedAt: number | null;
   hasMicrophone: boolean; isRealtimeConnected: boolean; lastEventType: string | null;
-  vadState: VadState; speechStartedAtMs: number | null; speechEndedAtMs: number | null; error: string | null;
+  vadState: VadState; speechStartedAtMs: number | null; speechEndedAtMs: number | null; assistantSpeaking: boolean; interruptionCount: number; error: string | null;
 };
 
 type VoiceSessionListener = (snapshot: VoiceSessionSnapshot) => void;
@@ -16,7 +17,7 @@ type RealtimeEventListener = (envelope: RealtimeEventEnvelope) => void;
 const INITIAL_VAD: VadSignal = { state: "idle", audioStartMs: null, audioEndMs: null };
 const INITIAL_SNAPSHOT: VoiceSessionSnapshot = {
   id:null,status:"idle",startedAt:null,endedAt:null,hasMicrophone:false,isRealtimeConnected:false,lastEventType:null,
-  vadState:"idle",speechStartedAtMs:null,speechEndedAtMs:null,error:null,
+  vadState:"idle",speechStartedAtMs:null,speechEndedAtMs:null,assistantSpeaking:false,interruptionCount:0,error:null,
 };
 
 function createSessionId() {
@@ -31,6 +32,7 @@ export class VoiceSessionClient {
   private microphoneStream: MediaStream | null = null;
   private remoteAudio: HTMLAudioElement | null = null;
   private vad: VadSignal = { ...INITIAL_VAD };
+  private bargeIn: BargeInState = { ...INITIAL_BARGE_IN_STATE };
   private transport = new RealtimeWebRTCTransport({
     onRemoteStream:(stream)=>this.handleRemoteStream(stream),
     onEvent:(envelope)=>this.handleRealtimeEvent(envelope),
@@ -45,6 +47,7 @@ export class VoiceSessionClient {
   start(){
     if(this.snapshot.status!=="idle"&&this.snapshot.status!=="closed")return this.snapshot;
     this.vad={...INITIAL_VAD};
+    this.bargeIn={...INITIAL_BARGE_IN_STATE};
     this.setSnapshot({...INITIAL_SNAPSHOT,id:createSessionId(),status:"ready",startedAt:Date.now()});
     return this.snapshot;
   }
@@ -84,11 +87,26 @@ export class VoiceSessionClient {
 
   private handleRealtimeEvent(envelope:RealtimeEventEnvelope){
     const type=envelope.event.type;
+    const wasSpeaking=this.bargeIn.assistantSpeaking;
+    this.bargeIn=reduceAssistantPlayback(this.bargeIn,envelope.event);
+
+    if(type==="input_audio_buffer.speech_started"&&wasSpeaking){
+      this.interruptAssistant();
+    }
     const error=type==="error"?this.readRealtimeError(envelope.event):this.snapshot.error;
     this.vad=reduceVadEvent(this.vad,envelope.event);
-    this.setSnapshot({...this.snapshot,lastEventType:type,error,vadState:this.vad.state,
-      speechStartedAtMs:this.vad.audioStartMs,speechEndedAtMs:this.vad.audioEndMs});
+    this.setSnapshot({...this.snapshot,lastEventType:type,error,vadState:this.vad.state,\n      speechStartedAtMs:this.vad.audioStartMs,speechEndedAtMs:this.vad.audioEndMs,assistantSpeaking:this.bargeIn.assistantSpeaking});
     this.eventListeners.forEach((listener)=>listener(envelope));
+  }
+
+  private interruptAssistant(){
+    const audioEndMs=this.remoteAudio&&Number.isFinite(this.remoteAudio.currentTime)?this.remoteAudio.currentTime*1000:0;
+    try{this.transport.sendEvent(createCancelResponseEvent());}catch{}
+    const truncate=createTruncateItemEvent(this.bargeIn,audioEndMs);
+    if(truncate){try{this.transport.sendEvent(truncate);}catch{}}
+    if(this.remoteAudio){this.remoteAudio.pause();this.remoteAudio.currentTime=0;}
+    this.bargeIn={...this.bargeIn,assistantSpeaking:false,interruptedAt:Date.now()};
+    this.setSnapshot({...this.snapshot,assistantSpeaking:false,interruptionCount:this.snapshot.interruptionCount+1});
   }
 
   private readRealtimeError(event:RealtimeEvent){
