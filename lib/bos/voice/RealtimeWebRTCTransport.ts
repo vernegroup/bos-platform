@@ -90,7 +90,7 @@ export class RealtimeWebRTCTransport {
 
   private async getCredential(): Promise<RealtimeCredential> {
     const response = await fetch(this.options.sessionEndpoint ?? "/api/voice/session", {
-      method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store",
+      method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, cache: "no-store",
     });
     if (!response.ok) throw new Error(`Voice session endpoint failed (${response.status})`);
     const data = (await response.json()) as { client_secret?: { value?: string }; clientSecret?: string; model?: string; expiresAt?: number | null };

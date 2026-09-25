@@ -13,6 +13,8 @@ function errorResponse(error:string,status:number,headers:Record<string,string>=
   return NextResponse.json({error},{status,headers:{"Cache-Control":"no-store, private",...headers}});
 }
 export async function POST(request: Request) {
+  const cookieHeader=request.headers.get("cookie")??"";
+  console.info("[voice/session] Request auth diagnostic",{hasCookie:Boolean(cookieHeader),hasSessionCookie:/authjs\.session-token|next-auth\.session-token/i.test(cookieHeader),origin:request.headers.get("origin"),host:request.headers.get("host")});
   let principal;
   try { principal=await requireVoicePrincipal(); }
   catch(error){
