@@ -43,3 +43,14 @@
 @media(max-width:1200px){.bos-assistant-panel{right:16px;bottom:80px}}
 @media(max-width:520px){.bos-assistant-panel{right:10px;bottom:72px;width:calc(100vw - 20px);height:min(620px,calc(100dvh - 90px));border-radius:16px}.bos-assistant-header{padding:18px}.bos-assistant-body{padding:18px}.bos-assistant-suggestions{margin-left:0}}
 @media(prefers-reduced-motion:reduce){.bos-assistant-panel{animation:none}}
+
+/* VOICE-CHAT-03 — TextChat */
+.bos-text-chat-list{display:flex;flex-direction:column;gap:14px}
+.bos-assistant-message-user{justify-content:flex-end}
+.bos-assistant-message-user p{border-radius:14px 4px 14px 14px;background:#0E2A47;color:#fff}
+.bos-assistant-message-assistant{justify-content:flex-start}
+.bos-assistant-composer textarea{overflow-y:auto}
+.bos-assistant-send:not(:disabled){cursor:pointer;transition:transform .16s ease,opacity .16s ease}
+.bos-assistant-send:not(:disabled):hover{transform:translateY(-1px);opacity:.92}
+.bos-assistant-send:not(:disabled):focus-visible{outline:3px solid rgba(14,42,71,.18);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.bos-assistant-send:not(:disabled){transition:none}.bos-assistant-send:not(:disabled):hover{transform:none}}
