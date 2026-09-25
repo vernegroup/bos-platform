@@ -24,9 +24,7 @@ export default function ProductRail(){
               <div className="bos-product-rail__name">{product.label}</div>
               {product.available && product.modal ? (
                 <ProductDetailsModal product={product.modal} variant="rail" />
-              ) : (
-                <span className="bos-product-rail__planned">W PRZYGOTOWANIU</span>
-              )}
+              ) : null}
             </article>
           ))}
         </div>
