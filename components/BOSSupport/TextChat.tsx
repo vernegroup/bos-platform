@@ -1,75 +1,16 @@
 "use client";
-
-import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import MicrophoneControl, { type MicrophoneState } from "./MicrophoneControl";
-
-export type TextChatMessage = { id: string; role: "assistant" | "user"; content: string };
-
-const START_MESSAGE: TextChatMessage = {
-  id: "welcome",
-  role: "assistant",
-  content: "Napisz, czego potrzebujesz. Na tym etapie testujemy lokalny przebieg rozmowy; silnik AI zostanie podłączony w kolejnych zadaniach.",
-};
-const LOCAL_REPLY = "Wiadomość została dodana do lokalnej sesji testowej. Po podłączeniu silnika AI w tym miejscu pojawi się właściwa odpowiedź BOS Assistant.";
-
-type TextChatProps = {
-  onFirstMessage?: () => void;
-  onVoiceStateChange?: (state: MicrophoneState) => void;
-  onMicrophoneStreamChange?: (stream: MediaStream | null) => void;
-};
-
-export default function TextChat({ onFirstMessage, onVoiceStateChange, onMicrophoneStreamChange }: TextChatProps) {
-  const [messages, setMessages] = useState<TextChatMessage[]>([START_MESSAGE]);
-  const [draft, setDraft] = useState("");
-  const endRef = useRef<HTMLDivElement>(null);
-  const firstMessageSent = useRef(false);
-
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, [messages]);
-
-  function sendMessage(raw: string) {
-    const content = raw.trim();
-    if (!content) return;
-    const stamp = Date.now();
-    setMessages((current) => [...current,
-      { id: `user-${stamp}`, role: "user", content },
-      { id: `assistant-${stamp}`, role: "assistant", content: LOCAL_REPLY },
-    ]);
-    setDraft("");
-    if (!firstMessageSent.current) { firstMessageSent.current = true; onFirstMessage?.(); }
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); sendMessage(draft); }
-  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); sendMessage(draft); }
-  }
-
-  return (
-    <>
-      <div className="bos-assistant-body" aria-live="polite" aria-relevant="additions">
-        <div className="bos-text-chat-list">
-          {messages.map((message) => (
-            <div className={`bos-assistant-message bos-assistant-message-${message.role}`} key={message.id}>
-              {message.role === "assistant" && <span className="bos-assistant-avatar" aria-hidden="true">B</span>}
-              <p>{message.content}</p>
-            </div>
-          ))}
-          <div ref={endRef} />
-        </div>
-        {messages.length === 1 && (
-          <div className="bos-assistant-suggestions" aria-label="Przykładowe pytania">
-            <button type="button" onClick={() => sendMessage("Pomóż mi wybrać produkt")}>Pomóż mi wybrać produkt</button>
-            <button type="button" onClick={() => sendMessage("Mam pytanie o wdrożenie")}>Mam pytanie o wdrożenie</button>
-            <button type="button" onClick={() => sendMessage("Jak działa BOS?")}>Jak działa BOS?</button>
-          </div>
-        )}
-      </div>
-      <form className="bos-assistant-composer" onSubmit={handleSubmit}>
-        <MicrophoneControl onStateChange={onVoiceStateChange} onStreamChange={onMicrophoneStreamChange} />
-        <textarea rows={1} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleKeyDown} aria-label="Wiadomość do BOS Assistant" placeholder="Napisz wiadomość..." />
-        <button className="bos-assistant-send" type="submit" aria-label="Wyślij wiadomość" disabled={!draft.trim()}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.7 4.2 21 11.1a1 1 0 0 1 0 1.8L3.7 19.8a1 1 0 0 1-1.35-1.13l1.1-5.2L13 12 3.45 10.53l-1.1-5.2A1 1 0 0 1 3.7 4.2Z" /></svg>
-        </button>
-      </form>
-    </>
-  );
+import {FormEvent,KeyboardEvent,useEffect,useRef,useState} from "react";
+import MicrophoneControl,{type MicrophoneState}from"./MicrophoneControl";
+export type TextChatMessage={id:string;role:"assistant"|"user";content:string};
+const START_MESSAGE:TextChatMessage={id:"welcome",role:"assistant",content:"Napisz, czego potrzebujesz. BOS Assistant jest połączony z silnikiem AI."};
+type TextChatProps={onFirstMessage?:()=>void;onVoiceStateChange?:(state:MicrophoneState)=>void;onMicrophoneStreamChange?:(stream:MediaStream|null)=>void};
+export default function TextChat({onFirstMessage,onVoiceStateChange,onMicrophoneStreamChange}:TextChatProps){
+ const[messages,setMessages]=useState<TextChatMessage[]>([START_MESSAGE]);const[draft,setDraft]=useState("");const[waiting,setWaiting]=useState(false);const endRef=useRef<HTMLDivElement>(null);const firstMessageSent=useRef(false);
+ useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages,waiting]);
+ async function sendMessage(raw:string){const content=raw.trim();if(!content||waiting)return;const userMessage:TextChatMessage={id:`user-${Date.now()}`,role:"user",content};const next=[...messages,userMessage];setMessages(next);setDraft("");setWaiting(true);if(!firstMessageSent.current){firstMessageSent.current=true;onFirstMessage?.();}
+  try{const response=await fetch("/api/assistant/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:next.filter(m=>m.id!=="welcome").map(({role,content})=>({role,content}))})});const data=await response.json() as {message?:string;error?:string};if(!response.ok||!data.message)throw new Error(data.error||"AI_ERROR");setMessages(current=>[...current,{id:`assistant-${Date.now()}`,role:"assistant",content:data.message!}]);}
+  catch{setMessages(current=>[...current,{id:`assistant-error-${Date.now()}`,role:"assistant",content:"Nie udało się uzyskać odpowiedzi AI. Spróbuj ponownie za chwilę."}]);}finally{setWaiting(false);}
+ }
+ function handleSubmit(e:FormEvent<HTMLFormElement>){e.preventDefault();void sendMessage(draft);}function handleKeyDown(e:KeyboardEvent<HTMLTextAreaElement>){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();void sendMessage(draft);}}
+ return <><div className="bos-assistant-body" aria-live="polite" aria-relevant="additions"><div className="bos-text-chat-list">{messages.map(m=><div className={`bos-assistant-message bos-assistant-message-${m.role}`} key={m.id}>{m.role==="assistant"&&<span className="bos-assistant-avatar" aria-hidden="true">B</span>}<p>{m.content}</p></div>)}{waiting&&<div className="bos-assistant-message bos-assistant-message-assistant"><span className="bos-assistant-avatar" aria-hidden="true">B</span><p>...</p></div>}<div ref={endRef}/></div>{messages.length===1&&<div className="bos-assistant-suggestions" aria-label="Przykładowe pytania"><button type="button" onClick={()=>void sendMessage("Pomóż mi wybrać produkt")}>Pomóż mi wybrać produkt</button><button type="button" onClick={()=>void sendMessage("Mam pytanie o wdrożenie")}>Mam pytanie o wdrożenie</button><button type="button" onClick={()=>void sendMessage("Jak działa BOS?")}>Jak działa BOS?</button></div>}</div><form className="bos-assistant-composer" onSubmit={handleSubmit}><MicrophoneControl onStateChange={onVoiceStateChange} onStreamChange={onMicrophoneStreamChange}/><textarea rows={1} value={draft} onChange={e=>setDraft(e.target.value)} onKeyDown={handleKeyDown} aria-label="Wiadomość do BOS Assistant" placeholder="Napisz wiadomość..." disabled={waiting}/><button className="bos-assistant-send" type="submit" aria-label="Wyślij wiadomość" disabled={!draft.trim()||waiting}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.7 4.2 21 11.1a1 1 0 0 1 0 1.8L3.7 19.8a1 1 0 0 1-1.35-1.13l1.1-5.2L13 12 3.45 10.53l-1.1-5.2A1 1 0 1 1 3.7 4.2Z"/></svg></button></form></>;
 }
