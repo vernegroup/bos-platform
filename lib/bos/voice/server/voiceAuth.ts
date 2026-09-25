@@ -1,8 +1,4 @@
-import type { Session } from "next-auth";
-import { auth } from "@/auth";
-import { db } from "@/lib/db";
+import { resolveBOSAccess } from "@/lib/bos/access";
 export type VoicePrincipal={userId:string;email:string|null;role:string|null};
 export class VoiceAuthError extends Error{readonly status=401;readonly code="UNAUTHORIZED";}
-async function resolveUserRole(userId:string){const sql=db();try{const rows=await sql.unsafe("SELECT role FROM organization_members WHERE user_id=$1 AND status='ACTIVE' ORDER BY created_at ASC LIMIT 1",[userId]);return typeof rows[0]?.role==="string"?rows[0].role:null;}catch(error){console.warn("[voice/auth] User role unavailable",error);return null;}}
-async function resolveUserIdByEmail(email:string){const sql=db();try{const rows=await sql.unsafe("SELECT id FROM users WHERE lower(email)=$1 AND status IN ('ACTIVE','INVITED') LIMIT 1",[email]);return typeof rows[0]?.id==="string"?rows[0].id:null;}catch(error){console.warn("[voice/auth] User id lookup unavailable",error);return null;}}
-export async function requireVoicePrincipal():Promise<VoicePrincipal>{const session=(await auth())as Session|null;const email=session?.user?.email?.trim().toLowerCase()||null;let userId=session?.user?.id?.trim()||null;if(!userId&&email)userId=await resolveUserIdByEmail(email);if(!userId){console.warn("[voice/auth] Missing authenticated BOS user",{hasSession:Boolean(session),hasEmail:Boolean(email)});throw new VoiceAuthError();}return{userId,email,role:await resolveUserRole(userId)};}
+export async function requireVoicePrincipal():Promise<VoicePrincipal>{const access=await resolveBOSAccess();if(!access){console.warn("[voice/auth] BOS access unavailable");throw new VoiceAuthError();}return{userId:access.user.id,email:access.user.email,role:access.membership.role};}
