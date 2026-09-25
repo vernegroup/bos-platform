@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
+import { AnalyticsPreviewBridge } from "@/components/analytics/AnalyticsPreviewBridge";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,7 +30,7 @@ export default function RootLayout({
       lang="pl"
       className={`${inter.variable} ${cormorant.variable}`}
     >
-      <body>{children}</body>
+      <body><AnalyticsPreviewBridge />{children}</body>
     </html>
   );
 }
