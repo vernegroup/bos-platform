@@ -7,7 +7,7 @@ const FORBIDDEN_KEYS = new Set(["password","passwd","passcode","secret","token",
 const SENSITIVE_KEY_PARTS = ["password","secret","token","authorization","cookie","prompt","conversation","transcript","clipboard","formdata","form_data"];
 const EMAIL = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
 const POLISH_PESEL = /^\\d{11}$/;
-const LONG_TOKEN = /^[A-Za-z0-9_\\-+/=.]{32,}$/;
+const LONG_TOKEN = /^[A-Za-z0-9_+/=.-]{32,}$/;
 
 function normalizedKey(key: string) { return key.trim().toLowerCase().replace(/[-\\s]/g, "_"); }
 function forbiddenKey(key: string) { const normalized=normalizedKey(key); return FORBIDDEN_KEYS.has(normalized)||SENSITIVE_KEY_PARTS.some((part)=>normalized.includes(part)); }
