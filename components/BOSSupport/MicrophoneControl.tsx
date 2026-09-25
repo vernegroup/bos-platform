@@ -16,8 +16,6 @@ export default function MicrophoneControl({onStateChange,onStreamChange}:Microph
  function stopMicrophone(){streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);updateState("idle");}
  async function startMicrophone(){if(!navigator.mediaDevices?.getUserMedia){updateState("unsupported");return;}updateState("requesting");try{const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});streamRef.current=stream;onStreamChange?.(stream);updateState("active");}catch(error){const denied=error instanceof DOMException&&(error.name==="NotAllowedError"||error.name==="SecurityError");onStreamChange?.(null);updateState(denied?"denied":"idle");}}
  async function toggleMicrophone(){if(state==="active"){stopMicrophone();return;}await startMicrophone();}
- async function acceptNotice(){const r:VoiceInformationRecord={state:"acknowledged",version:1,acknowledgedAt:new Date().toISOString()};try{localStorage.setItem(VOICE_NOTICE_KEY,JSON.stringify(r));}catch{}setInformationState("acknowledged");setShowNotice(false);setShowPrivacy(false);await startMicrophone();}
- function closeNotice(){setShowNotice(false);setShowPrivacy(false);}
  useEffect(()=>()=>{streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);},[onStreamChange]);
 
  const label=state==="active"?"Wyłącz mikrofon":state==="requesting"?"Oczekiwanie na dostęp do mikrofonu":"Włącz mikrofon";
