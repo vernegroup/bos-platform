@@ -20,8 +20,8 @@ export default async function StandardsPage(){
   <section className="bos-standard-list bos-operational-list">
    <div className="bos-standard-list-head"><span>STANOWISKO</span><span>OBSZAR</span><span>WERSJA</span><span>CZYNNOŚCI</span><span>AKTUALIZACJA</span><span>STATUS</span><span /></div>
    {standards.map(s=><Link href={`/app/onboarding/standards/${s.id}`} className="bos-standard-list-row" key={s.id}><strong>{s.name}</strong><span>{s.area||"—"}</span><b>{s.currentVersion||"ROBOCZA"}</b><span>{String("taskCount" in s ? s.taskCount : (s.versions.find(x=>x.version===s.currentVersion)?.tasks.length??0))}</span><span>{s.updatedAt||"—"}</span><em data-status={s.status}>{s.status}</em><i>→</i></Link>)}
-   {!standards.length&&<div className="bos-operational-empty"><strong>Brak standardów</strong><p>Utwórz pierwszy Standard Stanowiska, aby przygotować wzorzec dla wdrożeń.</p></div>}
+   {!standards.length&&<div className="bos-operational-empty"><strong>Brak standardów</strong><p>Utwórz pierwszy standard stanowiska, aby przygotować wzorzec dla wdrożeń.</p></div>}
   </section>
-  <div className="bos-onboarding-rule-note"><span>ZASADA WERSJONOWANIA</span><p>Nowa wersja standardu nie zmienia historycznych ani trwających wdrożeń rozpoczętych na wcześniejszej wersji.</p></div>
+  <div className="bos-onboarding-rule-note"><span>ZASADA WERSJONOWANIA</span><p>Nowa wersja standardu nie zmienia zakończonych ani trwających wdrożeń rozpoczętych na wcześniejszej wersji.</p></div>
  </>;
 }
