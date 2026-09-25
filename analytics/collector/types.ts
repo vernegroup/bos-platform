@@ -1,4 +1,4 @@
-import type { AnalyticsEventV1, ValidationResult } from "../contracts/event-v1";
+import type { AnalyticsEventV1 } from "../contracts/event-v1";
 
 export type AnalyticsCollectorInput = AnalyticsEventV1 | AnalyticsEventV1[];
 
