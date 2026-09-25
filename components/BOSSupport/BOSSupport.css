@@ -68,3 +68,21 @@
 .bos-microphone-error{position:absolute;right:0;bottom:50px;width:220px;padding:9px 11px;border:1px solid #E5CDD0;border-radius:9px;background:#FFF8F8;color:#8B3942;font-size:10px;line-height:1.35;box-shadow:0 8px 24px rgba(8,27,45,.12)}
 @media(max-width:520px){.bos-microphone-error{left:0;right:auto;width:200px}}
 @media(prefers-reduced-motion:reduce){.bos-microphone-button{transition:none}}
+
+/* VOICE-CHAT-05 — VoiceStateIndicator */
+.bos-assistant-panel{grid-template-rows:auto auto 1fr auto}
+.bos-voice-state{min-height:48px;display:flex;align-items:center;gap:10px;padding:9px 18px;border-bottom:1px solid #E8ECF0;background:#FBFCFD;color:#5B6B7C}
+.bos-voice-state-dot{width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#9AA7B4}
+.bos-voice-state-copy{min-width:0;display:flex;flex-direction:column;gap:1px}
+.bos-voice-state-copy strong{color:#31475D;font-size:11px;font-weight:700;line-height:1.25}
+.bos-voice-state-copy>span{color:#7A8897;font-size:9px;line-height:1.25}
+.bos-voice-state-requesting .bos-voice-state-dot{background:#C9902E;animation:bosVoicePulse 1s ease-in-out infinite}
+.bos-voice-state-active{background:#F4F8FB}
+.bos-voice-state-active .bos-voice-state-dot{background:#2C7A63;box-shadow:0 0 0 4px rgba(44,122,99,.10)}
+.bos-voice-state-denied .bos-voice-state-dot,.bos-voice-state-unsupported .bos-voice-state-dot{background:#B24A55}
+.bos-voice-state-bars{height:20px;display:flex;align-items:center;gap:2px;margin-left:auto}
+.bos-voice-state-bars i{display:block;width:2px;height:6px;border-radius:2px;background:#2C7A63;animation:bosVoiceBars .9s ease-in-out infinite}
+.bos-voice-state-bars i:nth-child(2){animation-delay:.12s}.bos-voice-state-bars i:nth-child(3){animation-delay:.24s}.bos-voice-state-bars i:nth-child(4){animation-delay:.36s}
+@keyframes bosVoicePulse{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes bosVoiceBars{0%,100%{height:5px}50%{height:16px}}
+@media(prefers-reduced-motion:reduce){.bos-voice-state-requesting .bos-voice-state-dot,.bos-voice-state-bars i{animation:none}}

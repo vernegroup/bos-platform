@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import MicrophoneControl from "./MicrophoneControl";
+import MicrophoneControl, { type MicrophoneState } from "./MicrophoneControl";
 
 export type TextChatMessage = { id: string; role: "assistant" | "user"; content: string };
 
@@ -12,9 +12,9 @@ const START_MESSAGE: TextChatMessage = {
 };
 const LOCAL_REPLY = "Wiadomość została dodana do lokalnej sesji testowej. Po podłączeniu silnika AI w tym miejscu pojawi się właściwa odpowiedź BOS Assistant.";
 
-type TextChatProps = { onFirstMessage?: () => void };
+type TextChatProps = {\n  onFirstMessage?: () => void;\n  onVoiceStateChange?: (state: MicrophoneState) => void;\n};
 
-export default function TextChat({ onFirstMessage }: TextChatProps) {
+export default function TextChat({ onFirstMessage, onVoiceStateChange }: TextChatProps) {
   const [messages, setMessages] = useState<TextChatMessage[]>([START_MESSAGE]);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
@@ -61,7 +61,7 @@ export default function TextChat({ onFirstMessage }: TextChatProps) {
       </div>
 
       <form className="bos-assistant-composer" onSubmit={handleSubmit}>
-        <MicrophoneControl />
+        <MicrophoneControl onStateChange={onVoiceStateChange} />
         <textarea
           rows={1}
           value={draft}
