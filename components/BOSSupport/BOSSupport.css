@@ -18,3 +18,28 @@
 @media(max-width:1200px){.bos-support-widget{right:16px;bottom:16px}.bos-support-button{width:52px;height:52px}.bos-support-button-icon{width:23px;height:23px}.bos-support-window{right:16px;bottom:80px;width:min(360px,calc(100vw - 32px))}}
 @media(max-width:520px){.bos-support-button{width:48px;height:48px}.bos-support-button-icon{width:21px;height:21px}}
 @media(prefers-reduced-motion:reduce){.bos-support-button{transition:none}.bos-support-window{animation:none}}
+
+/* VOICE-CHAT-02 — AssistantPanel */
+.bos-assistant-panel{position:fixed;right:28px;bottom:108px;z-index:9998;width:min(390px,calc(100vw - 32px));height:min(610px,calc(100vh - 140px));display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;border:1px solid #E2E7EC;border-radius:20px;background:#fff;color:#132B43;box-shadow:0 24px 80px rgba(8,27,45,.22);animation:bosSupportOpen .22s ease}
+.bos-assistant-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:22px 22px 18px;border-bottom:1px solid #E8ECF0;background:#F8FAFC}
+.bos-assistant-eyebrow{display:block;margin-bottom:5px;color:#718092;font-size:9px;font-weight:800;letter-spacing:1.5px}
+.bos-assistant-header h2{margin:0;font-size:20px;line-height:1.2;font-weight:650;color:#0E2A47}
+.bos-assistant-close{width:34px;height:34px;display:grid;place-items:center;flex:0 0 auto;border:1px solid #DCE3EA;border-radius:50%;background:#fff;color:#536579;font-size:24px;line-height:1;cursor:pointer}
+.bos-assistant-close:hover{border-color:#AEBAC6;color:#0E2A47}
+.bos-assistant-close:focus-visible{outline:3px solid rgba(14,42,71,.18);outline-offset:2px}
+.bos-assistant-body{min-height:0;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:20px;background:#fff}
+.bos-assistant-message{display:flex;align-items:flex-start;gap:10px}
+.bos-assistant-avatar{width:30px;height:30px;display:grid;place-items:center;flex:0 0 30px;border-radius:9px;background:#0E2A47;color:#fff;font-size:11px;font-weight:800}
+.bos-assistant-message p{margin:0;max-width:275px;padding:12px 14px;border-radius:4px 14px 14px 14px;background:#F1F4F7;color:#425466;font-size:13px;line-height:1.55}
+.bos-assistant-suggestions{display:grid;gap:8px;margin-left:40px}
+.bos-assistant-suggestions button{width:100%;padding:10px 12px;border:1px solid #DCE3EA;border-radius:10px;background:#fff;color:#31475D;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.bos-assistant-suggestions button:hover{border-color:#9EACBA;background:#F8FAFC}
+.bos-assistant-composer{display:grid;grid-template-columns:1fr 42px;align-items:end;gap:10px;padding:14px;border-top:1px solid #E8ECF0;background:#F8FAFC}
+.bos-assistant-composer textarea{width:100%;min-height:44px;max-height:110px;resize:none;padding:12px 14px;border:1px solid #D7DFE7;border-radius:12px;background:#fff;color:#172B3F;font:inherit;font-size:13px;line-height:1.45}
+.bos-assistant-composer textarea:focus{outline:none;border-color:#8294A6;box-shadow:0 0 0 3px rgba(14,42,71,.06)}
+.bos-assistant-send{width:42px;height:42px;display:grid;place-items:center;border:0;border-radius:11px;background:#0E2A47;color:#fff}
+.bos-assistant-send svg{width:18px;height:18px;fill:currentColor}
+.bos-assistant-send:disabled{cursor:not-allowed;opacity:.38}
+@media(max-width:1200px){.bos-assistant-panel{right:16px;bottom:80px}}
+@media(max-width:520px){.bos-assistant-panel{right:10px;bottom:72px;width:calc(100vw - 20px);height:min(620px,calc(100dvh - 90px));border-radius:16px}.bos-assistant-header{padding:18px}.bos-assistant-body{padding:18px}.bos-assistant-suggestions{margin-left:0}}
+@media(prefers-reduced-motion:reduce){.bos-assistant-panel{animation:none}}
