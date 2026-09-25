@@ -48,7 +48,7 @@
 .bos-product-rail__name{
   position:relative;z-index:2;padding:0;
   color:rgba(246,244,239,.82);
-  font-family:var(--font-body),Arial,sans-serif;
+  font-family:var(--font-product-rail),Arial,sans-serif;
   font-size:clamp(10px,.72vw,14px);
   font-weight:700;
   font-synthesis:none;
