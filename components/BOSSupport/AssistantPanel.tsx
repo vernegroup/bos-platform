@@ -28,7 +28,7 @@ export default function AssistantPanel({ onClose }: AssistantPanelProps) {
   const handleStreamChange = useCallback((stream: MediaStream | null) => {
     const client = clientRef.current;
     if (!client) return;
-    if (stream) client.attachMicrophone(stream);
+    if (stream) void client.attachMicrophone(stream);
     else client.detachMicrophone();
   }, []);
 
