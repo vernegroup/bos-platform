@@ -14,7 +14,7 @@ export async function storeRawAnalyticsEvent(event: AnalyticsEventV1): Promise<R
       schema_version, event_id, occurred_at, source, domain, app_id, environment, path, session_id, event, data
     ) VALUES (
       ${event.schema_version}, ${event.event_id}, ${event.timestamp}, ${event.source}, ${event.domain},
-      ${event.app_id}, ${event.environment}, ${event.path}, ${event.session_id ?? null}, ${event.event}, ${sql.json(event.data)}
+      ${event.app_id}, ${event.environment}, ${event.path}, ${event.session_id ?? null}, ${event.event}, ${sql.json(event.data as Parameters<typeof sql.json>[0])}
     )
     ON CONFLICT (event_id) DO NOTHING
     RETURNING event_id
