@@ -92,6 +92,11 @@
 .bos-public-root .bos-product-modal-audience p{color:rgba(225,231,238,.58)}
 .bos-public-root .bos-product-modal-cta{background:#b8873e;color:#07111d}
 .bos-public-root .bos-product-modal-steps{border-color:rgba(255,255,255,.09)}
+/* Keep the fixed support control from covering the last rail item at narrow effective widths / browser zoom. */
+@media(max-width:1200px){
+  .bos-product-rail__track{padding-right:clamp(128px,12vw,168px)}
+  .bos-product-rail__track:after{right:clamp(128px,12vw,168px)}
+}
 @media(max-width:800px){
   .bos-product-rail{min-height:auto;padding:72px 0 84px}
   .bos-product-rail__intro{width:calc(100vw - 48px);margin-bottom:62px}

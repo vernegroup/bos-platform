@@ -216,3 +216,31 @@
     opacity:.92;
 
 }
+
+/* At narrow effective widths (including browser zoom), keep support compact and away from rail content. */
+@media (max-width:1200px){
+    .bos-support-widget{
+        right:16px;
+        bottom:16px;
+    }
+
+    .bos-support-button{
+        width:52px;
+        height:52px;
+        font-size:23px;
+    }
+
+    .bos-support-window{
+        right:16px;
+        bottom:80px;
+        width:min(360px,calc(100vw - 32px));
+    }
+}
+
+@media (max-width:520px){
+    .bos-support-button{
+        width:48px;
+        height:48px;
+        font-size:21px;
+    }
+}
