@@ -32,7 +32,6 @@ export class AudioPlaybackController {
     if (!this.audio) {
       this.audio = new Audio();
       this.audio.autoplay = true;
-      this.audio.playsInline = true;
       this.audio.addEventListener("playing", this.onPlaying);
       this.audio.addEventListener("pause", this.onPause);
       this.audio.addEventListener("timeupdate", this.onTimeUpdate);

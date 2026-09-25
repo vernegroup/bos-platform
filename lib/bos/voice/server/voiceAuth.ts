@@ -32,9 +32,11 @@ export async function requireVoicePrincipal(): Promise<VoicePrincipal> {
   const userId = session?.user?.id?.trim();
   if (!userId) throw new VoiceAuthError();
 
+  const email = session?.user?.email?.trim().toLowerCase() || null;
+
   return {
     userId,
-    email: session.user.email?.trim().toLowerCase() || null,
+    email,
     role: await resolveUserRole(userId),
   };
 }
