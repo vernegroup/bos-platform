@@ -16,7 +16,7 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageP
         <section className="bos-login-panel" aria-labelledby="verify-title">
           <Link href="/" className="bos-login-brand">
             <span className="bos-login-brand-name">BOS</span>
-            <span className="bos-login-brand-subtitle">BUSINESS OPERATING STANDARDS</span>
+            <span className="bos-login-brand-subtitle">STANDARDY OPERACYJNE BIZNESU</span>
           </Link>
           <div className="bos-login-rule" />
           <div className="bos-login-copy">
@@ -32,7 +32,7 @@ export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageP
           </Link>
         </section>
       </section>
-      <aside className="bos-login-brand-panel" aria-label="Business Operating Standards">
+      <aside className="bos-login-brand-panel" aria-label="Standardy Operacyjne Biznesu">
         <div className="bos-login-brand-backdrop" aria-hidden="true" />
         <div className="bos-login-brand-message">
           <p>Uporządkowana praca.<br />Silniejsze organizacje.</p>

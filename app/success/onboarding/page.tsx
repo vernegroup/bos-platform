@@ -40,10 +40,10 @@ export default async function OnboardingSuccessPage({
 
         <ExecutivePaper>
 
-          <PurchaseHeader product="BOS Onboarding" />
+          <PurchaseHeader product="BOS Wdrożenia" />
 
           <DocumentTable
-            product="BOS Onboarding"
+            product="BOS Wdrożenia"
             sessionId={checkout.session.id}
           />
 

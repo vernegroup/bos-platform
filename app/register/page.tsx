@@ -14,7 +14,7 @@ export default async function RegisterPage() {
         <section className="bos-register-panel" aria-labelledby="bos-register-title">
           <Link href="/" className="bos-register-brand" aria-label="BOS — strona publiczna">
             <span className="bos-register-brand-name">BOS</span>
-            <span className="bos-register-brand-subtitle">BUSINESS OPERATING STANDARDS</span>
+            <span className="bos-register-brand-subtitle">STANDARDY OPERACYJNE BIZNESU</span>
           </Link>
           <div className="bos-register-rule" />
           <header className="bos-register-copy">
@@ -24,7 +24,7 @@ export default async function RegisterPage() {
           <RegisterForm />
         </section>
       </section>
-      <aside className="bos-register-brand-panel" aria-label="Business Operating Standards">
+      <aside className="bos-register-brand-panel" aria-label="Standardy Operacyjne Biznesu">
         <div className="bos-register-brand-backdrop" aria-hidden="true" />
         <div className="bos-register-brand-message">
           <p>Jedna organizacja.<br />Jeden uporządkowany system.</p>

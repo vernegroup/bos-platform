@@ -19,7 +19,7 @@ export default async function PromotionClosurePage({ params }: { params: Promise
 
       <section className="bos-app-intro bos-promotions-detail-head">
         <div>
-          <div className="bos-app-kicker">BOS / PROMOTIONS / REKORD HISTORYCZNY</div>
+          <div className="bos-app-kicker">BOS / AWANSE / REKORD HISTORYCZNY</div>
           <h1>{closure.employee}</h1>
           <p>{closure.fromRole} → {closure.toRole} · {closure.type}</p>
         </div>

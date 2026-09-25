@@ -24,7 +24,7 @@ const navigation:{label:string;href:string;icon:IconName}[] = [
   { label:"Aktualizacje", href:"/app/updates", icon:"updates" },
   { label:"Ustawienia", href:"/app/settings", icon:"settings" },
 ];
-const roleLabels:Record<string,string>={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",USER:"Użytkownik"};
+const roleLabels:Record<string,string>={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Menedżer",USER:"Użytkownik"};
 
 function Icon({name}:{name:IconName}) {
   const common={width:18,height:18,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.7,strokeLinecap:"round" as const,strokeLinejoin:"round" as const,"aria-hidden":true};

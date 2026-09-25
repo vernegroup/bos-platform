@@ -128,7 +128,7 @@ export default function ImplementationForm() {
           <input type="checkbox" />
 
           <span>
-           Wyrażam zgodę na kontakt w sprawie wdrożenia Business Operating Standards.
+           Wyrażam zgodę na kontakt w sprawie wdrożenia Standardów Operacyjnych Biznesu.
           </span>
 
         </label>

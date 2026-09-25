@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation";
 type RailProduct={label:string;href?:string};
 
 const products:RailProduct[]=[
-  {label:"ONBOARDING",href:"/app/onboarding"},
-  {label:"PROMOTIONS",href:"/app/promotions"},
-  {label:"WORK"},
-  {label:"PRICING"},
-  {label:"COMPLIANCE"},
+  {label:"WDROŻENIA",href:"/app/onboarding"},
+  {label:"AWANSE",href:"/app/promotions"},
+  {label:"PRACA"},
+  {label:"WYCENA"},
+  {label:"ZGODNOŚĆ"},
 ];
 
 export default function AppProductRail(){

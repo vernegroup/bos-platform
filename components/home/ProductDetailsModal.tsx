@@ -6,9 +6,9 @@ type ProductKey="onboarding"|"promotions";
 const data={
  onboarding:{
   kicker:"BOS WDROŻENIA",title:"Uporządkuj wdrożenie. Skróć drogę do samodzielności.",
-  description:"BOS Wdrożenia prowadzi managera przez przygotowanie, realizację i zamknięcie wdrożenia pracownika w jednym, powtarzalnym procesie.",
-  benefits:[["Jeden standard","Stanowisko, czynności krytyczne i oczekiwany rezultat są zapisane w jednym miejscu."],["Kontrola postępu","Manager widzi etap procesu, realizację zadań i moment gotowości pracownika."],["Mniej improwizacji","Kolejne wdrożenia wykorzystują ten sam sprawdzony mechanizm zamiast zaczynać od zera."]],
-  audience:"Dla właścicieli i managerów MŚP, którzy chcą wdrażać pracowników w sposób powtarzalny i możliwy do kontrolowania.",
+  description:"BOS Wdrożenia prowadzi menedżera przez przygotowanie, realizację i zamknięcie wdrożenia pracownika w jednym, powtarzalnym procesie.",
+  benefits:[["Jeden standard","Stanowisko, czynności krytyczne i oczekiwany rezultat są zapisane w jednym miejscu."],["Kontrola postępu","Menedżer widzi etap procesu, realizację zadań i moment gotowości pracownika."],["Mniej improwizacji","Kolejne wdrożenia wykorzystują ten sam sprawdzony mechanizm zamiast zaczynać od zera."]],
+  audience:"Dla właścicieli i menedżerów MŚP, którzy chcą wdrażać pracowników w sposób powtarzalny i możliwy do kontrolowania.",
   steps:[["01","Przygotuj","Zdefiniuj stanowisko i standard."],["02","Przeprowadź","Realizuj kolejne etapy wdrożenia."],["03","Zamknij","Zweryfikuj gotowość i zachowaj historię."]],
   demo:"/videos/bos-onboarding-demo.webm"
  },
@@ -38,7 +38,7 @@ export default function ProductDetailsModal({product,variant="default"}:{product
     </div>
     <div className="bos-product-modal-demo">
      <div className="bos-product-demo-frame">
-      {!videoFailed?<video autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoFailed(true)}><source src={d.demo} type="video/webm"/></video>:<div className="bos-product-demo-placeholder"><span>BOS</span><strong>Demo produktu</strong><p>Miejsce na finalne nagranie rzeczywistego interfejsu.</p></div>}
+      {!videoFailed?<video autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoFailed(true)}><source src={d.demo} type="video/webm"/></video>:<div className="bos-product-demo-placeholder"><span>BOS</span><strong>Prezentacja produktu</strong><p>Miejsce na finalne nagranie rzeczywistego interfejsu.</p></div>}
      </div>
      <div className="bos-product-modal-steps">{d.steps.map(([n,h,p])=><article key={n}><b>{n}</b><div><h3>{h}</h3><p>{p}</p></div></article>)}</div>
     </div>

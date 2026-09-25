@@ -7,7 +7,7 @@ export const dynamic="force-dynamic";
 
 const datePL=(value:string)=>new Intl.DateTimeFormat("pl-PL",{year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(value));
 const productHref={onboarding:"/app/onboarding",promotions:"/app/promotions"} as const;
-const roleLabels={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",USER:"Użytkownik"} as const;
+const roleLabels={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Menedżer",USER:"Użytkownik"} as const;
 
 export default async function OrganizationPage(){
  const access=await requireBOSAccess();

@@ -15,11 +15,11 @@ export default function DocumentTable({
   let fileName = "";
 
   switch (product) {
-    case "BOS Promotions":
+    case "BOS Awanse":
       fileName = "BOS Promotions.zip";
       break;
 
-    case "BOS Pricing":
+    case "BOS Wycena":
       fileName = "BOS Pricing.zip";
       break;
 

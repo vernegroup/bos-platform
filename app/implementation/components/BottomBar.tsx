@@ -61,11 +61,11 @@ export default function BottomBar() {
           <div className="bos-footer-platform">
 
             <div className="bos-footer-title">
-              BUSINESS OPERATING STANDARDS
+              STANDARDY OPERACYJNE BIZNESU
             </div>
 
             <div className="bos-footer-row">
-              Executive Operating Platform
+              Platforma zarządzania operacyjnego
             </div>
 
           </div>
@@ -75,7 +75,7 @@ export default function BottomBar() {
           <div className="bos-footer-contact">
 
             <div className="bos-footer-title">
-              CONTACT
+              KONTAKT
             </div>
 
             <div className="bos-footer-row">
@@ -93,7 +93,7 @@ export default function BottomBar() {
           <div className="bos-footer-page">
 
             <div className="bos-footer-location">
-              PLATFORM
+              PLATFORMA
             </div>
 
             <div className="bos-footer-number">

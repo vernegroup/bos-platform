@@ -41,7 +41,7 @@ export default async function PromotionClosedPage() {
             <i>→</i>
           </Link>
         ))}
-        {!rows.length && <div className="bos-operational-empty"><strong>Brak historii zmian</strong><p>Zamknięte procesy Promotions pojawią się tutaj po końcowej weryfikacji.</p></div>}
+        {!rows.length && <div className="bos-operational-empty"><strong>Brak historii zmian</strong><p>Zamknięte procesy awansu pojawią się tutaj po końcowej weryfikacji.</p></div>}
       </section>
 
       <div className="bos-promotions-rule-note"><span>REKORD HISTORYCZNY</span><p>Zamknięcie zachowuje zakres zmiany, wynik weryfikacji, osobę weryfikującą oraz ewentualne zalecenia.</p></div>

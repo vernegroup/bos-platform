@@ -22,7 +22,7 @@ export default async function ProductsPage(){
         const meta=productMeta[product.key]; if(!meta)return null;
         return <article className="bos-product-card" key={product.key}>
           <div className="bos-product-card-top"><div className="bos-product-brand">BOS</div><span className="bos-product-status"><i aria-hidden="true"/>Aktywny</span></div>
-          <div className="bos-product-card-body"><h2>{product.name}</h2><strong>{meta.description}</strong><p>{meta.detail}</p></div>
+          <div className="bos-product-card-body"><h2>{product.key==="onboarding"?"BOS Wdrożenia":product.key==="promotions"?"BOS Awanse":product.name}</h2><strong>{meta.description}</strong><p>{meta.detail}</p></div>
           <dl className="bos-product-meta"><div><dt>Licencja</dt><dd>Dożywotnia</dd></div><div><dt>Wersja</dt><dd>{product.currentVersion??"—"}</dd></div></dl>
           <Link href={meta.href}>Otwórz produkt <span aria-hidden="true">→</span></Link>
         </article>;

@@ -19,14 +19,14 @@ export default async function PromotionsEntryPage() {
     <>
       <section className="bos-app-intro bos-promotions-intro">
         <div>
-          <div className="bos-app-kicker">BOS / PROMOTIONS</div>
-          <h1>BOS Promotions</h1>
+          <div className="bos-app-kicker">BOS / AWANSE</div>
+          <h1>BOS Awanse</h1>
           <p>Awans lub przesunięcie poziome prowadzone od decyzji, przez przygotowanie i przejście, do weryfikacji oraz trwałego zapisu wyniku.</p>
         </div>
-        <div className="bos-app-build-state"><span>PRODUKT</span><strong>WEB 1.0 / DANE ORGANIZACJI</strong></div>
+        <div className="bos-app-build-state"><span>PRODUKT</span><strong>WERSJA 1.0 / DANE ORGANIZACJI</strong></div>
       </section>
 
-      <section className="bos-promotions-commandbar" aria-label="Stan procesów Promotions">
+      <section className="bos-promotions-commandbar" aria-label="Stan procesów awansu">
         <div><span>W TOKU</span><strong>{active.length}</strong></div>
         <div><span>GOTOWOŚĆ KONTROLI</span><strong>{readiness}%</strong></div>
         <div><span>ZAMKNIĘTE</span><strong>{closed.length}</strong></div>

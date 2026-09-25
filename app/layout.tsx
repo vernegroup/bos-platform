@@ -14,7 +14,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Business Operating Standards",
+  title: "Standardy Operacyjne Biznesu",
   description:
     "Gotowe standardy operacyjne dla nowoczesnych przedsiębiorstw.",
 };

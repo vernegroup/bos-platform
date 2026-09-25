@@ -19,7 +19,7 @@ export default function BOSIntro(){
   <div className="bos-intro-inner">
    <div className="bos-intro-mark">BOS</div>
    <div className="bos-intro-rule"/>
-   <span>BUSINESS OPERATING STANDARDS</span>
+   <span>STANDARDY OPERACYJNE BIZNESU</span>
    <h2 id="bos-intro-title">System operacyjny dla małych i średnich firm.</h2>
    <p>BOS porządkuje powtarzalne procesy firmy i zamienia sposób działania organizacji w konkretne, mierzalne i możliwe do wdrożenia systemy pracy.</p>
    <strong>Nie kolejny zestaw dokumentów. Narzędzia do prowadzenia rzeczywistych procesów.</strong>

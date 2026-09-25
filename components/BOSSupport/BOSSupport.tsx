@@ -13,7 +13,7 @@ export default function BOSSupport() {
         <div className="bos-support-window">
 
           <div className="bos-support-header">
-            BOS Support
+            Pomoc BOS
           </div>
 
           <div className="bos-support-content">

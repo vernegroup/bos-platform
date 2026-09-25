@@ -6,7 +6,7 @@ import "./app-shell.css";
 
 export const metadata: Metadata = {
   title: "BOS — Panel klienta",
-  description: "Środowisko aplikacyjne Business Operating Standards.",
+  description: "Środowisko aplikacyjne Standardów Operacyjnych Biznesu.",
 };
 
 export default async function BOSAppLayout({ children }: { children: React.ReactNode }) {

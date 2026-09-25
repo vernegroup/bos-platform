@@ -3,11 +3,11 @@
 import ProductDetailsModal from "./ProductDetailsModal";
 
 const products = [
-  { id:"onboarding", label:"ONBOARDING", modal:"onboarding", available:true },
-  { id:"promotions", label:"PROMOTIONS", modal:"promotions", available:true },
-  { id:"work", label:"WORK", available:false },
-  { id:"pricing", label:"PRICING", available:false },
-  { id:"compliance", label:"COMPLIANCE", available:false },
+  { id:"onboarding", label:"WDROŻENIA", modal:"onboarding", available:true },
+  { id:"promotions", label:"AWANSE", modal:"promotions", available:true },
+  { id:"work", label:"PRACA", available:false },
+  { id:"pricing", label:"WYCENA", available:false },
+  { id:"compliance", label:"ZGODNOŚĆ", available:false },
 ] as const;
 
 export default function ProductRail(){

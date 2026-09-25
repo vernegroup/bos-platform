@@ -40,10 +40,10 @@ export default async function PromotionsSuccessPage({
 
         <ExecutivePaper>
 
-          <PurchaseHeader product="BOS Promotions" />
+          <PurchaseHeader product="BOS Awanse" />
 
           <DocumentTable
-            product="BOS Promotions"
+            product="BOS Awanse"
             sessionId={checkout.session.id}
           />
 

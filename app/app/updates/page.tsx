@@ -31,7 +31,7 @@ export default async function UpdatesPage() {
       <section className="bos-core-version-strip">
         {versions.map((version) => (
           <article key={version.key}>
-            <span>{version.key.toUpperCase()}</span>
+            <span>{version.key==="onboarding"?"WDROŻENIA":version.key==="promotions"?"AWANSE":version.key.toUpperCase()}</span>
             <strong>{version.currentVersion ?? "—"}</strong>
             <small>{version.latestUpdateAt ? `OSTATNIA PUBLIKACJA ${datePL(version.latestUpdateAt)}` : "BRAK OPUBLIKOWANEJ HISTORII"}</small>
           </article>
@@ -45,7 +45,7 @@ export default async function UpdatesPage() {
         ) : updates.map((update) => (
           <article key={update.id}>
             <time>{datePL(update.publishedAt)}</time>
-            <span>{update.productName}</span>
+            <span>{update.productName.replace(/Onboarding/gi,"Wdrożenia").replace(/Promotions/gi,"Awanse")}</span>
             <div><strong>{update.version} · {update.title}</strong><p>{update.description}</p></div>
             <b data-current={update.isCurrent}>{update.isCurrent ? "BIEŻĄCA" : "HISTORIA"}</b>
           </article>

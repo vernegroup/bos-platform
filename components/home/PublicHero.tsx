@@ -10,7 +10,7 @@ export default function PublicHero() {
           <span>BIZNESU</span>
         </h1>
         <div className="bos-public-hero__marker" aria-hidden="true">
-          <span>SCROLL</span><i />
+          <span>PRZEWIŃ</span><i />
         </div>
       </div>
     </section>

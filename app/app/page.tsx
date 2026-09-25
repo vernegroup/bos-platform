@@ -47,7 +47,7 @@ export default async function BOSAppPage(){
           const meta=productMeta[product.key];
           if(!meta)return null;
           return <article className="bos-home-product" key={product.key}>
-            <div className="bos-home-product-head"><div><h3>{product.name}</h3><p>{meta.description}</p></div><span>Aktywny</span></div>
+            <div className="bos-home-product-head"><div><h3>{product.key==="onboarding"?"BOS Wdrożenia":product.key==="promotions"?"BOS Awanse":product.name}</h3><p>{meta.description}</p></div><span>Aktywny</span></div>
             <Link href={meta.href}>Otwórz produkt →</Link>
           </article>;
         })}
@@ -59,7 +59,7 @@ export default async function BOSAppPage(){
       <div className="bos-home-section-head"><h2 id="home-updates">Ostatnie aktualizacje</h2><Link href="/app/updates">Zobacz wszystkie →</Link></div>
       <div className="bos-home-updates">
         {updates.slice(0,3).map(update=><Link href="/app/updates" key={update.id}>
-          <div><strong>{update.title}</strong><span>{update.productName}</span></div>
+          <div><strong>{update.title}</strong><span>{update.productName.replace(/Onboarding/gi,"Wdrożenia").replace(/Promotions/gi,"Awanse")}</span></div>
           <time dateTime={update.publishedAt}>{datePL(update.publishedAt)}</time>
         </Link>)}
         {!updates.length&&<div className="bos-home-empty">Brak nowych aktualizacji.</div>}
