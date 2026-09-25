@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+
 
 type LoginFormProps = { callbackUrl: string };
 
@@ -11,38 +11,18 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     setError("");
     setPending(true);
-
-    const form = new FormData(event.currentTarget);
-    const email = String(form.get("email") ?? "").trim();
-    const password = String(form.get("password") ?? "");
-
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        redirectTo: callbackUrl,
-      });
-
-      if (result?.error) {
-        setError("Nieprawidłowy adres e-mail lub hasło.");
-        setPending(false);
-        return;
-      }
-
-      window.location.assign(result?.url || callbackUrl);
-    } catch {
-      setError("Nie udało się zalogować. Spróbuj ponownie.");
-      setPending(false);
-    }
+    // Use Auth.js' same-origin server callback flow. This lets the response that
+    // authenticates the credentials set the session cookie on the exact host
+    // currently serving BOS (Preview today, standardybiznesu.pl in production).
+    // Do not use the client helper here: Preview deployment hostnames change.
   }
 
   return (
-    <form className="bos-login-form" onSubmit={handleSubmit}>
+    <form className="bos-login-form" action="/api/auth/callback/credentials" method="post" onSubmit={handleSubmit}>
+      <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="bos-login-field">
         <label htmlFor="email">Adres e-mail</label>
         <input
