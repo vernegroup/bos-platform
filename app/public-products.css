@@ -48,9 +48,11 @@
 .bos-product-rail__name{
   position:relative;z-index:2;padding:0;
   color:rgba(246,244,239,.82);
-  font-family:inherit;
+  font-family:var(--font-body),Arial,sans-serif;
   font-size:clamp(10px,.72vw,14px);
   font-weight:700;
+  font-synthesis:none;
+  font-feature-settings:"kern" 1,"liga" 1;
   letter-spacing:.19em;
   line-height:1;
   transition:color .22s ease,transform .22s ease;
