@@ -1,24 +1,18 @@
 "use client";
-
-import { useEffect, useRef, useState } from "react";
-
-export type MicrophoneState = "idle" | "requesting" | "active" | "denied" | "unsupported";
-type MicrophoneControlProps={onStateChange?:(state:MicrophoneState)=>void;onStreamChange?:(stream:MediaStream|null)=>void};
-type VoiceInformationState="unknown"|"acknowledged";
-type VoiceInformationRecord={state:"acknowledged";version:1;acknowledgedAt:string};
-const VOICE_NOTICE_KEY="bos.voice.firstUseNotice.v1";
-function readVoiceInformationState():VoiceInformationState{try{const raw=localStorage.getItem(VOICE_NOTICE_KEY);if(!raw)return"unknown";if(raw==="acknowledged")return"acknowledged";const r=JSON.parse(raw) as Partial<VoiceInformationRecord>;return r.state==="acknowledged"&&r.version===1?"acknowledged":"unknown";}catch{return"unknown";}}
-
-export default function MicrophoneControl({onStateChange,onStreamChange}:MicrophoneControlProps){
- const [state,setState]=useState<MicrophoneState>("idle");
- const streamRef=useRef<MediaStream|null>(null);
+import {useEffect,useRef,useState} from "react";
+export type MicrophoneState="idle"|"requesting"|"active"|"denied"|"unsupported";
+type Props={onStateChange?:(state:MicrophoneState)=>void;onStreamChange?:(stream:MediaStream|null)=>void};
+type Diagnostic={name:string;message:string;secure:boolean;permission:string;devices:number};
+function explain(d:Diagnostic){const base=`${d.name}: ${d.message||"brak komunikatu"} | secure=${d.secure} | permission=${d.permission} | audioInputs=${d.devices}`;if(d.name==="NotAllowedError")return `Dostęp odrzucony przez przeglądarkę/system. ${base}`;if(d.name==="NotFoundError")return `Nie znaleziono mikrofonu. ${base}`;if(d.name==="NotReadableError")return `Mikrofon istnieje, ale nie można go odczytać (np. zajęty lub blokowany przez system). ${base}`;if(d.name==="SecurityError")return `Polityka bezpieczeństwa blokuje mikrofon. ${base}`;return `Błąd mikrofonu. ${base}`;}
+export default function MicrophoneControl({onStateChange,onStreamChange}:Props){
+ const[state,setState]=useState<MicrophoneState>("idle");const[diagnostic,setDiagnostic]=useState<string|null>(null);const streamRef=useRef<MediaStream|null>(null);
  function updateState(next:MicrophoneState){setState(next);onStateChange?.(next);}
- function stopMicrophone(){streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);updateState("idle");}
- async function startMicrophone(){if(!navigator.mediaDevices?.getUserMedia){updateState("unsupported");return;}updateState("requesting");try{const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});streamRef.current=stream;onStreamChange?.(stream);updateState("active");}catch(error){const denied=error instanceof DOMException&&(error.name==="NotAllowedError"||error.name==="SecurityError");onStreamChange?.(null);updateState(denied?"denied":"idle");}}
+ function stopMicrophone(){streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);setDiagnostic(null);updateState("idle");}
+ async function permission(){try{if(!navigator.permissions)return"unsupported";const p=await navigator.permissions.query({name:"microphone" as PermissionName});return p.state;}catch{return"query-error";}}
+ async function devices(){try{return(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="audioinput").length;}catch{return-1;}}
+ async function startMicrophone(){setDiagnostic(null);if(!window.isSecureContext||!navigator.mediaDevices?.getUserMedia){const d={name:"Unsupported",message:"getUserMedia niedostępne",secure:window.isSecureContext,permission:await permission(),devices:await devices()};setDiagnostic(explain(d));console.error("[bos/microphone]",d);updateState("unsupported");return;}updateState("requesting");try{const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});streamRef.current=stream;onStreamChange?.(stream);console.info("[bos/microphone] active",{permission:await permission(),devices:await devices(),tracks:stream.getAudioTracks().length});updateState("active");}catch(error){const e=error instanceof DOMException?error:null;const d={name:e?.name??"UnknownError",message:e?.message??String(error),secure:window.isSecureContext,permission:await permission(),devices:await devices()};console.error("[bos/microphone]",d,error);setDiagnostic(explain(d));onStreamChange?.(null);updateState(e?.name==="NotAllowedError"||e?.name==="SecurityError"?"denied":"idle");}}
  async function toggleMicrophone(){if(state==="active"){stopMicrophone();return;}await startMicrophone();}
  useEffect(()=>()=>{streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);},[onStreamChange]);
-
  const label=state==="active"?"Wyłącz mikrofon":state==="requesting"?"Oczekiwanie na dostęp do mikrofonu":"Włącz mikrofon";
- return <div className="bos-microphone-control"><button className={`bos-microphone-button bos-microphone-button-${state}`} type="button" onClick={toggleMicrophone} disabled={state==="requesting"} aria-label={label} aria-pressed={state==="active"} title={label}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5a4 4 0 0 0 4-4V6a4 4 0 1 0-8 0v4.5a4 4 0 0 0 4 4Zm-2-8.5a2 2 0 1 1 4 0v4.5a2 2 0 1 1-4 0V6Zm8 4a1 1 0 0 1 2 0v.5a8 8 0 0 1-7 7.94V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.56A8 8 0 0 1 4 10.5V10a1 1 0 1 1 2 0v.5a6 6 0 0 0 12 0V10Z"/></svg>{state==="active"&&<span className="bos-microphone-live-dot" aria-hidden="true"/>}</button>
- {(state==="denied"||state==="unsupported")&&<span className="bos-microphone-error" role="status">{state==="denied"?"Brak dostępu do mikrofonu.":"Mikrofon nie jest obsługiwany w tej przeglądarce."}</span>}</div>;
+ return <div className="bos-microphone-control"><button className={`bos-microphone-button bos-microphone-button-${state}`} type="button" onClick={toggleMicrophone} disabled={state==="requesting"} aria-label={label} aria-pressed={state==="active"} title={label}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14.5a4 4 0 0 0 4-4V6a4 4 0 1 0-8 0v4.5a4 4 0 0 0 4 4Zm-2-8.5a2 2 0 1 1 4 0v4.5a2 2 0 1 1-4 0V6Zm8 4a1 1 0 0 1 2 0v.5a8 8 0 0 1-7 7.94V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.56A8 8 0 0 1 4 10.5V10a1 1 0 1 1 2 0v.5a6 6 0 0 0 12 0V10Z"/></svg>{state==="active"&&<span className="bos-microphone-live-dot" aria-hidden="true"/>}</button>{diagnostic&&<span className="bos-microphone-error" role="status">{diagnostic}</span>}</div>;
 }
