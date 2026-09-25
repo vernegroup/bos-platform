@@ -101,3 +101,13 @@
 .bos-voice-notice :focus-visible{outline:3px solid currentColor;outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.bos-voice-notice,.bos-voice-notice-backdrop{scroll-behavior:auto;transition:none!important;animation:none!important}}
 @media (forced-colors:active){.bos-voice-notice,.bos-voice-microphone-disclosure{border:1px solid CanvasText}.bos-voice-notice-actions button,.bos-voice-privacy-link{forced-color-adjust:auto}}
+
+/* Voice UI refinement */
+.bos-assistant-header h2{font-family:Georgia,"Times New Roman",serif;font-size:24px;font-weight:600;letter-spacing:-.025em}
+.bos-assistant-ai-toast{position:fixed;right:438px;bottom:430px;z-index:10000;width:210px;padding:10px 12px;border:1px solid rgba(14,42,71,.12);border-radius:12px;background:rgba(255,255,255,.97);box-shadow:0 12px 32px rgba(8,27,45,.14);color:#536579;animation:bosAiToast 3s ease forwards;pointer-events:none}
+.bos-assistant-ai-toast strong{display:block;margin-bottom:3px;color:#0E2A47;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.bos-assistant-ai-toast span{display:block;font-size:9px;line-height:1.35}
+@keyframes bosAiToast{0%{opacity:0;transform:translateX(8px)}10%,82%{opacity:1;transform:none}100%{opacity:0;transform:translateX(4px)}}
+@media(max-width:1200px){.bos-assistant-ai-toast{right:392px;bottom:390px}}
+@media(max-width:720px){.bos-assistant-ai-toast{right:16px;bottom:auto;top:16px;width:min(220px,calc(100vw - 32px))}}
+@media(prefers-reduced-motion:reduce){.bos-assistant-ai-toast{animation:bosAiToastFade 3s linear forwards}@keyframes bosAiToastFade{0%,82%{opacity:1}100%{opacity:0}}}
