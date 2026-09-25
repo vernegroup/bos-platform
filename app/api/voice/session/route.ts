@@ -14,7 +14,8 @@ function errorResponse(error:string,status:number,headers:Record<string,string>=
 }
 export async function POST(request: Request) {
   const cookieHeader=request.headers.get("cookie")??"";
-  console.info("[voice/session] Request auth diagnostic",{hasCookie:Boolean(cookieHeader),hasSessionCookie:/authjs\.session-token|next-auth\.session-token/i.test(cookieHeader),origin:request.headers.get("origin"),host:request.headers.get("host")});
+  const cookieNames=cookieHeader.split(";").map(v=>v.trim().split("=")[0]).filter(Boolean);
+  console.info("[voice/session] Request auth diagnostic",{hasCookie:Boolean(cookieHeader),cookieNames,hasSessionCookie:cookieNames.some(name=>/authjs\.session-token|next-auth\.session-token/i.test(name)),origin:request.headers.get("origin"),host:request.headers.get("host")});
   let principal;
   try { principal=await requireVoicePrincipal(); }
   catch(error){
