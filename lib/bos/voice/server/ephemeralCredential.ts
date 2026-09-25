@@ -25,6 +25,8 @@ export async function createEphemeralVoiceCredential(
   apiKey: string,
   model: string,
 ): Promise<EphemeralVoiceCredential> {
+  const toolPolicy=createVoiceLabToolPolicy();
+  assertNoVoiceDatabaseTools(toolPolicy.tools);
   const response = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
     method: "POST",
     headers: {
@@ -36,6 +38,7 @@ export async function createEphemeralVoiceCredential(
         type: "realtime",
         model,
         modalities: ["audio", "text"],
+        ...toolPolicy,
       },
     }),
     cache: "no-store",

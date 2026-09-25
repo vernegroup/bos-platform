@@ -10,6 +10,8 @@ export default function MicrophoneControl({ onStateChange, onStreamChange }: Mic
   const [state,setState]=useState<MicrophoneState>("idle");
   const [showNotice,setShowNotice]=useState(false);
   const streamRef=useRef<MediaStream|null>(null);
+  const noticeRef=useRef<HTMLDivElement|null>(null);
+  const previousFocusRef=useRef<HTMLElement|null>(null);
   function updateState(next:MicrophoneState){setState(next);onStateChange?.(next);}
   function stopMicrophone(){streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);updateState("idle");}
 
@@ -41,6 +43,25 @@ export default function MicrophoneControl({ onStateChange, onStreamChange }: Mic
 
   useEffect(()=>()=>{streamRef.current?.getTracks().forEach(t=>t.stop());streamRef.current=null;onStreamChange?.(null);},[onStreamChange]);
 
+  useEffect(()=>{
+    if(!showNotice) return;
+    previousFocusRef.current=document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const dialog=noticeRef.current;
+    const focusable=dialog?.querySelector<HTMLElement>("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])");
+    focusable?.focus();
+    function onKeyDown(event:KeyboardEvent){
+      if(event.key==="Escape"){event.preventDefault();setShowNotice(false);setShowPrivacy(false);return;}
+      if(event.key!=="Tab"||!dialog)return;
+      const nodes=Array.from(dialog.querySelectorAll<HTMLElement>("button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+      if(!nodes.length)return;
+      const first=nodes[0],last=nodes[nodes.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+    document.addEventListener("keydown",onKeyDown);
+    return()=>{document.removeEventListener("keydown",onKeyDown);previousFocusRef.current?.focus();};
+  },[showNotice]);
+
   const label=state==="active"?"Wyłącz mikrofon":state==="requesting"?"Oczekiwanie na dostęp do mikrofonu":"Włącz mikrofon";
   return <div className="bos-microphone-control">
     <button className={`bos-microphone-button bos-microphone-button-${state}`} type="button" onClick={toggleMicrophone} disabled={state==="requesting"} aria-label={label} aria-pressed={state==="active"} title={label}>
@@ -52,7 +73,7 @@ export default function MicrophoneControl({ onStateChange, onStreamChange }: Mic
       <div className="bos-voice-notice" role="dialog" aria-modal="true" aria-labelledby="bos-voice-notice-title">
         <span className="bos-voice-notice-label">BOS VOICE · AI</span>
         <h3 id="bos-voice-notice-title">Rozmowa głosowa z systemem AI</h3>
-        <p>Aby prowadzić rozmowę głosową, dźwięk z mikrofonu jest przetwarzany w celu rozpoznania wypowiedzi i wygenerowania odpowiedzi.</p>
+        <p id="bos-voice-notice-description">Aby prowadzić rozmowę głosową, dźwięk z mikrofonu jest przetwarzany w celu rozpoznania wypowiedzi i wygenerowania odpowiedzi.</p>
         <p className="bos-voice-notice-secondary">Po wybraniu „Uruchom Voice” przeglądarka może osobno poprosić o dostęp do mikrofonu.</p>
         <div className="bos-voice-notice-actions">
           <button type="button" className="bos-voice-notice-cancel" onClick={()=>setShowNotice(false)}>Anuluj</button>

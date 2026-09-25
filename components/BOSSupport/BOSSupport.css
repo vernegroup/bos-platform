@@ -97,3 +97,7 @@
 .bos-voice-notice-actions button{min-height:38px;padding:0 14px;border-radius:10px;font-weight:700;cursor:pointer}
 .bos-voice-notice-cancel{border:1px solid #cbd5e1;background:#fff;color:#334155}
 .bos-voice-notice-start{border:1px solid #0f172a;background:#0f172a;color:#fff}
+\n
+.bos-voice-notice :focus-visible{outline:3px solid currentColor;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.bos-voice-notice,.bos-voice-notice-backdrop{scroll-behavior:auto;transition:none!important;animation:none!important}}
+@media (forced-colors:active){.bos-voice-notice,.bos-voice-microphone-disclosure{border:1px solid CanvasText}.bos-voice-notice-actions button,.bos-voice-privacy-link{forced-color-adjust:auto}}

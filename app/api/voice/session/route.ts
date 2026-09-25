@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireVoicePrincipal, VoiceAuthError } from "@/lib/bos/voice/server/voiceAuth";
 import { createEphemeralVoiceCredential, VoiceCredentialError } from "@/lib/bos/voice/server/ephemeralCredential";
 import { checkVoiceSessionRateLimit, voiceRateLimitHeaders } from "@/lib/bos/voice/server/voiceRateLimit";
+import { getServerOpenAIApiKey } from "@/lib/bos/voice/server/openAIKey";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,7 +19,7 @@ export async function POST() {
   }
   const rate=checkVoiceSessionRateLimit(principal.userId);const rateHeaders=voiceRateLimitHeaders(rate);
   if(!rate.allowed)return errorResponse("VOICE_RATE_LIMITED",429,{...rateHeaders,"Retry-After":String(rate.retryAfterSeconds)});
-  const apiKey=process.env.OPENAI_API_KEY;
+  const apiKey=getServerOpenAIApiKey();
   if(!apiKey)return errorResponse("VOICE_NOT_CONFIGURED",503,rateHeaders);
   try{
     const credential=await createEphemeralVoiceCredential(apiKey,REALTIME_MODEL);
