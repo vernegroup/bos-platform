@@ -1,14 +1,17 @@
 "use client";
 import {FormEvent,KeyboardEvent,useEffect,useRef,useState} from "react";
+import {usePathname} from "next/navigation";
+import {detectBosProduct} from "@/lib/bos/assistant/pageContext";
 import MicrophoneControl,{type MicrophoneState}from"./MicrophoneControl";
 export type TextChatMessage={id:string;role:"assistant"|"user";content:string};
 const START_MESSAGE:TextChatMessage={id:"welcome",role:"assistant",content:"Napisz, czego potrzebujesz. BOS Assistant jest połączony z silnikiem AI."};
 type TextChatProps={onFirstMessage?:()=>void;onVoiceStateChange?:(state:MicrophoneState)=>void;onMicrophoneStreamChange?:(stream:MediaStream|null)=>void};
 export default function TextChat({onFirstMessage,onVoiceStateChange,onMicrophoneStreamChange}:TextChatProps){
+ const pathname=usePathname()||"/";
  const[messages,setMessages]=useState<TextChatMessage[]>([START_MESSAGE]);const[draft,setDraft]=useState("");const[waiting,setWaiting]=useState(false);const endRef=useRef<HTMLDivElement>(null);const firstMessageSent=useRef(false);
  useEffect(()=>{endRef.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages,waiting]);
  async function sendMessage(raw:string){const content=raw.trim();if(!content||waiting)return;const userMessage:TextChatMessage={id:`user-${Date.now()}`,role:"user",content};const next=[...messages,userMessage];setMessages(next);setDraft("");setWaiting(true);if(!firstMessageSent.current){firstMessageSent.current=true;onFirstMessage?.();}
-  try{const response=await fetch("/api/assistant/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:next.filter(m=>m.id!=="welcome").map(({role,content})=>({role,content}))})});const data=await response.json() as {message?:string;error?:string};if(!response.ok||!data.message)throw new Error(data.error||"AI_ERROR");setMessages(current=>[...current,{id:`assistant-${Date.now()}`,role:"assistant",content:data.message!}]);}
+  try{const response=await fetch("/api/assistant/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:next.filter(m=>m.id!=="welcome").map(({role,content})=>({role,content})),context:{currentRoute:pathname,currentProduct:detectBosProduct(pathname)}})});const data=await response.json() as {message?:string;error?:string};if(!response.ok||!data.message)throw new Error(data.error||"AI_ERROR");setMessages(current=>[...current,{id:`assistant-${Date.now()}`,role:"assistant",content:data.message!}]);}
   catch{setMessages(current=>[...current,{id:`assistant-error-${Date.now()}`,role:"assistant",content:"Nie udało się uzyskać odpowiedzi AI. Spróbuj ponownie za chwilę."}]);}finally{setWaiting(false);}
  }
  function handleSubmit(e:FormEvent<HTMLFormElement>){e.preventDefault();void sendMessage(draft);}function handleKeyDown(e:KeyboardEvent<HTMLTextAreaElement>){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();void sendMessage(draft);}}

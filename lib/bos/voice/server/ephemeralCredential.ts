@@ -1,5 +1,6 @@
 import "server-only";
 import { createVoiceLabToolPolicy, assertNoVoiceDatabaseTools } from "./voiceToolPolicy";
+import { VOICE_SCOPE_POLICY } from "./voiceScopePolicy";
 
 export type EphemeralVoiceCredential = {
   clientSecret: string;
@@ -27,6 +28,7 @@ export class VoiceCredentialError extends Error {
 export async function createEphemeralVoiceCredential(
   apiKey: string,
   model: string,
+  instructions: string,
 ): Promise<EphemeralVoiceCredential> {
   const toolPolicy=createVoiceLabToolPolicy();
   assertNoVoiceDatabaseTools(toolPolicy.tools);
@@ -41,6 +43,7 @@ export async function createEphemeralVoiceCredential(
         type: "realtime",
         model,
         modalities: ["audio", "text"],
+        instructions: `${instructions}\n\n${VOICE_SCOPE_POLICY}`,
         ...toolPolicy,
       },
     }),
