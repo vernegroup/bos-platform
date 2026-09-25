@@ -1,3 +1,6 @@
+import "server-only";
+import { createVoiceLabToolPolicy, assertNoVoiceDatabaseTools } from "./voiceToolPolicy";
+
 export type EphemeralVoiceCredential = {
   clientSecret: string;
   model: string;
