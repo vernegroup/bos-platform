@@ -146,3 +146,13 @@
  .bos-public-root .bos-bottom-bar .bos-page-width{width:calc(100vw - 48px)}
  .bos-public-root .bos-bottom-bar-inner{min-height:auto;padding:24px 0 20px}
 }
+
+/* BOS Assistant launcher safe-zone: keep footer content clear of viewport center */
+@media(min-width:801px){
+  .bos-public-root .bos-bottom-bar-inner{
+    grid-template-columns:minmax(0,1.35fr) minmax(180px,.8fr) minmax(180px,.65fr);
+    column-gap:clamp(110px,9vw,170px);
+  }
+  .bos-public-root .bos-footer-company{transform:translateX(54px)}
+  .bos-public-root .bos-footer-contact{transform:translateX(36px)}
+}
