@@ -12,9 +12,13 @@ const START_MESSAGE: TextChatMessage = {
 };
 const LOCAL_REPLY = "Wiadomość została dodana do lokalnej sesji testowej. Po podłączeniu silnika AI w tym miejscu pojawi się właściwa odpowiedź BOS Assistant.";
 
-type TextChatProps = {\n  onFirstMessage?: () => void;\n  onVoiceStateChange?: (state: MicrophoneState) => void;\n};
+type TextChatProps = {
+  onFirstMessage?: () => void;
+  onVoiceStateChange?: (state: MicrophoneState) => void;
+  onMicrophoneStreamChange?: (stream: MediaStream | null) => void;
+};
 
-export default function TextChat({ onFirstMessage, onVoiceStateChange }: TextChatProps) {
+export default function TextChat({ onFirstMessage, onVoiceStateChange, onMicrophoneStreamChange }: TextChatProps) {
   const [messages, setMessages] = useState<TextChatMessage[]>([START_MESSAGE]);
   const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
@@ -59,17 +63,9 @@ export default function TextChat({ onFirstMessage, onVoiceStateChange }: TextCha
           </div>
         )}
       </div>
-
       <form className="bos-assistant-composer" onSubmit={handleSubmit}>
-        <MicrophoneControl onStateChange={onVoiceStateChange} />
-        <textarea
-          rows={1}
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={handleKeyDown}
-          aria-label="Wiadomość do BOS Assistant"
-          placeholder="Napisz wiadomość..."
-        />
+        <MicrophoneControl onStateChange={onVoiceStateChange} onStreamChange={onMicrophoneStreamChange} />
+        <textarea rows={1} value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={handleKeyDown} aria-label="Wiadomość do BOS Assistant" placeholder="Napisz wiadomość..." />
         <button className="bos-assistant-send" type="submit" aria-label="Wyślij wiadomość" disabled={!draft.trim()}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.7 4.2 21 11.1a1 1 0 0 1 0 1.8L3.7 19.8a1 1 0 0 1-1.35-1.13l1.1-5.2L13 12 3.45 10.53l-1.1-5.2A1 1 0 0 1 3.7 4.2Z" /></svg>
         </button>

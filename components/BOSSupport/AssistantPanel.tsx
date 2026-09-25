@@ -1,17 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import TextChat from "./TextChat";
 import VoiceStateIndicator from "./VoiceStateIndicator";
 import type { MicrophoneState } from "./MicrophoneControl";
+import { VoiceSessionClient, type VoiceSessionSnapshot } from "../../lib/bos/voice/VoiceSessionClient";
 
 type AssistantPanelProps = { onClose: () => void };
 
 export default function AssistantPanel({ onClose }: AssistantPanelProps) {
   const [voiceState, setVoiceState] = useState<MicrophoneState>("idle");
+  const clientRef = useRef<VoiceSessionClient | null>(null);
+  const [session, setSession] = useState<VoiceSessionSnapshot | null>(null);
+
+  if (!clientRef.current) clientRef.current = new VoiceSessionClient();
+
+  useEffect(() => {
+    const client = clientRef.current!;
+    const unsubscribe = client.subscribe(setSession);
+    client.start();
+    return () => {
+      unsubscribe();
+      client.close();
+    };
+  }, []);
+
+  const handleStreamChange = useCallback((stream: MediaStream | null) => {
+    const client = clientRef.current;
+    if (!client) return;
+    if (stream) client.attachMicrophone(stream);
+    else client.detachMicrophone();
+  }, []);
 
   return (
-    <section className="bos-assistant-panel" id="bos-support-window" role="dialog" aria-modal="false" aria-labelledby="bos-assistant-title">
+    <section className="bos-assistant-panel" id="bos-support-window" role="dialog" aria-modal="false" aria-labelledby="bos-assistant-title" data-voice-session={session?.status ?? "idle"}>
       <header className="bos-assistant-header">
         <div>
           <span className="bos-assistant-eyebrow">BOS ASSISTANT</span>
@@ -20,7 +42,7 @@ export default function AssistantPanel({ onClose }: AssistantPanelProps) {
         <button className="bos-assistant-close" type="button" onClick={onClose} aria-label="Zamknij BOS Assistant">×</button>
       </header>
       <VoiceStateIndicator state={voiceState} />
-      <TextChat onVoiceStateChange={setVoiceState} />
+      <TextChat onVoiceStateChange={setVoiceState} onMicrophoneStreamChange={handleStreamChange} />
     </section>
   );
 }

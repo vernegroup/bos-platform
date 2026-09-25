@@ -6,9 +6,10 @@ export type MicrophoneState = "idle" | "requesting" | "active" | "denied" | "uns
 
 type MicrophoneControlProps = {
   onStateChange?: (state: MicrophoneState) => void;
+  onStreamChange?: (stream: MediaStream | null) => void;
 };
 
-export default function MicrophoneControl({ onStateChange }: MicrophoneControlProps) {
+export default function MicrophoneControl({ onStateChange, onStreamChange }: MicrophoneControlProps) {
   const [state, setState] = useState<MicrophoneState>("idle");
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -20,6 +21,7 @@ export default function MicrophoneControl({ onStateChange }: MicrophoneControlPr
   function stopMicrophone() {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
+    onStreamChange?.(null);
     updateState("idle");
   }
 
@@ -38,19 +40,17 @@ export default function MicrophoneControl({ onStateChange }: MicrophoneControlPr
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
         video: false,
       });
       streamRef.current = stream;
+      onStreamChange?.(stream);
       updateState("active");
     } catch (error) {
       const denied =
         error instanceof DOMException &&
         (error.name === "NotAllowedError" || error.name === "SecurityError");
+      onStreamChange?.(null);
       updateState(denied ? "denied" : "idle");
     }
   }
@@ -59,8 +59,9 @@ export default function MicrophoneControl({ onStateChange }: MicrophoneControlPr
     return () => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
+      onStreamChange?.(null);
     };
-  }, []);
+  }, [onStreamChange]);
 
   const label =
     state === "active"
@@ -87,9 +88,7 @@ export default function MicrophoneControl({ onStateChange }: MicrophoneControlPr
       </button>
       {(state === "denied" || state === "unsupported") && (
         <span className="bos-microphone-error" role="status">
-          {state === "denied"
-            ? "Brak dostępu do mikrofonu."
-            : "Mikrofon nie jest obsługiwany w tej przeglądarce."}
+          {state === "denied" ? "Brak dostępu do mikrofonu." : "Mikrofon nie jest obsługiwany w tej przeglądarce."}
         </span>
       )}
     </div>
