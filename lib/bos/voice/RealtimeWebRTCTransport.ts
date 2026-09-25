@@ -1,6 +1,7 @@
 import { parseRealtimeEvent, type RealtimeEvent, type RealtimeEventEnvelope } from "./RealtimeEvents";
+import { VoiceSessionExpiry } from "./VoiceSessionExpiry";
 
-export type RealtimeCredential = { clientSecret: string; model: string };
+export type RealtimeCredential = { clientSecret: string; model: string; expiresAt: number | null };
 
 type RealtimeTransportOptions = {
   sessionEndpoint?: string;
@@ -14,6 +15,7 @@ export class RealtimeWebRTCTransport {
   private channel: RTCDataChannel | null = null;
   private microphone: MediaStream | null = null;
   private options: RealtimeTransportOptions;
+  private expiry = new VoiceSessionExpiry();
 
   constructor(options: RealtimeTransportOptions = {}) { this.options = options; }
 
@@ -21,6 +23,7 @@ export class RealtimeWebRTCTransport {
     this.disconnect();
     this.microphone = stream;
     const credential = await this.getCredential();
+    this.expiry.arm({expiresAt:credential.expiresAt,onExpired:()=>this.disconnect()});
     const peer = new RTCPeerConnection();
     this.peer = peer;
     stream.getAudioTracks().forEach((track) => peer.addTrack(track, stream));
@@ -61,6 +64,7 @@ export class RealtimeWebRTCTransport {
   }
 
   disconnect() {
+    this.expiry.clear();
     if (this.channel) {
       this.channel.removeEventListener("message", this.handleMessage);
       this.channel.close();
@@ -89,9 +93,9 @@ export class RealtimeWebRTCTransport {
       method: "POST", headers: { "Content-Type": "application/json" }, cache: "no-store",
     });
     if (!response.ok) throw new Error(`Voice session endpoint failed (${response.status})`);
-    const data = (await response.json()) as { client_secret?: { value?: string }; clientSecret?: string; model?: string };
+    const data = (await response.json()) as { client_secret?: { value?: string }; clientSecret?: string; model?: string; expiresAt?: number | null };
     const clientSecret = data.clientSecret ?? data.client_secret?.value;
     if (!clientSecret || !data.model) throw new Error("Voice session endpoint returned incomplete realtime credentials");
-    return { clientSecret, model: data.model };
+    return { clientSecret, model: data.model, expiresAt: data.expiresAt ?? null };
   }
 }
