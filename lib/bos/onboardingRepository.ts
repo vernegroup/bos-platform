@@ -253,10 +253,10 @@ export async function listOnboardingStartOptions(organizationId?:string) {
   requirePersistedOnboarding();
   const sql=db(); const orgId=tenantId(organizationId);
   const [standards,memberships,employees,products]=await Promise.all([
-    sql`SELECT s.id standard_id,s.name,s.area,sv.id version_id,sv.version_label
+    sql`SELECT DISTINCT ON (s.id) s.id standard_id,s.name,s.area,sv.id version_id,sv.version_label
       FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.organization_id=${orgId} AND s.status='ACTIVE' AND sv.status='PUBLISHED'
-      ORDER BY s.name,sv.version_number DESC`,
+      ORDER BY s.id,sv.version_number DESC`,
     sql`SELECT u.id,u.display_name,u.email,m.role FROM memberships m JOIN users u ON u.id=m.user_id
       WHERE m.organization_id=${orgId} AND m.status='ACTIVE' AND u.status='ACTIVE' ORDER BY u.display_name`,
     sql`SELECT e.id,e.first_name,e.last_name,e.employee_number,e.position,e.department,e.linked_user_id
