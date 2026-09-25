@@ -31,7 +31,7 @@ export default async function UpdatesPage() {
       <section className="bos-core-version-strip">
         {versions.map((version) => (
           <article key={version.key}>
-            <span>{version.key==="onboarding"?"WDROŻENIA":version.key==="promotions"?"AWANSE":version.key.toUpperCase()}</span>
+            <span>{version.key === "onboarding" ? "WDROŻENIA" : "AWANSE"}</span>
             <strong>{version.currentVersion ?? "—"}</strong>
             <small>{version.latestUpdateAt ? `OSTATNIA PUBLIKACJA ${datePL(version.latestUpdateAt)}` : "BRAK OPUBLIKOWANEJ HISTORII"}</small>
           </article>
