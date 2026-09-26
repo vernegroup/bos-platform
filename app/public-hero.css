@@ -105,3 +105,9 @@
 
 /* CLEANUP: no legacy scroll marker. */
 .bos-public-hero__marker{display:none!important}
+
+
+/* MOBILE CLEANUP — wallpaper provides sufficient contrast; remove legacy wordmark halo only on mobile. */
+@media(max-width:800px){
+  .bos-public-wordmark:after{content:none;display:none}
+}

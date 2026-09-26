@@ -1,9 +1,9 @@
 /* SCENE MATCH FIX — luminous architectural corridor inspired by the approved reference.
    Procedural CSS only: deep black space, rectilinear planes, electric blue/violet and warm amber portals. */
-:root{--bos-public-scroll:0;--bos-public-mouse-x:0;--bos-public-mouse-y:0;--bos-public-black:#010204;--bos-public-navy:#020711;--bos-public-gold:#d49a50}
+:root{--bos-public-scroll:0;--bos-public-mouse-x:0;--bos-public-mouse-y:0;--bos-public-black:#02050a;--bos-public-navy:#030914;--bos-public-gold:#d49a50}
 .bos-public-root{position:relative;isolation:isolate;min-height:100vh;background:var(--bos-public-black);color:#fff}
 .bos-public-content{position:relative;z-index:2}
-.bos-public-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#010204;perspective:1550px}
+.bos-public-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#02050a;perspective:1550px}
 .bos-public-scene>*{position:absolute}
 .bos-public-scene__base{inset:0;background:
  radial-gradient(ellipse at 64% 48%,rgba(8,23,42,.76),transparent 42%),
@@ -83,10 +83,10 @@
 
 /* DARK HALL — viewer stands in a black corridor looking into a barely lit hall.
    The visual focus is the empty darkness below the wordmark; neon only hints at distant structure. */
-.bos-public-scene{perspective:1850px;background:#000103}
+.bos-public-scene{perspective:1850px;background:#02050a}
 .bos-public-scene__base{background:
  radial-gradient(ellipse 31% 23% at 50% 59%,rgba(5,13,21,.34),rgba(1,4,8,.12) 45%,transparent 76%),
- linear-gradient(90deg,#000102 0%,#01050a 20%,#010307 50%,#020309 79%,#000102 100%)}
+ linear-gradient(90deg,#01040a 0%,#020812 20%,#020711 50%,#030712 79%,#01040a 100%)}
 .bos-public-scene__architecture{
  inset:11% 4% 15% 29%;
  opacity:.34;
@@ -126,3 +126,80 @@
  radial-gradient(ellipse 35% 28% at 50% 59%,transparent 0%,rgba(0,0,0,.1) 48%,rgba(0,0,0,.48) 78%,rgba(0,0,0,.82) 100%),
  linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.16) 30%,rgba(0,0,0,.12) 70%,rgba(0,0,0,.86)),
  linear-gradient(180deg,rgba(0,0,0,.7),transparent 28%,transparent 70%,rgba(0,0,0,.55))}
+
+
+/* ROOM DEPTH LAB 01 — implied physical room, still almost entirely swallowed by darkness.
+   Large converging planes catch only reflected neon; the center stays empty and deep. */
+.bos-public-scene__base:after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:
+ linear-gradient(152deg,rgba(31,94,145,.055) 0 1px,transparent 1px 100%),
+ linear-gradient(28deg,transparent 0 67%,rgba(158,83,43,.045) 67% 67.15%,transparent 67.15%),
+ radial-gradient(ellipse 15% 18% at 55% 55%,rgba(4,10,15,.18),rgba(0,0,0,.62) 72%);
+ clip-path:polygon(7% 5%,94% 8%,79% 91%,19% 92%);
+ opacity:.78;
+}
+.bos-public-scene__architecture:before{
+ content:"";position:absolute;inset:-28% -38%;pointer-events:none;
+ background:
+ linear-gradient(166deg,rgba(12,36,56,.16),rgba(0,0,0,.02) 29%,transparent 29.3%) left/50% 100% no-repeat,
+ linear-gradient(194deg,rgba(34,20,42,.12),rgba(0,0,0,.02) 30%,transparent 30.3%) right/50% 100% no-repeat,
+ linear-gradient(180deg,rgba(15,31,45,.10),transparent 32%) top/100% 48% no-repeat,
+ linear-gradient(0deg,rgba(10,24,35,.18),transparent 38%) bottom/100% 54% no-repeat;
+ opacity:.72;filter:blur(.35px);
+}
+.bos-public-scene__architecture:after{
+ content:"";position:absolute;left:19%;right:18%;top:20%;bottom:13%;pointer-events:none;
+ border:1px solid rgba(95,147,184,.035);
+ box-shadow:inset 0 0 70px rgba(3,12,20,.44),0 0 110px rgba(0,0,0,.75);
+ transform:perspective(900px) rotateX(-1deg);
+ background:
+ linear-gradient(90deg,rgba(39,115,168,.045),transparent 8%,transparent 91%,rgba(183,94,43,.04)),
+ linear-gradient(180deg,rgba(36,91,130,.025),transparent 25%,transparent 76%,rgba(31,72,96,.035));
+}
+.bos-public-scene__haze:after{
+ content:"";position:absolute;left:24%;right:21%;bottom:5%;height:42%;
+ background:
+ repeating-linear-gradient(171deg,transparent 0 8.5%,rgba(83,137,170,.018) 8.7% 8.85%,transparent 9.05% 17%),
+ linear-gradient(180deg,transparent,rgba(14,34,48,.09));
+ clip-path:polygon(43% 0,57% 0,100% 100%,0 100%);
+ filter:blur(.25px);opacity:.72;
+}
+@media(max-width:800px){
+ .bos-public-scene__base:after{clip-path:polygon(0 7%,100% 8%,92% 92%,7% 92%)}
+ .bos-public-scene__architecture:after{left:7%;right:6%}
+ .bos-public-scene__haze:after{left:8%;right:7%}
+}
+
+
+
+
+/* WALLPAPER LAB 02 — raw home.jpg quality/scale check. No image filters or dimming. */
+.bos-public-scene:before{
+ content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+ background-image:url("/images/HOME%202.jpg");
+ background-position:center center;
+ background-size:cover;
+ background-repeat:no-repeat;
+ opacity:1;
+ transform:none;
+ filter:none;
+}
+.bos-public-scene:after{content:none}
+.bos-public-scene__base,.bos-public-scene__mist,.bos-public-scene__architecture,.bos-public-scene__beams,.bos-public-scene__haze{display:none}
+.bos-public-scene__vignette,.bos-public-scene__grain{display:none}
+
+
+/* MOBILE WALLPAPER LAB — dedicated portrait composition; desktop remains untouched. */
+@media(max-width:800px){
+ .bos-public-scene:before{
+  inset:0;
+  background-image:url("/images/HOME%202%20MOBILE.png");
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  opacity:1;
+  transform:none;
+  filter:none;
+ }
+}

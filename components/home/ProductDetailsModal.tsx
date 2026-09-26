@@ -32,7 +32,7 @@ export default function ProductDetailsModal({product,variant="default"}:{product
     <button ref={closeRef} className="bos-product-modal-close" type="button" aria-label="Zamknij" onClick={()=>setOpen(false)}>×</button>
     <div className="bos-product-modal-copy">
      <span className="bos-product-modal-kicker">{d.kicker}</span><h2 id={"modal-"+product}>{d.title}</h2><p className="bos-product-modal-lead">{d.description}</p>
-     <div className="bos-product-modal-benefits">{d.benefits.map(([h,p])=><article key={h}><i aria-hidden="true">✓</i><div><h3>{h}</h3><p>{p}</p></div></article>)}</div>
+     <div className="bos-product-modal-benefits">{d.benefits.map(([h,p])=><article key={h}><div><h3>{h}</h3><p>{p}</p></div></article>)}</div>
      <div className="bos-product-modal-audience"><b>Dla kogo?</b><p>{d.audience}</p></div>
      <Link href="/register" className="bos-product-modal-cta">ZAŁÓŻ KONTO <span>→</span></Link>
     </div>
@@ -40,7 +40,7 @@ export default function ProductDetailsModal({product,variant="default"}:{product
      <div className="bos-product-demo-frame">
       {!videoFailed?<video autoPlay muted loop playsInline preload="metadata" onError={()=>setVideoFailed(true)}><source src={d.demo} type="video/webm"/></video>:<div className="bos-product-demo-placeholder"><span>BOS</span><strong>Prezentacja produktu</strong><p>Miejsce na finalne nagranie rzeczywistego interfejsu.</p></div>}
      </div>
-     <div className="bos-product-modal-steps">{d.steps.map(([n,h,p])=><article key={n}><b>{n}</b><div><h3>{h}</h3><p>{p}</p></div></article>)}</div>
+     <div className="bos-product-modal-steps">{d.steps.map(([,h,p])=><article key={h}><div><h3>{h}</h3><p>{p}</p></div></article>)}</div>
     </div>
    </section>
   </div>}
