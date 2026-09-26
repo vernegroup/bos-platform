@@ -83,7 +83,7 @@
 .bos-product-rail__item.is-planned .bos-product-rail__name{color:rgba(246,244,239,.28)}
 /* dark product modal retained */
 .bos-public-root .bos-product-modal-backdrop{background:rgba(0,3,7,.84);backdrop-filter:blur(14px)}
-.bos-public-root .bos-product-modal{border:1px solid rgba(255,255,255,.1);background:#07111d;color:#eef1f4;box-shadow:0 40px 120px rgba(0,0,0,.65)}
+.bos-public-root .bos-product-modal{border:1px solid rgba(255,255,255,.1);background:#101820;color:#eef1f4;box-shadow:0 40px 120px rgba(0,0,0,.65)}
 .bos-public-root .bos-product-modal-close{background:rgba(255,255,255,.06);color:#fff;box-shadow:none}
 .bos-public-root .bos-product-modal-kicker{color:#d2a45b}
 .bos-public-root .bos-product-modal-copy>h2,.bos-public-root .bos-product-modal-benefits h3,.bos-public-root .bos-product-modal-steps h3{color:#f4f2ed}
