@@ -177,7 +177,7 @@
 /* WALLPAPER LAB 02 — raw home.jpg quality/scale check. No image filters or dimming. */
 .bos-public-scene:before{
  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
- background-image:url("/images/home.jpg");
+ background-image:url("/images/HOME%202.jpg");
  background-position:center center;
  background-size:cover;
  background-repeat:no-repeat;
