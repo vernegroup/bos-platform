@@ -203,3 +203,17 @@
   filter:none;
  }
 }
+
+
+/* ANDROID MOBILE VIEWPORT FIX — keep the portrait wallpaper canvas stable while Chrome UI expands/collapses.
+   100svh uses the small viewport as a fixed reference, preventing background-size:cover from re-cropping the scene mid-scroll. */
+@media(max-width:800px){
+ .bos-public-scene{
+  inset:auto;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  height:100svh;
+ }
+}
