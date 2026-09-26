@@ -107,3 +107,23 @@
 }
 @media(hover:none){.bos-product-rail__reveal{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.bos-product-rail__name,.bos-product-rail__reveal{transition:none}}
+
+
+/* PRODUCT MODAL UI ALIGNMENT — match authenticated BOS visual language; dimensions unchanged. */
+.bos-public-root .bos-product-modal{border-radius:0;border:1px solid rgba(123,139,153,.34);background:#f7f8f8;color:#071522;box-shadow:0 28px 90px rgba(0,0,0,.52)}
+.bos-public-root .bos-product-modal-copy{background:#f7f8f8;border-right:1px solid #d9dee1}
+.bos-public-root .bos-product-modal-close{border:1px solid #d9dee1;border-radius:0;background:#fff;color:#071522}
+.bos-public-root .bos-product-modal-kicker{color:#b47b20}
+.bos-public-root .bos-product-modal-copy>h2{color:#071522;font-family:Arial,"Helvetica Neue",sans-serif;font-weight:700;letter-spacing:-.035em}
+.bos-public-root .bos-product-modal-lead,.bos-public-root .bos-product-modal-benefits p,.bos-public-root .bos-product-modal-steps p{color:#66727e}
+.bos-public-root .bos-product-modal-benefits{gap:0;border-top:1px solid #d9dee1}
+.bos-public-root .bos-product-modal-benefits article{display:block;padding:16px 0;border-bottom:1px solid #d9dee1}
+.bos-public-root .bos-product-modal-benefits h3,.bos-public-root .bos-product-modal-steps h3{color:#071522;font-family:Arial,"Helvetica Neue",sans-serif;font-weight:700}
+.bos-public-root .bos-product-modal-audience{border:1px solid #e1e4e6;background:#fff}
+.bos-public-root .bos-product-modal-audience p{color:#66727e}
+.bos-public-root .bos-product-modal-cta{border-radius:0;background:#c38d31;color:#fff}
+.bos-public-root .bos-product-modal-demo{background:#f1f3f3}
+.bos-public-root .bos-product-demo-frame{border-radius:0;border:1px solid #cfd5d8;background:#0b1823;box-shadow:none}
+.bos-public-root .bos-product-modal-steps{border-color:#cfd5d8}
+.bos-public-root .bos-product-modal-steps article{display:block;padding-left:14px;border-left:1px solid #d9dee1}
+.bos-public-root .bos-product-modal-steps article:first-child{border-left:0}
