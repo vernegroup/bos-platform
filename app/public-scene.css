@@ -188,3 +188,18 @@
 .bos-public-scene:after{content:none}
 .bos-public-scene__base,.bos-public-scene__mist,.bos-public-scene__architecture,.bos-public-scene__beams,.bos-public-scene__haze{display:none}
 .bos-public-scene__vignette,.bos-public-scene__grain{display:none}
+
+
+/* MOBILE WALLPAPER LAB — dedicated portrait composition; desktop remains untouched. */
+@media(max-width:800px){
+ .bos-public-scene:before{
+  inset:0;
+  background-image:url("/images/HOME%202%20MOBILE.png");
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  opacity:1;
+  transform:none;
+  filter:none;
+ }
+}
