@@ -194,7 +194,7 @@
 @media(max-width:800px){
  .bos-public-scene:before{
   inset:0;
-  background-image:url("/images/HOME%202%20MOBILE.png");
+  background-image:url("/_next/image?url=%2Fimages%2FHOME%25202%2520MOBILE.png&w=1080&q=82");
   background-position:center center;
   background-size:cover;
   background-repeat:no-repeat;
