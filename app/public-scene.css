@@ -170,3 +170,25 @@
  .bos-public-scene__architecture:after{left:7%;right:6%}
  .bos-public-scene__haze:after{left:8%;right:7%}
 }
+
+
+/* IMAGE HYBRID LAB 01 — generated room is a low-frequency depth plate, never the UI itself. */
+.bos-public-scene:before{
+ content:"";position:absolute;inset:-5%;z-index:0;pointer-events:none;
+ background:url("/images/bos-room-lab-01.webp") center 56%/cover no-repeat;
+ filter:saturate(.72) brightness(.28) contrast(1.12) hue-rotate(-4deg) blur(.35px);
+ opacity:.48;
+ transform:translate3d(calc(var(--bos-public-mouse-x)*-.18vw),calc(var(--bos-public-mouse-y)*-.10vh),-760px) scale(1.08);
+ transform-origin:50% 55%;
+}
+.bos-public-scene:after{
+ content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+ background:
+ radial-gradient(ellipse 34% 30% at 50% 56%,transparent 0%,rgba(1,5,11,.18) 54%,rgba(1,4,9,.62) 100%),
+ linear-gradient(90deg,rgba(1,4,9,.82),rgba(2,7,15,.22) 30%,rgba(2,7,15,.16) 70%,rgba(1,4,9,.82)),
+ linear-gradient(180deg,rgba(1,4,9,.58),transparent 28%,transparent 68%,rgba(1,4,9,.45));
+}
+.bos-public-scene__base,.bos-public-scene__mist,.bos-public-scene__architecture,.bos-public-scene__beams,.bos-public-scene__haze,.bos-public-scene__vignette,.bos-public-scene__grain{z-index:1}
+@media(max-width:800px){
+ .bos-public-scene:before{inset:-3% -24%;background-position:50% 54%;opacity:.36;filter:saturate(.68) brightness(.24) contrast(1.1) blur(.45px)}
+}
