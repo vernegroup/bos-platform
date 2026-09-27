@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run test:analytics-synthetic && npm run test:analytics-privacy && next build",
     "start": "next start",
     "lint": "eslint",
     "db:migrate": "node scripts/migrate.mjs",
     "test:onboarding-failsafe": "node scripts/check-onboarding-failsafe.mjs",
-    "test:analytics-synthetic": "tsx analytics/tests/synthetic-data.test.ts"
+    "test:analytics-synthetic": "tsx analytics/tests/synthetic-data.test.ts",
+    "test:analytics-privacy": "tsx analytics/tests/privacy-validator.test.ts"
   },
   "dependencies": {
     "argon2": "^0.45.1",
