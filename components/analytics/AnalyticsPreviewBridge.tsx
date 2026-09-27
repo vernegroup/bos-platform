@@ -22,7 +22,6 @@ export function AnalyticsPreviewBridge() {
     });
 
     collector.emit("session_start");
-    collector.pageView();
 
     const click = (event: MouseEvent) => collector.click(event);
     let lastScroll = -1;
