@@ -15,7 +15,7 @@ export function AnalyticsPreviewBridge() {
   useEffect(() => {
     if (analyticsEnvironment() !== "preview") return;
     const collector = new BrowserCollector({
-      domain: window.location.hostname,
+      domain: "standardybiznesu.pl",
       appId: "bos-platform",
       environment: "preview",
       path: () => window.location.pathname,
@@ -46,7 +46,7 @@ export function AnalyticsPreviewBridge() {
 
   useEffect(() => {
     if (analyticsEnvironment() !== "preview") return;
-    const collector = new BrowserCollector({ domain: window.location.hostname, appId: "bos-platform", environment: "preview", path: () => window.location.pathname });
+    const collector = new BrowserCollector({ domain: "standardybiznesu.pl", appId: "bos-platform", environment: "preview", path: () => window.location.pathname });
     collector.pageView();
     void collector.flush();
   }, [pathname]);
