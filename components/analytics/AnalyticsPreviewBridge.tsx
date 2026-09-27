@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { BrowserCollector } from "@/analytics/browser/browser-collector";
 
@@ -11,7 +11,6 @@ function analyticsEnvironment(): "production" | "preview" | "development" {
 
 export function AnalyticsPreviewBridge() {
   const pathname = usePathname();
-  const previousPath = useRef<string | null>(null);
 
   useEffect(() => {
     if (analyticsEnvironment() !== "preview") return;
@@ -47,10 +46,10 @@ export function AnalyticsPreviewBridge() {
   useEffect(() => {
     if (analyticsEnvironment() !== "preview") return;
     const collector = new BrowserCollector({ domain: "standardybiznesu.pl", appId: "bos-platform", environment: "preview", path: () => window.location.pathname });
-    const from = previousPath.current;
-    if (from && from !== pathname) collector.navigation(from, pathname);
+    const previousPath = sessionStorage.getItem("bos_analytics_previous_path");
+    if (previousPath && previousPath !== pathname) collector.navigation(previousPath, pathname);
     collector.pageView();
-    previousPath.current = pathname;
+    sessionStorage.setItem("bos_analytics_previous_path", pathname);
     void collector.flush();
   }, [pathname]);
 
