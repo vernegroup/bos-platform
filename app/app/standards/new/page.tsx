@@ -12,10 +12,10 @@ async function createDraft(formData:FormData){
  const returnTo=String(formData.get("returnTo")??"").trim();
  if(!name) redirect("/app/standards/new?error=name");
  const id=await createOrganizationDraftStandard({organizationId:access.organization.id,name,area,createdByUserId:access.user.id});
- redirect(returnTo==="promotions"?`/app/standards/${id}?returnTo=promotions`:`/app/standards/${id}`);
+ redirect(returnTo==="promotions"?`/app/standards/${id}?returnTo=promotions`:returnTo==="onboarding"?`/app/standards/${id}?returnTo=onboarding`:`/app/standards/${id}`);
 }
 
-export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string;returnTo?:string}>}){
+export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string;returnTo?:"promotions"|"onboarding"}>}){
  const access=await requireBOSAccess(); const {error,returnTo}=await searchParams;
  return <>
   <div className="bos-standard-back"><Link href="/app/standards">← STANDARDY ORGANIZACJI</Link></div>
