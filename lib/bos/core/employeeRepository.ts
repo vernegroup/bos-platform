@@ -101,5 +101,13 @@ export async function getEmployeeOperationalHistory(input:{organizationId:string
   processStatus:r.process_status,owner:r.owner,latestDecision:r.latest_decision??undefined,
   latestDecisionAt:r.latest_decision_at?String(r.latest_decision_at):undefined,latestDecisionBy:r.latest_decision_by??undefined,
   latestClosureId:r.latest_closure_id??undefined,decisionCount:r.decision_count??0
+ })),promotions:promotionRows.map(r=>({
+  processId:r.process_id,fromRole:r.from_role,toRole:r.to_role,changeType:r.change_type,
+  standardId:r.standard_id??undefined,standardName:r.standard_name??undefined,
+  standardVersionId:r.standard_version_id??undefined,standardVersion:r.version_label??undefined,
+  lifecycleState:r.lifecycle_state,owner:r.owner,latestDecision:r.latest_decision??undefined,
+  latestDecisionAt:r.latest_decision_at?String(r.latest_decision_at):undefined,
+  latestDecisionBy:r.latest_decision_by??undefined,latestClosureId:r.latest_closure_id??undefined,
+  closedAt:r.closed_at?String(r.closed_at):undefined,decisionCount:r.decision_count??0
  }))};
 }
