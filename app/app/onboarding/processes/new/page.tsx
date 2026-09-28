@@ -23,8 +23,9 @@ async function startOnboarding(fd:FormData){
   redirect("/app/onboarding/processes");
 }
 
-export default async function NewProcessPage(){
-  const access=await requireBOSAccess(); const options=await listOnboardingStartOptions(access.organization.id);
+export default async function NewProcessPage({searchParams}:{searchParams:Promise<{standardId?:string}>}){
+  const access=await requireBOSAccess(); const options=await listOnboardingStartOptions(access.organization.id); const {standardId:selectedStandardId}=await searchParams;
+  const selectedStandard=selectedStandardId?options.standards.find(s=>s.standardId===selectedStandardId):undefined;
   const onboardingProduct=options.products.find(p=>p.key.toLowerCase().includes("onboarding"))??options.products[0];
   const today=new Date().toISOString().slice(0,10);
   return <>
@@ -35,7 +36,7 @@ export default async function NewProcessPage(){
     </section>
     <section className="bos-process-new">
       {!options.standards.length||!options.members.length||!onboardingProduct?<div className="bos-operational-empty"><strong>Nie można utworzyć wdrożenia</strong>
-        <p>Potrzebujesz opublikowanego Standardu, aktywnych członków organizacji i aktywnej licencji produktu.</p></div>:
+        <p>Potrzebujesz opublikowanego Standardu, aktywnych członków organizacji i aktywnej licencji produktu.</p>{!options.standards.length&&<div style={{marginTop:14}}><Link href="/app/standards/new?returnTo=onboarding" className="bos-standard-primary-action">+ UTWÓRZ STANDARD</Link></div>}</div>:
       <form action={startOnboarding} style={{display:"grid",gap:18}}>
         <input type="hidden" name="productId" value={onboardingProduct.id}/>
         <div className="bos-process-new-field"><span>01 / PRACOWNIK</span><strong>Pracownik</strong>
@@ -44,8 +45,8 @@ export default async function NewProcessPage(){
           <input name="employeeName" required placeholder="Imię i nazwisko pracownika" style={{padding:10}}/>
           <small>Snapshot nazwy pozostaje w historii procesu niezależnie od późniejszych zmian konta.</small></div>
         <div className="bos-process-new-field"><span>02 / STANDARD</span><strong>Opublikowana wersja Standardu</strong>
-          <select name="standardVersion" required defaultValue="" style={{padding:10}}><option value="" disabled>Wybierz Standard i wersję</option>
-            {options.standards.map(s=><option value={`${s.standardId}:${s.versionId}`} key={s.versionId}>{s.name} · {s.version}{s.area?` · ${s.area}`:""}</option>)}</select></div>
+          <select name="standardVersion" required defaultValue={selectedStandard?`${selectedStandard.standardId}:${selectedStandard.versionId}`:""} style={{padding:10}}><option value="" disabled>Wybierz Standard i wersję</option>
+            {options.standards.map(s=><option value={`${s.standardId}:${s.versionId}`} key={s.versionId}>{s.name} · {s.version}{s.area?` · ${s.area}`:""}</option>)}</select><div style={{marginTop:10}}><Link href="/app/standards/new?returnTo=onboarding" className="bos-onboarding-text-link">+ UTWÓRZ NOWY STANDARD ORGANIZACJI</Link></div>{selectedStandard&&<small>Wybrano z repozytorium organizacji: {selectedStandard.name} · {selectedStandard.version}</small>}</div>
         <div className="bos-process-new-field"><span>03 / ROLE OPERACYJNE</span><strong>Owner, trener, evaluator i opcjonalny buddy</strong>
           {(["ownerUserId","trainerUserId","evaluatorUserId"] as const).map((name,i)=><label key={name} style={{display:"grid",gap:6}}>
             <small>{["OWNER PROCESU","TRENER","EVALUATOR"][i]}</small><select name={name} required defaultValue={access.user.id} style={{padding:10}}>
