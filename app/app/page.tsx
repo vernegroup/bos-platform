@@ -3,7 +3,7 @@ import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
 import { listStandards, listProcesses } from "@/lib/bos/onboardingRepository";
-import { listProductUpdates } from "@/lib/bos/productUpdateRepository";
+import { listProductUpdates } from "@/lib/bos/productUpdateRepository";\nimport { listPromotionProcesses, listPromotionClosures } from "@/lib/bos/promotionsRepository";
 
 const productMeta = {
   onboarding: { description:"System wdrażania pracownika", href:"/app/onboarding" },
@@ -18,9 +18,9 @@ export const dynamic="force-dynamic";
 export default async function BOSAppPage(){
   const access=await requireBOSAccess();
   const products=await listLicensedProducts(access);
-  const hasOnboarding=products.some(product=>product.key==="onboarding");
+  const hasOnboarding=products.some(product=>product.key==="onboarding");\n  const hasPromotions=products.some(product=>product.key==="promotions");
 
-  const [members,standards,processes,updates]=await Promise.all([
+  const [members,standards,processes,updates,promotionProcesses,promotionClosures]=await Promise.all([
     listOrganizationMembers(access),
     hasOnboarding?listStandards(access.organization.id):Promise.resolve([]),
     hasOnboarding?listProcesses(access.organization.id):Promise.resolve([]),
@@ -37,7 +37,7 @@ export default async function BOSAppPage(){
       <article><strong>{products.length}</strong><span>Aktywne produkty</span></article>
       <article><strong>{members.filter(member=>member.status==="ACTIVE").length}</strong><span>Użytkowników</span></article>
       <article><strong>{standards.length}</strong><span>Standardów</span></article>
-      <article><strong>{processes.length}</strong><span>Wdrożenia w toku</span></article>
+      <article><strong>{processes.length+promotionProcesses.length}</strong><span>Procesy w toku</span></article>
     </section>
 
     <section className="bos-home-section" aria-labelledby="home-products">
@@ -55,6 +55,21 @@ export default async function BOSAppPage(){
       </div>
     </section>
 
+    {hasPromotions&&<section className="bos-home-section" aria-labelledby="home-promotions">
+      <div className="bos-home-section-head"><h2 id="home-promotions">Zmiany ról</h2><Link href="/app/promotions/processes">Wszystkie →</Link></div>
+      <div className="bos-home-updates">
+       {promotionProcesses.slice(0,4).map(process=><Link href={`/app/promotions/processes/${process.id}`} key={process.id}>
+        <div><strong>{process.employee}</strong><span>{process.fromRole} → {process.toRole} · {process.type}</span></div>
+        <time>{process.gates.readyAllowed?"DO DECYZJI":process.latestDecision==="NOT_YET"?"JESZCZE NIE":process.lifecycleState}</time>
+       </Link>)}
+       {!promotionProcesses.length&&<div className="bos-home-empty">Brak zmian ról wymagających pracy.</div>}
+      </div>
+      <div className="bos-home-section-head" style={{marginTop:16}}><h2>Ostatnio zamknięte</h2><Link href="/app/promotions/closed">Historia →</Link></div>
+      <div className="bos-home-updates">
+       {promotionClosures.slice(0,3).map(item=><Link href={`/app/promotions/closed/${item.id}`} key={item.id}><div><strong>{item.employee}</strong><span>{item.fromRole} → {item.toRole}</span></div><time>{item.result==="READY"?"GOTOWY":"STOP"}</time></Link>)}
+       {!promotionClosures.length&&<div className="bos-home-empty">Brak zamkniętych zmian ról.</div>}
+      </div>
+    </section>}
     <section className="bos-home-section" aria-labelledby="home-updates">
       <div className="bos-home-section-head"><h2 id="home-updates">Ostatnie aktualizacje</h2><Link href="/app/updates">Zobacz wszystkie →</Link></div>
       <div className="bos-home-updates">
