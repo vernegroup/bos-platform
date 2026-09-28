@@ -54,7 +54,7 @@ export async function listPromotionClosures(access:BOSAccess){
 
 export async function getPromotionClosure(access:BOSAccess,id:string){
  const rows=await db().unsafe(`
-  SELECT c.*,pd.decision_sequence,pd.decided_at,pd.note decision_note,
+  SELECT c.*,pd.decision_sequence,pd.decided_at,pd.note decision_note,\n    pd.standard_pass,pd.process_pass,pd.entry_pass,pd.deployment_pass,pd.k_pass,pd.readiness_pass,pd.transition_pass,
     owner.display_name owner,closer.display_name closer,s.name standard_name,sv.version_label
   FROM promotion_closure_events c
   JOIN promotion_decisions pd
@@ -73,7 +73,7 @@ export async function getPromotionClosure(access:BOSAccess,id:string){
   fromRole:r.from_role_snapshot,toRole:r.to_role_snapshot,type:typePL(r.change_type_snapshot),
   result:r.closure_kind,closedAt:datePL(r.closed_at),owner:r.owner,closer:r.closer,
   standardName:r.standard_name,standardVersion:r.version_label,
-  decisionSequence:r.decision_sequence,decisionNote:r.decision_note??undefined};
+  decisionSequence:r.decision_sequence,decisionNote:r.decision_note??undefined,decidedAt:datePL(r.decided_at),\n  gateSnapshot:{standard:!!r.standard_pass,process:!!r.process_pass,entry:!!r.entry_pass,deployment:!!r.deployment_pass,k:!!r.k_pass,readiness:!!r.readiness_pass,transition:!!r.transition_pass}};
 }
 
 export async function getPromotionProcess(access:BOSAccess,id:string){
