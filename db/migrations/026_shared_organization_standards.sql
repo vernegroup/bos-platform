@@ -4,8 +4,8 @@ BEGIN;
 -- Existing product_id values are retained as legacy provenance only.
 ALTER TABLE standards ALTER COLUMN product_id DROP NOT NULL;
 
-INSERT INTO bos_schema_migrations(version,description)
-VALUES ('026','CORE-STD-02 organization-owned Standards')
-ON CONFLICT (version) DO NOTHING;
+INSERT INTO bos_schema_migrations(name)
+VALUES ('026_shared_organization_standards')
+ON CONFLICT (name) DO NOTHING;
 
 COMMIT;
