@@ -54,7 +54,8 @@ export async function listPromotionClosures(access:BOSAccess){
 
 export async function getPromotionClosure(access:BOSAccess,id:string){
  const rows=await db().unsafe(`
-  SELECT c.*,pd.decision_sequence,pd.decided_at,pd.note decision_note,\n    pd.standard_pass,pd.process_pass,pd.entry_pass,pd.deployment_pass,pd.k_pass,pd.readiness_pass,pd.transition_pass,
+  SELECT c.*,pd.decision_sequence,pd.decided_at,pd.note decision_note,
+    pd.standard_pass,pd.process_pass,pd.entry_pass,pd.deployment_pass,pd.k_pass,pd.readiness_pass,pd.transition_pass,
     owner.display_name owner,closer.display_name closer,s.name standard_name,sv.version_label
   FROM promotion_closure_events c
   JOIN promotion_decisions pd
