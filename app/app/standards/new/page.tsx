@@ -11,7 +11,7 @@ async function createDraft(formData:FormData){
  const area=String(formData.get("area")??"").trim();
  if(!name) redirect("/app/standards/new?error=name");
  const id=await createOrganizationDraftStandard({organizationId:access.organization.id,name,area,createdByUserId:access.user.id});
- redirect(`/app/onboarding/standards/${id}`);
+ redirect(`/app/standards/${id}`);
 }
 
 export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string}>}){
