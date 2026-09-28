@@ -17,8 +17,7 @@ export default async function PromotionProcessesPage() {
           <div className="bos-app-kicker">01 / PRZEPROWADŹ</div>
           <h1>Zmiany w toku</h1>
           <p>Każdy awans lub przesunięcie poziome pozostaje osobnym procesem z właścicielem, datą wejścia i kontrolą kryteriów gotowości.</p>
-        </div>
-      </section>
+        </div>\n          <Link href="/app/promotions/processes/new" className="bos-standard-primary-action">+ NOWA ZMIANA</Link>\n      </section>
 
       <div className="bos-promotions-commandbar">
         <div><span>W TOKU</span><strong>{rows.length}</strong></div>
