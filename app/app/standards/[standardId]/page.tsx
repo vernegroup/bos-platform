@@ -7,10 +7,10 @@ export default async function OrganizationStandardDetailPage({
   searchParams,
 }: {
   params: Promise<{ standardId: string }>;
-  searchParams?: Promise<{ returnTo?: string }>;
+  searchParams?: Promise<{ returnTo?: "promotions" | "onboarding" }>;
 }) {
   const { standardId } = await params;
   const { returnTo } = (await searchParams) ?? {};
-  const query = returnTo === "promotions" ? "?returnTo=promotions" : "";
+  const query = returnTo === "promotions" ? "?returnTo=promotions" : returnTo === "onboarding" ? "?returnTo=onboarding" : "";
   redirect(`/app/onboarding/standards/${standardId}${query}`);
 }
