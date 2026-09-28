@@ -269,11 +269,15 @@ export async function savePromotionReadiness(access:BOSAccess,input:{processId:s
 export async function addPromotionTransitionItem(access:BOSAccess,input:{processId:string;item:string;disposition:"TRANSFER"|"RETAIN"|"CHANGE"|"NOT_APPLICABLE"}){
  const org=access.organization.id,user=access.user.id;
  if(!input.item.trim()) throw new Error("Element przekazania jest wymagany.");
- const rows=await db().unsafe(`INSERT INTO promotion_transition_items(organization_id,promotion_process_id,position,item,disposition,confirmation,created_by_user_id)
-  SELECT $1,$2,coalesce(max(position),0)+1,$3,$4,'PENDING',$5 FROM promotion_transition_items
-  WHERE organization_id=$1 AND promotion_process_id=$2 RETURNING id`,[org,input.processId,input.item.trim(),input.disposition,user]);
- if(!rows[0]) throw new Error("Nie udało się dodać elementu przekazania.");
- return rows[0].id as string;
+ return db().begin(async tx=>{
+  const [process]=await tx`SELECT id FROM promotion_processes WHERE id=${input.processId} AND organization_id=${org} FOR UPDATE`;
+  if(!process) throw new Error("Nie znaleziono procesu w tej organizacji.");
+  const [row]=await tx`INSERT INTO promotion_transition_items(organization_id,promotion_process_id,position,item,disposition,confirmation,created_by_user_id)
+   SELECT ${org},${input.processId},coalesce(max(position),0)+1,${input.item.trim()},${input.disposition},'PENDING',${user}
+   FROM promotion_transition_items WHERE organization_id=${org} AND promotion_process_id=${input.processId} RETURNING id`;
+  if(!row) throw new Error("Nie udało się dodać elementu przekazania.");
+  return row.id as string;
+ });
 }
 
 export async function confirmPromotionTransitionItem(access:BOSAccess,input:{processId:string;itemId:string;confirmation:"DONE"|"NOT_DONE";note?:string}){
@@ -298,4 +302,14 @@ export async function closePromotionProcess(access:BOSAccess,input:{processId:st
  if(d.decision==="NOT_YET") throw new Error("JESZCZE NIE nie zamyka procesu.");
  const rows=await db().unsafe("SELECT bos_close_promotion_process($1,$2,$3) id",[input.decisionId,user,input.note?.trim()||null]);
  return rows[0].id as string;
+}
+
+
+export async function finalizePromotionDecision(access:BOSAccess,input:{processId:string;decision:"READY"|"NOT_YET"|"STOP";note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ const [p]=await db().unsafe("SELECT id FROM promotion_processes WHERE id=$1 AND organization_id=$2",[input.processId,org]);
+ if(!p) throw new Error("Nie znaleziono procesu.");
+ const rows=await db().unsafe("SELECT decision_id,closure_id FROM bos_finalize_promotion_decision($1,$2::promotion_decision,$3,$4)",[input.processId,input.decision,user,input.note?.trim()||null]);
+ if(!rows[0]) throw new Error("Nie udało się zapisać decyzji.");
+ return {decisionId:rows[0].decision_id as string,closureId:rows[0].closure_id as string|null};
 }
