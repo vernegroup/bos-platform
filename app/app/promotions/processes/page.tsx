@@ -8,7 +8,7 @@ export default async function PromotionProcessesPage() {
   const access = await requireBOSAccess();
   const rows = await listPromotionProcesses(access);
   const promotions = rows.filter((row) => row.type === "AWANS").length;
-  const ready = rows.filter((row) => row.total > 0 && row.done === row.total).length;
+  const ready = rows.filter((row) => row.gates.readyAllowed).length;
 
   return (
     <>
@@ -30,7 +30,6 @@ export default async function PromotionProcessesPage() {
       <section className="bos-promotion-list bos-promotions-operational-list">
         <header><span>PRACOWNIK</span><span>ZMIANA</span><span>TYP</span><span>WEJŚCIE</span><span>PROWADZĄCY</span><span>KONTROLA</span><span /></header>
         {rows.map((row) => {
-          const percent = row.total ? Math.round((row.done / row.total) * 100) : 0;
           return (
             <Link href={`/app/promotions/processes/${row.id}`} className="bos-promotion-row" key={row.id}>
               <strong>{row.employee}</strong>
@@ -38,7 +37,7 @@ export default async function PromotionProcessesPage() {
               <b>{row.type}</b>
               <span>{row.effectiveOn}</span>
               <span>{row.owner}</span>
-              <div className="bos-promotion-row-progress" role="progressbar" aria-label={`Postęp zmiany stanowiska ${row.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><i style={{ width: `${percent}%` }} /><em>{row.done}/{row.total} · {percent}%</em></div>
+              <span>{row.gates.readyAllowed?"7/7 · GOTOWY DO DECYZJI":`${[row.gates.standard,row.gates.process,row.gates.entry,row.gates.deployment,row.gates.k,row.gates.readiness,row.gates.transition].filter(Boolean).length}/7 BRAMEK`}</span>
               <i>→</i>
             </Link>
           );
