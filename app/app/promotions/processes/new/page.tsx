@@ -25,11 +25,13 @@ async function startPromotion(fd:FormData){
   redirect(`/app/promotions/processes/${processId}`);
 }
 
-export default async function NewPromotionProcessPage(){
+export default async function NewPromotionProcessPage({searchParams}:{searchParams:Promise<{standardId?:string}>}){
   const access=await requireBOSAccess();
   const options=await listPromotionStartOptions(access);
+  const {standardId:selectedStandardId}=await searchParams;
   const product=options.products.find(p=>p.key.toLowerCase().includes("promotion"))??options.products.find(p=>p.name.toLowerCase().includes("awans"));
   const today=new Date().toISOString().slice(0,10);
+  const selectedStandard=selectedStandardId?options.standards.find(s=>s.standardId===selectedStandardId):undefined;
   const canStart=Boolean(product&&options.standards.length&&options.members.length&&options.employees.length);
 
   return <>
@@ -44,7 +46,8 @@ export default async function NewPromotionProcessPage(){
 
     <section className="bos-process-new">
       {!canStart?<div className="bos-operational-empty"><strong>Nie można utworzyć procesu</strong>
-        <p>Potrzebujesz aktywnego pracownika, opublikowanego Standardu roli B, aktywnego członka BOS oraz licencji Promotions.</p></div>:
+        <p>Potrzebujesz aktywnego pracownika, opublikowanego Standardu roli B, aktywnego członka BOS oraz licencji Promotions.</p>
+        {!options.standards.length&&<div style={{marginTop:14}}><Link href="/app/standards/new?returnTo=promotions" className="bos-standard-primary-action">+ UTWÓRZ STANDARD ROLI B</Link></div>}</div>:
       <form action={startPromotion} style={{display:"grid",gap:18}}>
         <input type="hidden" name="productId" value={product!.id}/>
 
@@ -67,12 +70,19 @@ export default async function NewPromotionProcessPage(){
           </label>
         </div>
 
-        <div className="bos-process-new-field"><span>03 / STANDARD ROLI B</span><strong>Opublikowana wersja Standardu</strong>
-          <select name="standardVersion" required defaultValue="" style={{padding:10}}>
-            <option value="" disabled>Wybierz Standard i wersję</option>
-            {options.standards.map(s=><option value={`${s.standardId}:${s.versionId}`} key={s.versionId}>{s.name} · {s.version}{s.area?` · ${s.area}`:""}</option>)}
-          </select>
-          <small>Po utworzeniu procesu Standard i jego wersja są niezmienne. Późniejsza publikacja nowej wersji nie zmieni tego procesu.</small>
+        <div className="bos-process-new-field"><span>03 / STANDARD ROLI B</span><strong>Standard docelowej roli</strong>
+          <div className="bos-promotion-standard-choice">
+            <label style={{display:"grid",gap:6,flex:"1 1 360px"}}><small>WYBIERZ Z REPOZYTORIUM ORGANIZACJI</small>
+              <select name="standardVersion" required defaultValue={selectedStandard?`${selectedStandard.standardId}:${selectedStandard.versionId}`:""} style={{padding:10}}>
+                <option value="" disabled>Wybierz opublikowany Standard</option>
+                {options.standards.map(s=><option value={`${s.standardId}:${s.versionId}`} key={s.versionId}>{s.name} · {s.version}{s.area?` · ${s.area}`:""}</option>)}
+              </select>
+            </label>
+            <div className="bos-promotion-standard-or"><span>LUB</span></div>
+            <Link href="/app/standards/new?returnTo=promotions" className="bos-standard-primary-action">+ UTWÓRZ NOWY STANDARD B</Link>
+          </div>
+          {selectedStandard&&<div className="bos-onboarding-rule-note"><span>STANDARD GOTOWY</span><p>{selectedStandard.name} · {selectedStandard.version} został wybrany z repozytorium organizacji.</p></div>}
+          <small>Promotions korzysta ze wspólnego repozytorium Standardów organizacji. Proces zamrozi dokładną opublikowaną wersję Standardu B; późniejsze wersje nie zmienią historii procesu.</small>
         </div>
 
         <div className="bos-process-new-field"><span>04 / ODPOWIEDZIALNOŚĆ</span><strong>Prowadzący i terminy</strong>
