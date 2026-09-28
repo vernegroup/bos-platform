@@ -20,7 +20,7 @@ export default async function OrganizationStandardsPage(){
   </div>
   <section className="bos-standard-list bos-operational-list">
    <div className="bos-standard-list-head"><span>STANDARD</span><span>OBSZAR</span><span>WERSJA</span><span>CZYNNOŚCI</span><span>AKTUALIZACJA</span><span>STATUS</span><span /></div>
-   {standards.map(s=><Link href={`/app/onboarding/standards/${s.id}`} className="bos-standard-list-row" key={s.id}>
+   {standards.map(s=><Link href={`/app/standards/${s.id}`} className="bos-standard-list-row" key={s.id}>
     <strong>{s.name}</strong><span>{s.area||"—"}</span><b>{s.currentVersion||"DRAFT"}</b>
     <span>{String("taskCount" in s?s.taskCount:0)}</span><span>{s.updatedAt||"—"}</span><em data-status={s.status}>{s.status}</em><i>→</i>
    </Link>)}
