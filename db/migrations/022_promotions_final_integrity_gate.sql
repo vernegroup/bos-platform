@@ -45,6 +45,7 @@ AS $$
     AND pp.change_type IN ('PROMOTION','LATERAL_MOVE')
     AND pp.owner_user_id IS NOT NULL
     AND pp.started_on IS NOT NULL
+    AND pp.effective_on IS NOT NULL
   FROM promotion_processes pp
   WHERE pp.id = p_process_id;
 $$;
@@ -102,7 +103,7 @@ FROM promotion_processes pp;
 COMMENT ON FUNCTION bos_promotion_standard_gate_pass(uuid) IS
   'G1 STANDARD: exact published target StandardVersion, materialized task set and readiness criteria exist.';
 COMMENT ON FUNCTION bos_promotion_process_gate_pass(uuid) IS
-  'G2 PROCESS: minimum role-transition identity required for a positive final decision.';
+  'G2 PROCESS: role-transition identity, owner, process start date and actual role-entry date are required for READY/GOTOWY.';
 COMMENT ON FUNCTION bos_promotion_entry_gate_pass(uuid) IS
   'G3 ENTRY: every target task assessed and every DO SPRAWDZENIA resolved.';
 COMMENT ON FUNCTION bos_promotion_deployment_gate_pass(uuid) IS
