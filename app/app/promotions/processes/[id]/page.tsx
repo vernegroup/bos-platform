@@ -48,22 +48,24 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
  const transitionDone=p.transition.filter(x=>x.confirmation==="DONE").length;
  return <>
   <div className="bos-standard-back"><Link href="/app/promotions/processes">← ZMIANY W TOKU</Link></div>
-  <nav className="bos-guided-flow" aria-label="Etapy BOS Promotions">
-   <a href="#assessment" className={!p.gates.entry?"is-active":""}><span>01</span><strong>OCEŃ</strong><small>Stan wejściowy</small></a>
-   <a href="#deployment" className={p.gates.entry&&!p.gates.deployment?"is-active":""}><span>02</span><strong>PRZEPROWADŹ</strong><small>Wymagane wdrożenie</small></a>
-   <a href="#verification" className={p.gates.deployment&&!p.gates.transition?"is-active":""}><span>03</span><strong>ZWERYFIKUJ</strong><small>Gotowość i przekazanie</small></a>
-   <a href="#decision" className={p.gates.readyAllowed?"is-active":""}><span>04</span><strong>ZDECYDUJ</strong><small>Wynik i historia</small></a>
-  </nav>
-
   <section className="bos-app-intro bos-promotions-view-head"><div>
-   <div className="bos-app-kicker">BOS / PROMOTIONS / PROCES A → B</div>
-   <h1>{p.employee}</h1><p>{p.fromRole} → {p.toRole} · {p.type} · prowadzący: {p.owner}</p>
-  </div><div className="bos-app-build-state"><span>STANDARD ROLI B</span><strong>{p.standardName} · {p.standardVersion}</strong></div></section>
+   <div className="bos-app-kicker">BOS / PROMOTIONS / MAPA ZMIANY</div>
+   <h1>{p.employee}</h1><p>{p.type} · prowadzący: {p.owner}</p>
+  </div><div className="bos-app-build-state"><span>STAN PROCESU</span><strong>{p.lifecycleState}</strong></div></section>
 
-  <section className="bos-process-summary">
-   <div><span>START</span><strong>{p.startedOn}</strong></div><div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong></div>
-   <div><span>OCENA WEJŚCIOWA</span><strong>{assessed}/{p.tasks.length}</strong></div><div><span>K — KRYTYCZNE</span><strong>{p.tasks.filter(t=>t.isCritical).length}</strong></div>
-   <div><span>BRAMKI</span><strong>{passed}/7</strong></div>
+  <section className="bos-role-transition-hero" aria-label="Zmiana roli A do B">
+   <div className="bos-role-node bos-role-node-from"><span>ROLA A · OBECNIE</span><strong>{p.fromRole}</strong><small>punkt wyjścia pracownika</small></div>
+   <div className="bos-role-transition-axis"><span>A</span><i>→</i><span>B</span><small>MAPA RÓŻNICY</small></div>
+   <div className="bos-role-node bos-role-node-to"><span>ROLA B · CEL</span><strong>{p.toRole}</strong><small>{p.standardName} · {p.standardVersion}</small></div>
+  </section>
+
+  <section className="bos-promotion-delta-summary">
+   <div><span>WYMAGANIA ROLI B</span><strong>{p.tasks.length}</strong></div>
+   <div><span>OCENIONE</span><strong>{assessed}/{p.tasks.length}</strong></div>
+   <div><span>DO WDROŻENIA</span><strong>{p.tasks.filter(t=>t.effectiveAssessment==="TO_DEPLOY").length}</strong></div>
+   <div><span>DO SPRAWDZENIA</span><strong>{p.tasks.filter(t=>t.effectiveAssessment==="TO_VERIFY").length}</strong></div>
+   <div><span>K</span><strong>{p.tasks.filter(t=>t.isCritical).length}</strong></div>
+   <div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong></div>
   </section>
 
   <section className="bos-promotion-gate-strip" aria-label="Final Integrity Gate">
@@ -71,11 +73,11 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   </section>
 
   <section className="bos-process-card" id="assessment">
-   <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">01 / OCEŃ</span><h2>Stan wejściowy względem roli B</h2></div><span className="bos-dashboard-count">{assessed} z {p.tasks.length} ocenionych</span></div>
+   <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">MAPA RÓŻNICY A → B</span><h2>Co z roli B jest już potwierdzone, a czego brakuje?</h2></div><span className="bos-dashboard-count">{assessed} z {p.tasks.length} ocenionych</span></div>
    <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · OCENA WEJŚCIOWA</strong><p>POTWIERDZONE oznacza wystarczający dowód. DO SPRAWDZENIA wymaga weryfikacji. DO WDROŻENIA uruchamia pełne pięć etapów BOS. Czynność K zawsze przechodzi rzeczywiste wdrożenie.</p></aside>
-   <div className="bos-promotion-assessment-list">
+   <div className="bos-promotion-delta-head"><span>WYMAGANIE ROLI B</span><span>STAN WEJŚCIOWY</span><span>DOWÓD / WERYFIKACJA</span><span>AKCJA</span></div><div className="bos-promotion-assessment-list">
    {p.tasks.map(t=><article className="bos-promotion-assessment-row" key={t.id}>
-    <div className="bos-promotion-assessment-copy"><span>{String(t.position).padStart(2,"0")}{t.isCritical?" · K":""}</span><strong>{t.name}</strong><small>Stan: {label(t.effectiveAssessment||t.initialAssessment)}</small></div>
+    <div className="bos-promotion-assessment-copy"><span>{String(t.position).padStart(2,"0")}{t.isCritical?" · K":""}</span><strong>{t.name}</strong><small>{t.isCritical?"K · zawsze wymaga rzeczywistego wdrożenia":"Wymaganie Standardu roli B"}</small></div>
     <form action={saveAssessment} className="bos-promotion-assessment-form">
      <input type="hidden" name="processId" value={p.id}/><input type="hidden" name="processTaskId" value={t.id}/>
      <select name="assessment" required defaultValue={t.initialAssessment??""} disabled={Boolean(t.verificationResult)}>
@@ -89,8 +91,8 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
    </div>
   </section>
 
-  <section className="bos-process-card" id="deployment">
-   <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">02 / PRZEPROWADŹ</span><h2>Wymagane wdrożenie</h2></div><span className="bos-dashboard-count">WYJAŚNIJ → POKAŻ → RAZEM → SAM → SPRAWDŹ</span></div>
+  <section className="bos-process-card bos-promotion-gap-work" id="deployment">
+   <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">LUKI DO UZUPEŁNIENIA</span><h2>Wdrożenie tylko tam, gdzie jest potrzebne</h2></div><span className="bos-dashboard-count">silnik BOS · WYJAŚNIJ → POKAŻ → RAZEM → SAM → SPRAWDŹ</span></div>
    <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · 5 ETAPÓW</strong><p>Realizuj tylko czynności oznaczone DO WDROŻENIA. Etapów nie można przeskakiwać. Dla K pełna ścieżka jest obowiązkowa niezależnie od oceny wejściowej.</p></aside>
    <div className="bos-promotion-deployment-list">{p.tasks.filter(t=>t.effectiveAssessment==="TO_DEPLOY"&&t.assessmentId).map(t=><article className="bos-promotion-deployment-row" key={t.id}>
     <div><span>{String(t.position).padStart(2,"0")}{t.isCritical?" · K":""}</span><strong>{t.name}</strong></div>
@@ -101,17 +103,17 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   </section>
 
   <section className="bos-process-card" id="verification">
-   <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">03 / ZWERYFIKUJ</span><h2>Gotowość i przekazanie roli</h2></div><span className="bos-dashboard-count">{readinessPassed}/{p.readiness.length} kryteriów · {transitionDone}/{p.transition.length} przekazanych</span></div>
+   <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZEJŚCIE A → B</span><h2>Gotowość roli B i przekazanie obowiązków</h2></div><span className="bos-dashboard-count">{readinessPassed}/{p.readiness.length} kryteriów · {transitionDone}/{p.transition.length} przekazanych</span></div>
    <div className="bos-promotions-verify-grid"><div>
-    <h3>Readiness Gate</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method}</small></div>{x.result?<b data-result={x.result}>{x.result}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></>}</form>)}
+    <h3>Gotowość do roli B</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method}</small></div>{x.result?<b data-result={x.result}>{x.result}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></>}</form>)}
    </div><div>
-    <h3>Handover A → B</h3>{p.transition.map(x=><form action={confirmTransition} className="bos-promotion-transition-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="itemId" value={x.id}/><div><strong>{x.item}</strong><small>{x.disposition}</small></div>{x.confirmation==="DONE"?<b>DONE ✓</b>:<><input name="note" placeholder="Uwaga"/><button name="confirmation" value="DONE">WYKONANE</button><button name="confirmation" value="NOT_DONE">NIE</button></>}</form>)}
+    <h3>Przekazanie między rolami</h3>{p.transition.map(x=><form action={confirmTransition} className="bos-promotion-transition-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="itemId" value={x.id}/><div><strong>{x.item}</strong><small>{x.disposition}</small></div>{x.confirmation==="DONE"?<b>DONE ✓</b>:<><input name="note" placeholder="Uwaga"/><button name="confirmation" value="DONE">WYKONANE</button><button name="confirmation" value="NOT_DONE">NIE</button></>}</form>)}
     <form action={addTransition} className="bos-promotion-transition-add"><input type="hidden" name="processId" value={p.id}/><input name="item" required placeholder="Co trzeba przekazać?"/><select name="disposition" defaultValue="TRANSFER"><option value="TRANSFER">PRZEKAŻ</option><option value="RETAIN">POZOSTAW</option><option value="CHANGE">ZMIEŃ</option><option value="NOT_APPLICABLE">N/D</option></select><button>DODAJ</button></form>
    </div></div>
   </section>
 
   <section className="bos-process-next bos-promotion-next" id="decision">
-   <div><span className="bos-dashboard-section-kicker">04 / ZDECYDUJ</span><strong>{p.gates.readyAllowed?"Wszystkie bramki spełnione — możliwa decyzja GOTOWY":"Proces wymaga dalszej pracy"}</strong><p>GOTOWY jest dostępne dopiero przy 7/7. JESZCZE NIE zachowuje proces otwarty. STOP kończy wyłącznie bieżącą próbę A → B.</p></div>
+   <div><span className="bos-dashboard-section-kicker">DECYZJA O ZMIANIE</span><strong>{p.gates.readyAllowed?"Wszystkie bramki spełnione — możliwa decyzja GOTOWY":"Proces wymaga dalszej pracy"}</strong><p>GOTOWY jest dostępne dopiero przy 7/7. JESZCZE NIE zachowuje proces otwarty. STOP kończy wyłącznie bieżącą próbę A → B.</p></div>
    <div className="bos-promotion-decision-box"><strong>{passed}/7</strong><span>BRAMEK</span><form action={decide}><input type="hidden" name="processId" value={p.id}/><textarea name="note" placeholder="Uzasadnienie / uwaga"/><div><button name="decision" value="READY" disabled={!p.gates.readyAllowed}>GOTOWY</button><button name="decision" value="NOT_YET">JESZCZE NIE</button><button name="decision" value="STOP">STOP</button></div></form></div>
   </section>
 
