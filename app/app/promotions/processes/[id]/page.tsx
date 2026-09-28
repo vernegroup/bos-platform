@@ -21,6 +21,13 @@ async function saveAssessment(fd:FormData){
 }
 
 const label=(v?:string)=>v==="CONFIRMED"?"POTWIERDZONE":v==="TO_VERIFY"?"DO SPRAWDZENIA":v==="TO_DEPLOY"?"DO WDROŻENIA":"BRAK OCENY";
+const dispositionLabel=(v:string)=>v==="TRANSFER"?"PRZEKAZYWANE OBOWIĄZKI":v==="RETAIN"?"ZACHOWYWANE OBOWIĄZKI":v==="CHANGE"?"UPRAWNIENIA / DOSTĘPY DO ZMIANY":"NIE DOTYCZY";
+const handoverGroups=[
+ ["TRANSFER","PRZEKAZYWANE OBOWIĄZKI","Co z roli A zostaje przekazane dalej"],
+ ["RETAIN","ZACHOWYWANE OBOWIĄZKI","Co pozostaje przy pracowniku po wejściu w rolę B"],
+ ["CHANGE","UPRAWNIENIA / DOSTĘPY","Nowe albo wycofywane dostępy i uprawnienia"],
+ ["NOT_APPLICABLE","NIE DOTYCZY","Elementy świadomie wyłączone z przejścia"]
+] as const;
 
 async function verifyAssessment(fd:FormData){
  "use server"; const access=await requireBOSAccess(); const processId=text(fd,"processId");
@@ -78,15 +85,18 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
    <div className="bos-promotion-delta-head"><span>WYMAGANIE ROLI B</span><span>STAN WEJŚCIOWY</span><span>DOWÓD / WERYFIKACJA</span><span>AKCJA</span></div><div className="bos-promotion-assessment-list">
    {p.tasks.map(t=><article className="bos-promotion-assessment-row" key={t.id}>
     <div className="bos-promotion-assessment-copy"><span>{String(t.position).padStart(2,"0")}{t.isCritical?" · K":""}</span><strong>{t.name}</strong><small>{t.isCritical?"K · zawsze wymaga rzeczywistego wdrożenia":"Wymaganie Standardu roli B"}</small></div>
-    <form action={saveAssessment} className="bos-promotion-assessment-form">
-     <input type="hidden" name="processId" value={p.id}/><input type="hidden" name="processTaskId" value={t.id}/>
-     <select name="assessment" required defaultValue={t.initialAssessment??""} disabled={Boolean(t.verificationResult)}>
-      {!t.initialAssessment&&<option value="" disabled>Wybierz ocenę</option>}<option value="CONFIRMED">POTWIERDZONE</option><option value="TO_VERIFY">DO SPRAWDZENIA</option><option value="TO_DEPLOY">DO WDROŻENIA</option>
-     </select>
-     <input name="evidenceNote" defaultValue={t.evidenceNote??""} placeholder="Dowód / uwaga" disabled={Boolean(t.verificationResult)}/>
-     {!t.verificationResult&&<button type="submit">ZAPISZ</button>}
-    </form>
-    {t.initialAssessment==="TO_VERIFY"&&!t.verificationResult&&<form action={verifyAssessment} className="bos-promotion-verify-form"><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="assessmentId" value={t.assessmentId}/><input name="verificationNote" placeholder="Co sprawdzono?"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></form>}
+    <div className="bos-promotion-evidence-cell">
+     <form action={saveAssessment} className="bos-promotion-assessment-form">
+      <input type="hidden" name="processId" value={p.id}/><input type="hidden" name="processTaskId" value={t.id}/>
+      <select name="assessment" required defaultValue={t.initialAssessment??""} disabled={Boolean(t.verificationResult)}>
+       {!t.initialAssessment&&<option value="" disabled>Wybierz ocenę</option>}<option value="CONFIRMED">POTWIERDZONE</option><option value="TO_VERIFY">DO SPRAWDZENIA</option><option value="TO_DEPLOY">DO WDROŻENIA</option>
+      </select>
+      <input name="evidenceNote" defaultValue={t.evidenceNote??""} placeholder="Dowód / kontekst: proces, obserwacja, dokument…" disabled={Boolean(t.verificationResult)}/>
+      {!t.verificationResult&&<button type="submit">ZAPISZ</button>}
+     </form>
+     {(t.evidenceNote||t.verificationResult)&&<div className="bos-promotion-evidence-record"><span>EVIDENCE / CONTEXT</span>{t.evidenceNote&&<p>{t.evidenceNote}</p>}{t.verificationResult&&<small>SPRAWDŹ: <b>{t.verificationResult}</b>{t.verificationNote?` · ${t.verificationNote}`:""}{t.verificationAt?` · ${t.verificationAt}`:""}</small>}</div>}
+    </div>
+    {t.initialAssessment==="TO_VERIFY"&&!t.verificationResult&&<form action={verifyAssessment} className="bos-promotion-verify-form"><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="assessmentId" value={t.assessmentId}/><input name="verificationNote" placeholder="Co sprawdzono i na jakiej podstawie?"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></form>}
    </article>)}
    </div>
   </section>
@@ -106,10 +116,19 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
    <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZEJŚCIE A → B</span><h2>Gotowość roli B i przekazanie obowiązków</h2></div><span className="bos-dashboard-count">{readinessPassed}/{p.readiness.length} kryteriów · {transitionDone}/{p.transition.length} przekazanych</span></div>
    <div className="bos-promotions-verify-grid"><div>
     <h3>Gotowość do roli B</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method}</small></div>{x.result?<b data-result={x.result}>{x.result}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></>}</form>)}
-   </div><div>
-    <h3>Przekazanie między rolami</h3>{p.transition.map(x=><form action={confirmTransition} className="bos-promotion-transition-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="itemId" value={x.id}/><div><strong>{x.item}</strong><small>{x.disposition}</small></div>{x.confirmation==="DONE"?<b>DONE ✓</b>:<><input name="note" placeholder="Uwaga"/><button name="confirmation" value="DONE">WYKONANE</button><button name="confirmation" value="NOT_DONE">NIE</button></>}</form>)}
-    <form action={addTransition} className="bos-promotion-transition-add"><input type="hidden" name="processId" value={p.id}/><input name="item" required placeholder="Co trzeba przekazać?"/><select name="disposition" defaultValue="TRANSFER"><option value="TRANSFER">PRZEKAŻ</option><option value="RETAIN">POZOSTAW</option><option value="CHANGE">ZMIEŃ</option><option value="NOT_APPLICABLE">N/D</option></select><button>DODAJ</button></form>
+   </div><div className="bos-promotion-handover">
+    <div className="bos-promotion-handover-head"><div><span>HANDOVER A → B</span><h3>Zamknięcie przejścia między rolami</h3></div><small>Zapisuj stan faktycznie wykonany, nie plan.</small></div>
+    <div className="bos-promotion-handover-groups">{handoverGroups.map(([kind,title,description])=>{const items=p.transition.filter(x=>x.disposition===kind);return <section className="bos-promotion-handover-group" key={kind}><header><div><strong>{title}</strong><small>{description}</small></div><b>{items.filter(x=>x.confirmation==="DONE").length}/{items.length}</b></header>
+     {items.map(x=><form action={confirmTransition} className="bos-promotion-transition-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="itemId" value={x.id}/><div><strong>{x.item}</strong><small>{dispositionLabel(x.disposition)}{x.confirmedAt?` · ${x.confirmedAt}`:""}{x.evidenceNote?` · ${x.evidenceNote}`:""}</small></div>{x.confirmation==="DONE"?<b>WYKONANE ✓</b>:<><input name="note" placeholder="Dowód / uwaga"/><button name="confirmation" value="DONE">WYKONANE</button><button name="confirmation" value="NOT_DONE">NIE</button></>}</form>)}
+     {!items.length&&<p className="bos-promotion-handover-empty">Brak elementów w tej kategorii.</p>}</section>})}</div>
+    <form action={addTransition} className="bos-promotion-transition-add"><input type="hidden" name="processId" value={p.id}/><input name="item" required placeholder="Co faktycznie zmienia się przy przejściu A → B?"/><select name="disposition" defaultValue="TRANSFER"><option value="TRANSFER">PRZEKAZYWANE OBOWIĄZKI</option><option value="RETAIN">ZACHOWYWANE OBOWIĄZKI</option><option value="CHANGE">UPRAWNIENIA / DOSTĘPY</option><option value="NOT_APPLICABLE">NIE DOTYCZY</option></select><button>DODAJ</button></form>
    </div></div>
+  </section>
+
+  <section className="bos-promotion-date-ledger" aria-label="Daty procesu">
+   <div><span>START PROCESU</span><strong>{p.startedOn||"—"}</strong><small>początek pracy nad zmianą</small></div>
+   <div><span>DECYZJA</span><strong>{p.latestDecisionAt||"—"}</strong><small>data ostatniej decyzji</small></div>
+   <div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong><small>rzeczywista data objęcia roli</small></div>
   </section>
 
   <section className="bos-process-next bos-promotion-next" id="decision">
