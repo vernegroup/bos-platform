@@ -44,7 +44,7 @@ AS $$
     AND nullif(btrim(pp.to_role), '') IS NOT NULL
     AND pp.change_type IN ('PROMOTION','LATERAL_MOVE')
     AND pp.owner_user_id IS NOT NULL
-    AND pp.started_at IS NOT NULL
+    AND pp.started_on IS NOT NULL
   FROM promotion_processes pp
   WHERE pp.id = p_process_id;
 $$;
