@@ -101,7 +101,7 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
 
  const tasks=await db().unsafe(`
   SELECT ppt.id,ppt.position_snapshot,ppt.name_snapshot,ppt.is_critical_snapshot,
-    pa.id assessment_id,pa.initial_assessment,pa.evidence_note,pa.assessed_at,pa.verification_result,
+    pa.id assessment_id,pa.initial_assessment,pa.evidence_note,pa.assessed_at,pa.verification_result,pa.verification_note,pa.verification_at,
     bos_promotion_effective_assessment_for_task(
       pa.initial_assessment,pa.verification_result,ppt.is_critical_snapshot
     ) effective_assessment,
@@ -121,7 +121,7 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
   ORDER BY created_at,id`,[id,access.organization.id]);
 
  const transition=await db().unsafe(`
-  SELECT id,position,item,disposition,confirmation,confirmed_at
+  SELECT id,position,item,disposition,confirmation,evidence_note,confirmed_at
   FROM promotion_transition_items
   WHERE promotion_process_id=$1 AND organization_id=$2
   ORDER BY position`,[id,access.organization.id]);
@@ -146,14 +146,14 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
    transition:!!r.transition_pass,readyAllowed:!!r.ready_allowed},
   tasks:tasks.map(t=>({id:t.id,position:t.position_snapshot,name:t.name_snapshot,
    isCritical:t.is_critical_snapshot,assessmentId:t.assessment_id??undefined,
-   initialAssessment:t.initial_assessment??undefined,evidenceNote:t.evidence_note??undefined,assessedAt:t.assessed_at?datePL(t.assessed_at):undefined,verificationResult:t.verification_result??undefined,
+   initialAssessment:t.initial_assessment??undefined,evidenceNote:t.evidence_note??undefined,assessedAt:t.assessed_at?datePL(t.assessed_at):undefined,verificationResult:t.verification_result??undefined,verificationNote:t.verification_note??undefined,verificationAt:t.verification_at?datePL(t.verification_at):undefined,
    effectiveAssessment:t.effective_assessment??undefined,
    stages:{explained:!!t.explained_at,shown:!!t.shown_at,together:!!t.together_at,
     solo:!!t.solo_at,checked:!!t.checked_at}})),
   readiness:readiness.map(x=>({id:x.id,criterion:x.criterion_snapshot,
    method:x.verification_method_snapshot,result:x.result,checkedAt:x.checked_at?datePL(x.checked_at):undefined})),
   transition:transition.map(x=>({id:x.id,position:x.position,item:x.item,
-   disposition:x.disposition,confirmation:x.confirmation,
+   disposition:x.disposition,confirmation:x.confirmation,evidenceNote:x.evidence_note??undefined,
    confirmedAt:x.confirmed_at?datePL(x.confirmed_at):undefined})),
   decisions:decisions.map(x=>({id:x.id,decision:x.decision,sequence:x.decision_sequence,
    decidedAt:datePL(x.decided_at),note:x.note??undefined,
