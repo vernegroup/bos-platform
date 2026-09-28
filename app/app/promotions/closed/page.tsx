@@ -16,7 +16,7 @@ export default async function PromotionClosedPage() {
         <div>
           <div className="bos-app-kicker">02 / ZAMKNIJ</div>
           <h1>Historia zmian</h1>
-          <p>Zweryfikowane awanse i przesunięcia poziome zachowane jako trwałe rekordy wykonania procesu.</p>
+          <p>Zamknięte awanse i przesunięcia poziome zachowane jako trwałe, historycznie stabilne rekordy decyzji.</p>
         </div>
         <Link href="/app/promotions/processes" className="bos-dashboard-text-link">ZMIANY W TOKU →</Link>
       </section>
@@ -44,7 +44,7 @@ export default async function PromotionClosedPage() {
         {!rows.length && <div className="bos-operational-empty"><strong>Brak historii zmian</strong><p>Zamknięte procesy Promotions pojawią się tutaj po końcowej weryfikacji.</p></div>}
       </section>
 
-      <div className="bos-promotions-rule-note"><span>REKORD HISTORYCZNY</span><p>Zamknięcie zachowuje zakres zmiany, wynik weryfikacji, osobę weryfikującą oraz ewentualne zalecenia.</p></div>
+      <div className="bos-promotions-rule-note"><span>REKORD HISTORYCZNY</span><p>Zamknięcie zachowuje A → B, typ zmiany, wynik decyzji, wersję Standardu i stan bramek z chwili decyzji. Rekord nie jest przepisywany przez późniejsze zmiany.</p></div>
     </>
   );
 }
