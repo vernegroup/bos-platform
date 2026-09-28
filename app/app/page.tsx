@@ -27,6 +27,8 @@ export default async function BOSAppPage(){
     hasOnboarding?listStandards(access.organization.id):Promise.resolve([]),
     hasOnboarding?listProcesses(access.organization.id):Promise.resolve([]),
     listProductUpdates(access),
+    hasPromotions?listPromotionProcesses(access):Promise.resolve([]),
+    hasPromotions?listPromotionClosures(access):Promise.resolve([]),
   ]);
 
   return <>
