@@ -9,20 +9,21 @@ async function createDraft(formData:FormData){
  const access=await requireBOSAccess();
  const name=String(formData.get("name")??"").trim();
  const area=String(formData.get("area")??"").trim();
+ const returnTo=String(formData.get("returnTo")??"").trim();
  if(!name) redirect("/app/standards/new?error=name");
  const id=await createOrganizationDraftStandard({organizationId:access.organization.id,name,area,createdByUserId:access.user.id});
- redirect(`/app/standards/${id}`);
+ redirect(returnTo==="promotions"?`/app/standards/${id}?returnTo=promotions`:`/app/standards/${id}`);
 }
 
-export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string}>}){
- const access=await requireBOSAccess(); const {error}=await searchParams;
+export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string;returnTo?:string}>}){
+ const access=await requireBOSAccess(); const {error,returnTo}=await searchParams;
  return <>
   <div className="bos-standard-back"><Link href="/app/standards">← STANDARDY ORGANIZACJI</Link></div>
   <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / STANDARDY ORGANIZACJI / NOWY</div><h1>Nowy Standard</h1>
    <p>Utwórz wspólną definicję roli lub pracy. Po publikacji będzie mogła zostać użyta przez produkty BOS korzystające ze Standardów.</p></div>
    <div className="bos-app-build-state"><span>ORGANIZACJA</span><strong>{access.organization.name}</strong></div>
   </section>
-  <form action={createDraft} className="bos-standard-detail-head"><div style={{display:"grid",gap:12,width:"100%",maxWidth:720}}>
+  <form action={createDraft} className="bos-standard-detail-head"><input type="hidden" name="returnTo" value={returnTo??""}/><div style={{display:"grid",gap:12,width:"100%",maxWidth:720}}>
    <label><span className="bos-dashboard-section-kicker">NAZWA STANDARDU</span><input name="name" required maxLength={160} autoFocus placeholder="np. Kierownik zmiany" style={{width:"100%",marginTop:6,padding:12}}/></label>
    <label><span className="bos-dashboard-section-kicker">OBSZAR</span><input name="area" maxLength={160} placeholder="np. Operacje / Sprzedaż" style={{width:"100%",marginTop:6,padding:12}}/></label>
    {error==="name"&&<p role="alert">Podaj nazwę Standardu.</p>}
