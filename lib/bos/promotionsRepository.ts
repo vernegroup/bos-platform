@@ -159,3 +159,48 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
     deployment:x.deployment_pass,k:x.k_pass,readiness:x.readiness_pass,transition:x.transition_pass}}))
  };
 }
+
+
+export async function listPromotionStartOptions(access:BOSAccess){
+ const org=access.organization.id;
+ const [standards,members,employees,products]=await Promise.all([
+  db().unsafe("SELECT DISTINCT ON (s.id) s.id standard_id,s.name,s.area,sv.id version_id,sv.version_label FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id WHERE s.organization_id=$1 AND s.status='ACTIVE' AND sv.status='PUBLISHED' ORDER BY s.id,sv.version_number DESC",[org]),
+  db().unsafe("SELECT u.id,u.display_name,u.email,m.role FROM memberships m JOIN users u ON u.id=m.user_id WHERE m.organization_id=$1 AND m.status='ACTIVE' AND u.status='ACTIVE' ORDER BY u.display_name",[org]),
+  db().unsafe("SELECT id,first_name,last_name,employee_number,position,department FROM employees WHERE organization_id=$1 AND status='ACTIVE' ORDER BY last_name,first_name,created_at",[org]),
+  db().unsafe("SELECT p.id,p.key,p.name FROM licenses l JOIN products p ON p.id=l.product_id WHERE l.organization_id=$1 AND l.status='ACTIVE' AND p.status='ACTIVE' ORDER BY p.name",[org])
+ ]);
+ return{
+  standards:standards.map(x=>({standardId:x.standard_id,name:x.name,area:x.area??"",versionId:x.version_id,version:x.version_label})),
+  members:members.map(x=>({id:x.id,name:x.display_name,email:x.email,role:x.role})),
+  employees:employees.map(x=>({id:x.id,name:[x.first_name,x.last_name].filter(Boolean).join(" "),employeeNumber:x.employee_number??"",position:x.position??"",department:x.department??""})),
+  products:products.map(x=>({id:x.id,key:x.key,name:x.name}))
+ };
+}
+
+export async function createPromotionProcess(access:BOSAccess,input:{
+ productId:string;employeeId:string;standardId:string;standardVersionId:string;
+ fromRole:string;toRole:string;changeType:"PROMOTION"|"LATERAL_MOVE";
+ ownerUserId:string;startedOn:string;effectiveOn?:string;createdByUserId:string;
+}){
+ const org=access.organization.id;
+ if(!input.employeeId||!input.standardId||!input.standardVersionId) throw new Error("Pracownik i docelowy Standard są wymagane.");
+ if(!input.fromRole.trim()||!input.toRole.trim()) throw new Error("Rola A i rola B są wymagane.");
+ if(input.fromRole.trim()===input.toRole.trim()) throw new Error("Rola A i rola B muszą być różne.");
+ if(!input.startedOn) throw new Error("Data rozpoczęcia jest wymagana.");
+ return db().begin(async tx=>{
+  const [version]=await tx`SELECT sv.id FROM standard_versions sv JOIN standards s ON s.id=sv.standard_id AND s.organization_id=sv.organization_id WHERE sv.id=${input.standardVersionId} AND sv.standard_id=${input.standardId} AND sv.organization_id=${org} AND sv.status='PUBLISHED' AND s.status='ACTIVE' FOR SHARE OF sv,s`;
+  if(!version) throw new Error("Proces można rozpocząć wyłącznie na opublikowanej wersji aktywnego Standardu.");
+  const [employee]=await tx`SELECT id,first_name,last_name FROM employees WHERE id=${input.employeeId} AND organization_id=${org} AND status='ACTIVE' FOR SHARE`;
+  if(!employee) throw new Error("Wybrany pracownik nie istnieje lub nie jest aktywny w tej organizacji.");
+  const [licensed]=await tx`SELECT p.id FROM products p JOIN licenses l ON l.product_id=p.id WHERE p.id=${input.productId} AND p.status='ACTIVE' AND l.organization_id=${org} AND l.status='ACTIVE' LIMIT 1`;
+  if(!licensed) throw new Error("Organizacja nie ma aktywnej licencji Promotions.");
+  const actors=[input.ownerUserId,input.createdByUserId];
+  const active=await tx`SELECT user_id FROM memberships WHERE organization_id=${org} AND status='ACTIVE' AND user_id = ANY(${[...new Set(actors)]})`;
+  if(active.length!==new Set(actors).size) throw new Error("Owner i twórca procesu muszą być aktywnymi członkami organizacji.");
+  const employeeName=[employee.first_name,employee.last_name].filter(Boolean).join(" ").trim();
+  const [p]=await tx`INSERT INTO promotion_processes(organization_id,product_id,employee_id,employee_name_snapshot,from_role,to_role,change_type,owner_user_id,status,effective_on,started_on,created_by_user_id,standard_id,standard_version_id) VALUES(${org},${input.productId},${employee.id},${employeeName},${input.fromRole.trim()},${input.toRole.trim()},${input.changeType},${input.ownerUserId},'PLANNED',${input.effectiveOn||null},${input.startedOn},${input.createdByUserId},${input.standardId},${input.standardVersionId}) RETURNING id`;
+  await tx`SELECT bos_seed_promotion_process_tasks(${p.id})`;
+  await tx`SELECT bos_seed_promotion_readiness_checks(${p.id})`;
+  return p.id as string;
+ });
+}
