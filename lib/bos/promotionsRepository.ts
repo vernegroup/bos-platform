@@ -204,3 +204,30 @@ export async function createPromotionProcess(access:BOSAccess,input:{
   return p.id as string;
  });
 }
+
+
+export async function savePromotionAssessment(access:BOSAccess,input:{
+ processId:string;processTaskId:string;assessment:"CONFIRMED"|"TO_VERIFY"|"TO_DEPLOY";evidenceNote?:string;
+}){
+ const org=access.organization.id,user=access.user.id;
+ return db().begin(async tx=>{
+  const [task]=await tx`SELECT ppt.id,ppt.is_critical_snapshot,pa.id assessment_id,pa.verification_result
+    FROM promotion_process_tasks ppt
+    LEFT JOIN promotion_assessments pa ON pa.promotion_process_task_id=ppt.id AND pa.organization_id=ppt.organization_id
+    WHERE ppt.id=${input.processTaskId} AND ppt.promotion_process_id=${input.processId} AND ppt.organization_id=${org}
+    FOR UPDATE OF ppt`;
+  if(!task) throw new Error("Nie znaleziono czynności w tym procesie.");
+  const [member]=await tx`SELECT 1 ok FROM memberships WHERE organization_id=${org} AND user_id=${user} AND status='ACTIVE' LIMIT 1`;
+  if(!member) throw new Error("Osoba oceniająca nie jest aktywnym członkiem organizacji.");
+  if(task.assessment_id && task.verification_result) throw new Error("Nie można zmienić oceny wejściowej po zapisaniu wyniku SPRAWDŹ.");
+  const note=input.evidenceNote?.trim()||null;
+  if(task.assessment_id){
+    await tx`UPDATE promotion_assessments SET initial_assessment=${input.assessment},evidence_note=${note},assessed_by_user_id=${user},assessed_at=now(),updated_at=now()
+      WHERE id=${task.assessment_id} AND organization_id=${org}`;
+    return task.assessment_id as string;
+  }
+  const [row]=await tx`INSERT INTO promotion_assessments(organization_id,promotion_process_id,promotion_process_task_id,initial_assessment,evidence_note,assessed_by_user_id)
+    VALUES(${org},${input.processId},${input.processTaskId},${input.assessment},${note},${user}) RETURNING id`;
+  return row.id as string;
+ });
+}
