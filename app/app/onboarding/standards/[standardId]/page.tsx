@@ -113,17 +113,17 @@ async function publishStandard(formData: FormData) {
   if(!qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
   await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed});
   const returnTo=text(formData,"returnTo");
-  redirect(returnTo==="promotions"?`/app/promotions/processes/new?standardId=${standardId}`:`/app/standards/${standardId}`);
+  redirect(returnTo==="promotions"?`/app/promotions/processes/new?standardId=${standardId}`:returnTo==="onboarding"?`/app/onboarding/processes/new?standardId=${standardId}`:`/app/standards/${standardId}`);
 }
 
-export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>;searchParams?:Promise<{returnTo?:string}>}) {
+export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>;searchParams?:Promise<{returnTo?:"promotions"|"onboarding"}>}) {
   const access=await requireBOSAccess(); const {standardId}=await params; const returnTo=(await searchParams)?.returnTo;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
-    <div className="bos-standard-back"><Link href={returnTo==="promotions"?"/app/promotions/processes/new":"/app/standards"}>{returnTo==="promotions"?"← WRÓĆ DO NOWEJ ZMIANY":"← STANDARDY ORGANIZACJI"}</Link></div>
+    <div className="bos-standard-back"><Link href={returnTo==="promotions"?"/app/promotions/processes/new":returnTo==="onboarding"?"/app/onboarding/processes/new":"/app/standards"}>{returnTo==="promotions"?"← WRÓĆ DO NOWEJ ZMIANY":returnTo==="onboarding"?"← WRÓĆ DO NOWEGO WDROŻENIA":"← STANDARDY ORGANIZACJI"}</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
       <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
       <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
