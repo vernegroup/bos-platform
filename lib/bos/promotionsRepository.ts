@@ -231,3 +231,27 @@ export async function savePromotionAssessment(access:BOSAccess,input:{
   return row.id as string;
  });
 }
+
+
+export async function verifyPromotionAssessment(access:BOSAccess,input:{processId:string;assessmentId:string;result:"PASS"|"FAIL";note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ const rows=await db().unsafe("UPDATE promotion_assessments SET verification_result=$1,verification_by_user_id=$2,verification_at=now(),verification_note=$3,updated_at=now() WHERE id=$4 AND promotion_process_id=$5 AND organization_id=$6 AND initial_assessment='TO_VERIFY' AND verification_result IS NULL RETURNING id",[input.result,user,input.note?.trim()||null,input.assessmentId,input.processId,org]);
+ if(!rows[0]) throw new Error("Nie znaleziono nierozstrzygniętej czynności DO SPRAWDZENIA.");
+ return rows[0].id as string;
+}
+
+export async function advancePromotionDeployment(access:BOSAccess,input:{processId:string;assessmentId:string;stage:"EXPLAINED"|"SHOWN"|"TOGETHER"|"SOLO"|"CHECKED";note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ return db().begin(async tx=>{
+  const [a]=await tx`SELECT pa.id,pa.initial_assessment,pa.verification_result,ppt.is_critical_snapshot
+   FROM promotion_assessments pa JOIN promotion_process_tasks ppt ON ppt.id=pa.promotion_process_task_id AND ppt.organization_id=pa.organization_id
+   WHERE pa.id=${input.assessmentId} AND pa.promotion_process_id=${input.processId} AND pa.organization_id=${org} FOR UPDATE OF pa`;
+  if(!a) throw new Error("Nie znaleziono oceny w tym procesie.");
+  const [effective]=await tx`SELECT bos_promotion_effective_assessment_for_task(${a.initial_assessment}::promotion_entry_assessment,${a.verification_result}::promotion_verification_result,${a.is_critical_snapshot}) value`;
+  if(effective.value!=="TO_DEPLOY") throw new Error("Ta czynność nie wymaga ścieżki DO WDROŻENIA.");
+  await tx`INSERT INTO promotion_deployment_progress(organization_id,promotion_process_id,promotion_assessment_id)
+    VALUES(${org},${input.processId},${input.assessmentId}) ON CONFLICT(promotion_assessment_id) DO NOTHING`;
+  const column={EXPLAINED:"explained",SHOWN:"shown",TOGETHER:"together",SOLO:"solo",CHECKED:"checked"}[input.stage];
+  await tx.unsafe(`UPDATE promotion_deployment_progress SET ${column}_at=COALESCE(${column}_at,now()), ${column}_by_user_id=COALESCE(${column}_by_user_id,$1), note=COALESCE($2,note), updated_at=now() WHERE promotion_assessment_id=$3 AND promotion_process_id=$4 AND organization_id=$5`,[user,input.note?.trim()||null,input.assessmentId,input.processId,org]);
+ });
+}
