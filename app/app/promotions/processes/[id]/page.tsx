@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireBOSAccess } from "@/lib/bos/access";
-import { advancePromotionDeployment, getPromotionProcess, savePromotionAssessment, verifyPromotionAssessment } from "@/lib/bos/promotionsRepository";
+import { addPromotionTransitionItem, advancePromotionDeployment, closePromotionProcess, confirmPromotionTransitionItem, getPromotionProcess, recordPromotionDecision, savePromotionAssessment, savePromotionReadiness, verifyPromotionAssessment } from "@/lib/bos/promotionsRepository";
 
 export const dynamic="force-dynamic";
 const text=(fd:FormData,key:string)=>String(fd.get(key)??"").trim();
@@ -33,6 +33,11 @@ async function advanceStage(fd:FormData){
  revalidatePath(`/app/promotions/processes/${processId}`); redirect(`/app/promotions/processes/${processId}`);
 }
 const stages=[["EXPLAINED","WYJAŚNIJ","explained"],["SHOWN","POKAŻ","shown"],["TOGETHER","RAZEM","together"],["SOLO","SAM","solo"],["CHECKED","SPRAWDŹ","checked"]] as const;
+async function saveReadiness(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");await savePromotionReadiness(access,{processId,checkId:text(fd,"checkId"),result:text(fd,"result") as "PASS"|"FAIL",note:text(fd,"note")||undefined});revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
+async function addTransition(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");await addPromotionTransitionItem(access,{processId,item:text(fd,"item"),disposition:text(fd,"disposition") as "TRANSFER"|"RETAIN"|"CHANGE"|"NOT_APPLICABLE"});revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
+async function confirmTransition(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");await confirmPromotionTransitionItem(access,{processId,itemId:text(fd,"itemId"),confirmation:text(fd,"confirmation") as "DONE"|"NOT_DONE",note:text(fd,"note")||undefined});revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
+async function decide(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");const decision=text(fd,"decision") as "READY"|"NOT_YET"|"STOP";const decisionId=await recordPromotionDecision(access,{processId,decision,note:text(fd,"note")||undefined});if(decision!=="NOT_YET"){const closureId=await closePromotionProcess(access,{processId,decisionId});redirect(`/app/promotions/closed/${closureId}`);}revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
+
 
 export default async function PromotionProcessPage({params}:{params:Promise<{id:string}>}){
  const {id:processId}=await params; const access=await requireBOSAccess();
