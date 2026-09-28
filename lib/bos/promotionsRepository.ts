@@ -73,7 +73,8 @@ export async function getPromotionClosure(access:BOSAccess,id:string){
   fromRole:r.from_role_snapshot,toRole:r.to_role_snapshot,type:typePL(r.change_type_snapshot),
   result:r.closure_kind,closedAt:datePL(r.closed_at),owner:r.owner,closer:r.closer,
   standardName:r.standard_name,standardVersion:r.version_label,
-  decisionSequence:r.decision_sequence,decisionNote:r.decision_note??undefined,decidedAt:datePL(r.decided_at),\n  gateSnapshot:{standard:!!r.standard_pass,process:!!r.process_pass,entry:!!r.entry_pass,deployment:!!r.deployment_pass,k:!!r.k_pass,readiness:!!r.readiness_pass,transition:!!r.transition_pass}};
+  decisionSequence:r.decision_sequence,decisionNote:r.decision_note??undefined,decidedAt:datePL(r.decided_at),
+  gateSnapshot:{standard:!!r.standard_pass,process:!!r.process_pass,entry:!!r.entry_pass,deployment:!!r.deployment_pass,k:!!r.k_pass,readiness:!!r.readiness_pass,transition:!!r.transition_pass}};
 }
 
 export async function getPromotionProcess(access:BOSAccess,id:string){
