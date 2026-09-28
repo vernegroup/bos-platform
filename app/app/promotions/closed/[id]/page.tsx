@@ -19,12 +19,19 @@ export default async function PromotionClosurePage({params}:{params:Promise<{id:
    <div><span>PROWADZĄCY</span><strong>{closure.owner}</strong></div>
    <div><span>ZAMKNIĘCIE</span><strong>{closure.closedAt}</strong></div>
    <div><span>ZAMKNĄŁ</span><strong>{closure.closer}</strong></div>
-   <div><span>DECYZJA</span><strong>#{closure.decisionSequence}</strong></div>
+   <div><span>DECYZJA</span><strong>#{closure.decisionSequence} · {closure.decidedAt}</strong></div>
   </section>
   <section className="bos-promotion-closure-result"><div>
    <span className="bos-dashboard-section-kicker">DECYZJA</span><h2>Karta zamknięcia zmiany</h2>
    <p>{closure.decisionNote||"Brak dodatkowej notatki."}</p>
   </div><div><span>REZULTAT</span><strong>{result}</strong></div></section>
+  <section className="bos-process-new" style={{display:"grid",gap:12}}>
+   <span className="bos-dashboard-section-kicker">FINAL INTEGRITY GATE / SNAPSHOT DECYZJI</span>
+   <div className="bos-promotions-commandbar">
+    {Object.entries({STANDARD:closure.gateSnapshot.standard,PROCESS:closure.gateSnapshot.process,ENTRY:closure.gateSnapshot.entry,DEPLOYMENT:closure.gateSnapshot.deployment,K:closure.gateSnapshot.k,READINESS:closure.gateSnapshot.readiness,TRANSITION:closure.gateSnapshot.transition}).map(([gate,passed])=><div key={gate}><span>{gate}</span><strong>{passed?"PASS":"—"}</strong></div>)}
+   </div>
+   <p>To stan siedmiu bramek zapisany w chwili decyzji. Późniejsze zmiany Standardu lub innych procesów nie zmieniają tego rekordu.</p>
+  </section>
   <section className="bos-promotion-record"><span className="bos-dashboard-section-kicker">TRWAŁY REKORD</span>
    <strong>{closure.employee} / {closure.fromRole} → {closure.toRole}</strong>
    <p>Rekord zachowuje znaczenie decyzji i wersję Standardu z chwili procesu.</p>
