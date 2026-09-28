@@ -255,3 +255,45 @@ export async function advancePromotionDeployment(access:BOSAccess,input:{process
   await tx.unsafe(`UPDATE promotion_deployment_progress SET ${column}_at=COALESCE(${column}_at,now()), ${column}_by_user_id=COALESCE(${column}_by_user_id,$1), note=COALESCE($2,note), updated_at=now() WHERE promotion_assessment_id=$3 AND promotion_process_id=$4 AND organization_id=$5`,[user,input.note?.trim()||null,input.assessmentId,input.processId,org]);
  });
 }
+
+
+export async function savePromotionReadiness(access:BOSAccess,input:{processId:string;checkId:string;result:"PASS"|"FAIL";note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ const rows=await db().unsafe("UPDATE promotion_readiness_checks SET result=$1,checked_by_user_id=$2,checked_at=now(),note=$3,updated_at=now() WHERE id=$4 AND promotion_process_id=$5 AND organization_id=$6 RETURNING id",[input.result,user,input.note?.trim()||null,input.checkId,input.processId,org]);
+ if(!rows[0]) throw new Error("Nie znaleziono kryterium gotowości w tym procesie.");
+ return rows[0].id as string;
+}
+
+export async function addPromotionTransitionItem(access:BOSAccess,input:{processId:string;item:string;disposition:"TRANSFER"|"RETAIN"|"CHANGE"|"NOT_APPLICABLE"}){
+ const org=access.organization.id,user=access.user.id;
+ if(!input.item.trim()) throw new Error("Element przekazania jest wymagany.");
+ const rows=await db().unsafe(`INSERT INTO promotion_transition_items(organization_id,promotion_process_id,position,item,disposition,confirmation,created_by_user_id)
+  SELECT $1,$2,coalesce(max(position),0)+1,$3,$4,'PENDING',$5 FROM promotion_transition_items
+  WHERE organization_id=$1 AND promotion_process_id=$2 RETURNING id`,[org,input.processId,input.item.trim(),input.disposition,user]);
+ if(!rows[0]) throw new Error("Nie udało się dodać elementu przekazania.");
+ return rows[0].id as string;
+}
+
+export async function confirmPromotionTransitionItem(access:BOSAccess,input:{processId:string;itemId:string;confirmation:"DONE"|"NOT_DONE";note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ const rows=await db().unsafe("UPDATE promotion_transition_items SET confirmation=$1,confirmed_by_user_id=$2,confirmed_at=now(),evidence_note=$3,updated_at=now() WHERE id=$4 AND promotion_process_id=$5 AND organization_id=$6 RETURNING id",[input.confirmation,user,input.note?.trim()||null,input.itemId,input.processId,org]);
+ if(!rows[0]) throw new Error("Nie znaleziono elementu przekazania w tym procesie.");
+ return rows[0].id as string;
+}
+
+export async function recordPromotionDecision(access:BOSAccess,input:{processId:string;decision:"READY"|"NOT_YET"|"STOP";note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ const [p]=await db().unsafe("SELECT id FROM promotion_processes WHERE id=$1 AND organization_id=$2",[input.processId,org]);
+ if(!p) throw new Error("Nie znaleziono procesu.");
+ const rows=await db().unsafe("SELECT bos_record_promotion_decision($1,$2::promotion_decision,$3,$4) id",[input.processId,input.decision,user,input.note?.trim()||null]);
+ return rows[0].id as string;
+}
+
+export async function closePromotionProcess(access:BOSAccess,input:{processId:string;decisionId:string;note?:string}){
+ const org=access.organization.id,user=access.user.id;
+ const [d]=await db().unsafe("SELECT id,decision FROM promotion_decisions WHERE id=$1 AND promotion_process_id=$2 AND organization_id=$3",[input.decisionId,input.processId,org]);
+ if(!d) throw new Error("Nie znaleziono decyzji w tym procesie.");
+ if(d.decision==="NOT_YET") throw new Error("JESZCZE NIE nie zamyka procesu.");
+ const rows=await db().unsafe("SELECT bos_close_promotion_process($1,$2,$3) id",[input.decisionId,user,input.note?.trim()||null]);
+ return rows[0].id as string;
+}
