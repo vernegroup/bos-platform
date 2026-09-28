@@ -2,7 +2,8 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
-import { listStandards, listProcesses } from "@/lib/bos/onboardingRepository";
+import { listProcesses } from "@/lib/bos/onboardingRepository";
+import { listStandards } from "@/lib/bos/core/standardRepository";
 import { listProductUpdates } from "@/lib/bos/productUpdateRepository";
 import { listPromotionProcesses, listPromotionClosures } from "@/lib/bos/promotionsRepository";
 
@@ -24,7 +25,7 @@ export default async function BOSAppPage(){
 
   const [members,standards,processes,updates,promotionProcesses,promotionClosures]=await Promise.all([
     listOrganizationMembers(access),
-    hasOnboarding?listStandards(access.organization.id):Promise.resolve([]),
+    listStandards(access.organization.id),
     hasOnboarding?listProcesses(access.organization.id):Promise.resolve([]),
     listProductUpdates(access),
     hasPromotions?listPromotionProcesses(access):Promise.resolve([]),
@@ -56,6 +57,16 @@ export default async function BOSAppPage(){
           </article>;
         })}
         {!products.length&&<div className="bos-home-empty">Brak aktywnych produktów przypisanych do organizacji.</div>}
+      </div>
+    </section>
+
+    <section className="bos-home-section" aria-labelledby="home-resources">
+      <div className="bos-home-section-head"><h2 id="home-resources">Zasoby organizacji</h2></div>
+      <div className="bos-home-products">
+        <article className="bos-home-product">
+          <div className="bos-home-product-head"><div><h3>Standardy organizacji</h3><p>Wspólne definicje pracy używane przez produkty BOS.</p></div><span>{standards.length}</span></div>
+          <Link href="/app/standards">Otwórz repozytorium →</Link>
+        </article>
       </div>
     </section>
 
