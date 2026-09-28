@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function PromotionClosedPage() {
   const access = await requireBOSAccess();
   const rows = await listPromotionClosures(access);
-  const recommendations = rows.filter((row) => row.result !== "COMPLETED").length;
+  const stopped = rows.filter((row) => row.result === "STOP").length;
   const promotions = rows.filter((row) => row.type === "AWANS").length;
 
   return (
@@ -25,19 +25,19 @@ export default async function PromotionClosedPage() {
         <div><span>ZAMKNIĘTE</span><strong>{rows.length}</strong></div>
         <div><span>AWANSE</span><strong>{promotions}</strong></div>
         <div><span>PRZESUNIĘCIA</span><strong>{rows.length - promotions}</strong></div>
-        <div><span>Z ZALECENIAMI</span><strong>{recommendations}</strong></div>
+        <div><span>STOP</span><strong>{stopped}</strong></div>
       </div>
 
       <section className="bos-promotion-history bos-promotions-operational-list">
-        <header><span>WERYFIKACJA</span><span>PRACOWNIK</span><span>ZMIANA</span><span>TYP</span><span>WYNIK</span><span>WERYFIKUJĄCY</span><span /></header>
+        <header><span>ZAMKNIĘCIE</span><span>PRACOWNIK</span><span>ZMIANA</span><span>TYP</span><span>WYNIK</span><span>ZAMKNĄŁ</span><span /></header>
         {rows.map((row) => (
           <Link href={`/app/promotions/closed/${row.id}`} key={row.id}>
-            <time>{row.verifiedAt}</time>
+            <time>{row.closedAt}</time>
             <strong>{row.employee}</strong>
             <span>{row.fromRole} → {row.toRole}</span>
             <b>{row.type}</b>
-            <em data-result={row.result}>{row.result === "COMPLETED" ? "ZAKOŃCZONE" : "Z ZALECENIAMI"}</em>
-            <span>{row.verifier}</span>
+            <em data-result={row.result}>{row.result === "READY" ? "GOTOWY" : "STOP"}</em>
+            <span>{row.closer}</span>
             <i>→</i>
           </Link>
         ))}
