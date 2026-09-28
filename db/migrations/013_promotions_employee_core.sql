@@ -18,44 +18,28 @@ WHERE pp.legacy_employee_user_id IS NOT NULL
   AND e.organization_id = pp.organization_id
   AND e.linked_user_id = pp.legacy_employee_user_id;
 
--- If a legacy Promotions row has no Employee Core record yet, create one.
--- Identity is derived only inside the same organization. The snapshot is retained
--- on promotion_processes and is not replaced by current Employee display data.
+-- Create Employee Core identity when a legacy Promotions user has not yet been
+-- represented there. Membership FK in Employee Core prevents cross-tenant links.
 INSERT INTO employees(
-  organization_id,
-  first_name,
-  last_name,
-  linked_user_id,
-  created_at,
-  updated_at
+  organization_id, first_name, last_name, linked_user_id, created_at, updated_at
 )
 SELECT DISTINCT ON (pp.organization_id, pp.legacy_employee_user_id)
   pp.organization_id,
-  CASE
-    WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
-      THEN split_part(btrim(pp.employee_name_snapshot), ' ', 1)
-    ELSE btrim(pp.employee_name_snapshot)
-  END,
-  CASE
-    WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
-      THEN substr(
-        btrim(pp.employee_name_snapshot),
-        position(' ' in btrim(pp.employee_name_snapshot)) + 1
-      )
-    ELSE ''
-  END,
+  CASE WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
+    THEN split_part(btrim(pp.employee_name_snapshot), ' ', 1)
+    ELSE btrim(pp.employee_name_snapshot) END,
+  CASE WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
+    THEN substr(btrim(pp.employee_name_snapshot), position(' ' in btrim(pp.employee_name_snapshot)) + 1)
+    ELSE '' END,
   pp.legacy_employee_user_id,
-  min(pp.created_at) OVER (
-    PARTITION BY pp.organization_id, pp.legacy_employee_user_id
-  ),
+  min(pp.created_at) OVER (PARTITION BY pp.organization_id, pp.legacy_employee_user_id),
   now()
 FROM promotion_processes pp
 WHERE pp.employee_id IS NULL
   AND pp.legacy_employee_user_id IS NOT NULL
   AND btrim(pp.employee_name_snapshot) <> ''
   AND NOT EXISTS (
-    SELECT 1
-    FROM employees e
+    SELECT 1 FROM employees e
     WHERE e.organization_id = pp.organization_id
       AND e.linked_user_id = pp.legacy_employee_user_id
   )
@@ -69,49 +53,22 @@ WHERE pp.employee_id IS NULL
   AND e.organization_id = pp.organization_id
   AND e.linked_user_id = pp.legacy_employee_user_id;
 
--- Legacy rows without a linked BOS user still need a tenant-scoped Employee.
--- Match an existing unlinked Employee only by the exact normalized snapshot
--- inside the same organization; otherwise create a new Employee.
-UPDATE promotion_processes pp
-SET employee_id = e.id
-FROM employees e
-WHERE pp.employee_id IS NULL
-  AND pp.legacy_employee_user_id IS NULL
-  AND e.organization_id = pp.organization_id
-  AND e.linked_user_id IS NULL
-  AND lower(btrim(concat_ws(' ', e.first_name, NULLIF(e.last_name, ''))))
-      = lower(btrim(pp.employee_name_snapshot))
-  AND (
-    SELECT count(*)
-    FROM employees e2
-    WHERE e2.organization_id = pp.organization_id
-      AND e2.linked_user_id IS NULL
-      AND lower(btrim(concat_ws(' ', e2.first_name, NULLIF(e2.last_name, ''))))
-          = lower(btrim(pp.employee_name_snapshot))
-  ) = 1;
-
+-- A pre-Employee-Core Promotions row could legally have employee_id NULL.
+-- Do not guess that two equal display names are the same person. Give each such
+-- historical process an explicit tenant-scoped Employee identity, traceable by
+-- a migration-only employee_number. This is safer than name-based merging.
 INSERT INTO employees(
-  organization_id,
-  first_name,
-  last_name,
-  created_at,
-  updated_at
+  organization_id, employee_number, first_name, last_name, created_at, updated_at
 )
 SELECT
   pp.organization_id,
-  CASE
-    WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
-      THEN split_part(btrim(pp.employee_name_snapshot), ' ', 1)
-    ELSE btrim(pp.employee_name_snapshot)
-  END,
-  CASE
-    WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
-      THEN substr(
-        btrim(pp.employee_name_snapshot),
-        position(' ' in btrim(pp.employee_name_snapshot)) + 1
-      )
-    ELSE ''
-  END,
+  'legacy-promotion:' || pp.id::text,
+  CASE WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
+    THEN split_part(btrim(pp.employee_name_snapshot), ' ', 1)
+    ELSE btrim(pp.employee_name_snapshot) END,
+  CASE WHEN position(' ' in btrim(pp.employee_name_snapshot)) > 0
+    THEN substr(btrim(pp.employee_name_snapshot), position(' ' in btrim(pp.employee_name_snapshot)) + 1)
+    ELSE '' END,
   pp.created_at,
   now()
 FROM promotion_processes pp
@@ -119,23 +76,12 @@ WHERE pp.employee_id IS NULL
   AND pp.legacy_employee_user_id IS NULL
   AND btrim(pp.employee_name_snapshot) <> '';
 
--- Resolve newly-created unlinked Employees deterministically. Because old rows
--- without user identity can be ambiguous, pair each unresolved process with the
--- nearest same-tenant Employee created from its snapshot and creation time.
 UPDATE promotion_processes pp
-SET employee_id = candidate.id
-FROM LATERAL (
-  SELECT e.id
-  FROM employees e
-  WHERE e.organization_id = pp.organization_id
-    AND e.linked_user_id IS NULL
-    AND lower(btrim(concat_ws(' ', e.first_name, NULLIF(e.last_name, ''))))
-        = lower(btrim(pp.employee_name_snapshot))
-  ORDER BY abs(extract(epoch FROM (e.created_at - pp.created_at))), e.id
-  LIMIT 1
-) candidate
+SET employee_id = e.id
+FROM employees e
 WHERE pp.employee_id IS NULL
-  AND pp.legacy_employee_user_id IS NULL;
+  AND e.organization_id = pp.organization_id
+  AND e.employee_number = 'legacy-promotion:' || pp.id::text;
 
 DO $$
 BEGIN
@@ -155,8 +101,6 @@ ALTER TABLE promotion_processes
 CREATE INDEX promotion_processes_employee_idx
   ON promotion_processes(organization_id, employee_id);
 
--- The old user reference is retained temporarily for migration audit only.
--- New Promotions domain code must use employee_id -> employees.
 COMMENT ON COLUMN promotion_processes.legacy_employee_user_id IS
   'Legacy pre-Employee-Core user reference retained for migration audit; not employee identity.';
 
