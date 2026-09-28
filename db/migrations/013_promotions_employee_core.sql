@@ -98,6 +98,10 @@ ALTER TABLE promotion_processes
   FOREIGN KEY (employee_id, organization_id)
   REFERENCES employees(id, organization_id);
 
+ALTER TABLE promotion_processes
+  ADD CONSTRAINT promotion_processes_id_org_unique
+  UNIQUE (id, organization_id);
+
 CREATE INDEX promotion_processes_employee_idx
   ON promotion_processes(organization_id, employee_id);
 
