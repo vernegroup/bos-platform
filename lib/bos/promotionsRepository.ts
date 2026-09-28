@@ -99,7 +99,7 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
 
  const tasks=await db().unsafe(`
   SELECT ppt.id,ppt.position_snapshot,ppt.name_snapshot,ppt.is_critical_snapshot,
-    pa.id assessment_id,pa.initial_assessment,pa.verification_result,
+    pa.id assessment_id,pa.initial_assessment,pa.evidence_note,pa.assessed_at,pa.verification_result,
     bos_promotion_effective_assessment_for_task(
       pa.initial_assessment,pa.verification_result,ppt.is_critical_snapshot
     ) effective_assessment,
@@ -144,7 +144,7 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
    transition:!!r.transition_pass,readyAllowed:!!r.ready_allowed},
   tasks:tasks.map(t=>({id:t.id,position:t.position_snapshot,name:t.name_snapshot,
    isCritical:t.is_critical_snapshot,assessmentId:t.assessment_id??undefined,
-   initialAssessment:t.initial_assessment??undefined,verificationResult:t.verification_result??undefined,
+   initialAssessment:t.initial_assessment??undefined,evidenceNote:t.evidence_note??undefined,assessedAt:t.assessed_at?datePL(t.assessed_at):undefined,verificationResult:t.verification_result??undefined,
    effectiveAssessment:t.effective_assessment??undefined,
    stages:{explained:!!t.explained_at,shown:!!t.shown_at,together:!!t.together_at,
     solo:!!t.solo_at,checked:!!t.checked_at}})),
