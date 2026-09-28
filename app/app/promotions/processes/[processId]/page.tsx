@@ -54,7 +54,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{pro
 
   <section className="bos-process-new" style={{display:"grid",gap:14}}>
    <div className="bos-promotions-rule-note"><span>ZASADA</span><p>Oceń stan wejściowy każdej czynności Standardu roli B. POTWIERDZONE oznacza istniejący wystarczający dowód; DO SPRAWDZENIA wymaga osobnej weryfikacji; DO WDROŻENIA uruchamia pełną ścieżkę BOS. Czynność K zawsze pozostaje wymaganiem rzeczywistego wdrożenia.</p></div>
-   {p.tasks.map(t=><form action={saveAssessment} className="bos-process-new-field" key={t.id} style={{display:"grid",gap:10}}>
+   {p.tasks.map(t=><div key={t.id} style={{display:"grid",gap:10}}><form action={saveAssessment} className="bos-process-new-field" style={{display:"grid",gap:10}}>
     <input type="hidden" name="processId" value={p.id}/><input type="hidden" name="processTaskId" value={t.id}/>
     <span>{String(t.position).padStart(2,"0")} / CZYNNOŚĆ {t.isCritical?"· K":""}</span>
     <strong>{t.name}</strong>
