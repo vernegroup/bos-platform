@@ -19,7 +19,7 @@ export default async function PromotionsEntryPage() {
         <div>
           <div className="bos-app-kicker">BOS / PROMOTIONS</div>
           <h1>BOS Promotions</h1>
-          <p>Awans lub przesunięcie poziome prowadzone od decyzji, przez przygotowanie i przejście, do weryfikacji oraz trwałego zapisu wyniku.</p>
+          <p>Kontrolowana zmiana roli A → B: porównaj pracownika ze Standardem roli docelowej, uzupełnij tylko rzeczywiste luki i zapisz wynik przejścia.</p>
         </div>
         <div className="bos-app-build-state"><span>PRODUKT</span><strong>WEB 1.0 / DANE ORGANIZACJI</strong></div>
       </section>
@@ -33,23 +33,15 @@ export default async function PromotionsEntryPage() {
 
       <section className="bos-promotions-path">
         <div className="bos-dashboard-section-head">
-          <div><span className="bos-dashboard-section-kicker">MECHANIZM</span><h2>Pięć bramek zmiany stanowiska</h2></div>
-          <span className="bos-dashboard-count">decyzja → zapis historii</span>
+          <div><span className="bos-dashboard-section-kicker">MODEL PRODUKTU</span><h2>Rola A → mapa różnicy → rola B</h2></div>
+          <span className="bos-dashboard-count">Standard roli B wyznacza wymagania</span>
         </div>
-        <div className="bos-promotions-gates">
-          {[
-            ["01", "Decyzja", "Zakres i typ zmiany"],
-            ["02", "Przygotowanie", "Warunki wejścia"],
-            ["03", "Przejście", "Realizacja zmiany"],
-            ["04", "Weryfikacja", "Kryteria gotowości"],
-            ["05", "Zapis", "Wynik i historia"],
-          ].map(([number, name, description]) => (
-            <div key={number}>
-              <span>{number}</span>
-              <strong>{name}</strong>
-              <small>{description}</small>
-            </div>
-          ))}
+        <div className="bos-promotions-identity-path">
+          <div><span>A</span><strong>ROLA OBECNA</strong><small>Punkt wyjścia pracownika</small></div>
+          <i>→</i>
+          <div className="is-delta"><span>Δ</span><strong>MAPA RÓŻNICY</strong><small>Potwierdź · sprawdź · wdróż</small></div>
+          <i>→</i>
+          <div><span>B</span><strong>ROLA DOCELOWA</strong><small>Gotowość + przekazanie</small></div>
         </div>
       </section>
 
