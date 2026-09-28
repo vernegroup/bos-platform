@@ -112,17 +112,18 @@ async function publishStandard(formData: FormData) {
   const qualityCheckPassed=["observable","realWork","repeatable","coversCritical"].every(key=>formData.get(key)==="on");
   if(!qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
   await publishDraftStandard({organizationId:access.organization.id,standardId,publishedByUserId:access.user.id,qualityCheckPassed});
-  redirect(`/app/onboarding/standards/${standardId}`);
+  const returnTo=text(formData,"returnTo");
+  redirect(returnTo==="promotions"?`/app/promotions/processes/new?standardId=${standardId}`:`/app/standards/${standardId}`);
 }
 
-export default async function StandardDetailPage({params}:{params:Promise<{standardId:string}>}) {
-  const access=await requireBOSAccess(); const {standardId}=await params;
+export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>;searchParams?:Promise<{returnTo?:string}>}) {
+  const access=await requireBOSAccess(); const {standardId}=await params; const returnTo=(await searchParams)?.returnTo;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
   const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
-    <div className="bos-standard-back"><Link href="/app/onboarding/standards">← STANDARDY STANOWISK</Link></div>
+    <div className="bos-standard-back"><Link href={returnTo==="promotions"?"/app/promotions/processes/new":"/app/standards"}>{returnTo==="promotions"?"← WRÓĆ DO NOWEJ ZMIANY":"← STANDARDY ORGANIZACJI"}</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
       <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
       <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
@@ -250,7 +251,7 @@ export default async function StandardDetailPage({params}:{params:Promise<{stand
       <div className="bos-standard-detail-head">
         {completeness.complete
           ? <div style={{display:"grid",gap:12}}><div><strong>Standard jest kompletny.</strong><p>Walidacja nie wykryła powodów blokujących publikację.</p></div>
-              <form action={publishStandard} style={{display:"grid",gap:8}}><input type="hidden" name="standardId" value={standard.id}/>
+              <form action={publishStandard} style={{display:"grid",gap:8}}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/>
                 <aside className="bos-context-guide"><strong>TEST KRYTERIUM · 4×TAK</strong><p>Przed publikacją potwierdź jakość Kryterium Gotowości. Ten test dotyczy definicji Standardu, nie oceny konkretnego pracownika.</p></aside>
                 <label><input type="checkbox" name="observable" required/> TAK — kryterium opisuje zachowanie lub wynik, który można zaobserwować.</label>
                 <label><input type="checkbox" name="realWork" required/> TAK — kryterium można sprawdzić w rzeczywistej pracy.</label>
