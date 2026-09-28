@@ -10,10 +10,8 @@ export default async function PromotionsEntryPage() {
     listPromotionProcesses(access),
     listPromotionClosures(access),
   ]);
-  const completedChecks = active.reduce((sum, process) => sum + process.done, 0);
-  const totalChecks = active.reduce((sum, process) => sum + process.total, 0);
-  const readiness = totalChecks ? Math.round((completedChecks / totalChecks) * 100) : 0;
-  const recommendations = closed.filter((item) => item.result !== "COMPLETED").length;
+  const ready = active.filter((process) => process.gates.readyAllowed).length;
+  const stopped = closed.filter((item) => item.result === "STOP").length;
 
   return (
     <>
@@ -28,9 +26,9 @@ export default async function PromotionsEntryPage() {
 
       <section className="bos-promotions-commandbar" aria-label="Stan procesów Promotions">
         <div><span>W TOKU</span><strong>{active.length}</strong></div>
-        <div><span>GOTOWOŚĆ KONTROLI</span><strong>{readiness}%</strong></div>
+        <div><span>GOTOWE DO DECYZJI</span><strong>{ready}</strong></div>
         <div><span>ZAMKNIĘTE</span><strong>{closed.length}</strong></div>
-        <div><span>Z ZALECENIAMI</span><strong>{recommendations}</strong></div>
+        <div><span>STOP</span><strong>{stopped}</strong></div>
       </section>
 
       <section className="bos-promotions-path">
@@ -63,13 +61,13 @@ export default async function PromotionsEntryPage() {
           </div>
           <div className="bos-promotions-preview-list">
             {active.slice(0, 5).map((process) => {
-              const percent = process.total ? Math.round((process.done / process.total) * 100) : 0;
+              const passed=[process.gates.standard,process.gates.process,process.gates.entry,process.gates.deployment,process.gates.k,process.gates.readiness,process.gates.transition].filter(Boolean).length;
               return (
                 <Link href={`/app/promotions/processes/${process.id}`} key={process.id}>
                   <div><strong>{process.employee}</strong><span>{process.fromRole} → {process.toRole}</span></div>
                   <b>{process.type}</b>
-                  <div className="bos-promotions-mini-progress" role="progressbar" aria-label={`Postęp zmiany stanowiska ${process.employee}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={percent}><i style={{ width: `${percent}%` }} /></div>
-                  <em>{percent}%</em>
+                  <span>{passed}/7 BRAMEK</span>
+                  <em>{process.gates.readyAllowed?"GOTOWY":"W TOKU"}</em>
                 </Link>
               );
             })}
@@ -85,9 +83,9 @@ export default async function PromotionsEntryPage() {
           <div className="bos-promotions-preview-list bos-promotions-preview-history">
             {closed.slice(0, 5).map((closure) => (
               <Link href={`/app/promotions/closed/${closure.id}`} key={closure.id}>
-                <time>{closure.verifiedAt}</time>
+                <time>{closure.closedAt}</time>
                 <div><strong>{closure.employee}</strong><span>{closure.fromRole} → {closure.toRole}</span></div>
-                <b>{closure.result === "COMPLETED" ? "ZAKOŃCZONE" : "Z ZALECENIAMI"}</b>
+                <b>{closure.result === "READY" ? "GOTOWY" : "STOP"}</b>
               </Link>
             ))}
             {!closed.length && <p className="bos-global-search-empty">Brak zamkniętych procesów.</p>}
