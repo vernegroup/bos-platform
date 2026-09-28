@@ -82,7 +82,7 @@ export default async function NewPromotionProcessPage(){
             </select>
           </label>
           <label style={{display:"grid",gap:6}}><small>START</small><input type="date" name="startedOn" required defaultValue={today} style={{padding:10}}/></label>
-          <label style={{display:"grid",gap:6}}><small>PLANOWANE WEJŚCIE W ROLĘ / OPCJONALNIE</small><input type="date" name="effectiveOn" style={{padding:10}}/></label>
+          <label style={{display:"grid",gap:6}}><small>WEJŚCIE W ROLĘ B</small><input type="date" name="effectiveOn" style={{padding:10}}/><small>Może pozostać puste podczas przygotowania procesu, ale GOTOWY wymaga zapisanej daty faktycznego wejścia w rolę B.</small></label>
         </div>
 
         <div className="bos-process-new-lock"><span>05</span><div><strong>UTWÓRZ PROCES A → B</strong>
