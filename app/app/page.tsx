@@ -3,7 +3,8 @@ import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
 import { listStandards, listProcesses } from "@/lib/bos/onboardingRepository";
-import { listProductUpdates } from "@/lib/bos/productUpdateRepository";\nimport { listPromotionProcesses, listPromotionClosures } from "@/lib/bos/promotionsRepository";
+import { listProductUpdates } from "@/lib/bos/productUpdateRepository";
+import { listPromotionProcesses, listPromotionClosures } from "@/lib/bos/promotionsRepository";
 
 const productMeta = {
   onboarding: { description:"System wdrażania pracownika", href:"/app/onboarding" },
@@ -18,7 +19,8 @@ export const dynamic="force-dynamic";
 export default async function BOSAppPage(){
   const access=await requireBOSAccess();
   const products=await listLicensedProducts(access);
-  const hasOnboarding=products.some(product=>product.key==="onboarding");\n  const hasPromotions=products.some(product=>product.key==="promotions");
+  const hasOnboarding=products.some(product=>product.key==="onboarding");
+  const hasPromotions=products.some(product=>product.key==="promotions");
 
   const [members,standards,processes,updates,promotionProcesses,promotionClosures]=await Promise.all([
     listOrganizationMembers(access),
