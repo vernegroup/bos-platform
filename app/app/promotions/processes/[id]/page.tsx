@@ -53,12 +53,13 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
  const passed=[p.gates.standard,p.gates.process,p.gates.entry,p.gates.deployment,p.gates.k,p.gates.readiness,p.gates.transition].filter(Boolean).length;
  const readinessPassed=p.readiness.filter(x=>x.result==="PASS").length;
  const transitionDone=p.transition.filter(x=>x.confirmation==="DONE").length;
+ const lifecyclePL=p.lifecycleState==="PLANNED"?(assessed>0?"W TOKU":"PLANOWANE"):p.lifecycleState==="IN_PROGRESS"?"W TOKU":p.lifecycleState==="READY_TO_DECIDE"?"GOTOWY DO DECYZJI":p.lifecycleState==="CLOSED"?"ZAMKNIĘTY":p.lifecycleState==="STOPPED"?"ZATRZYMANY":p.lifecycleState;
  return <>
   <div className="bos-standard-back"><Link href="/app/promotions/processes">← ZMIANY W TOKU</Link></div>
   <section className="bos-app-intro bos-promotions-view-head"><div>
    <div className="bos-app-kicker">BOS / PROMOTIONS / MAPA ZMIANY</div>
    <h1>{p.employee}</h1><p>{p.type} · prowadzący: {p.owner}</p>
-  </div><div className="bos-app-build-state"><span>STAN PROCESU</span><strong>{p.lifecycleState}</strong></div></section>
+  </div><div className="bos-app-build-state"><span>STAN PROCESU</span><strong>{lifecyclePL}</strong></div></section>
 
   <section className="bos-role-transition-hero" aria-label="Zmiana roli A do B">
    <div className="bos-role-node bos-role-node-from"><span>ROLA A · OBECNIE</span><strong>{p.fromRole}</strong><small>punkt wyjścia pracownika</small></div>
@@ -69,14 +70,14 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   <section className="bos-promotion-delta-summary">
    <div><span>WYMAGANIA ROLI B</span><strong>{p.tasks.length}</strong></div>
    <div><span>OCENIONE</span><strong>{assessed}/{p.tasks.length}</strong></div>
-   <div><span>DO WDROŻENIA</span><strong>{p.tasks.filter(t=>t.effectiveAssessment==="TO_DEPLOY").length}</strong></div>
-   <div><span>DO SPRAWDZENIA</span><strong>{p.tasks.filter(t=>t.effectiveAssessment==="TO_VERIFY").length}</strong></div>
+   <div><span>KLASYFIKACJA · DO WDROŻENIA</span><strong>{p.tasks.filter(t=>t.effectiveAssessment==="TO_DEPLOY").length}</strong></div>
+   <div><span>KLASYFIKACJA · DO SPRAWDZENIA</span><strong>{p.tasks.filter(t=>t.effectiveAssessment==="TO_VERIFY").length}</strong></div>
    <div><span>K</span><strong>{p.tasks.filter(t=>t.isCritical).length}</strong></div>
    <div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong></div>
   </section>
 
   <section className="bos-promotion-gate-strip" aria-label="Final Integrity Gate">
-   {([["STANDARD",p.gates.standard],["PROCESS",p.gates.process],["ENTRY",p.gates.entry],["DEPLOYMENT",p.gates.deployment],["K",p.gates.k],["READINESS",p.gates.readiness],["TRANSITION",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===passed?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"PASS":"—"}</b></div>)}
+   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===passed?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"PASS":"—"}</b></div>)}
   </section>
 
   <section className="bos-process-card" id="assessment">
@@ -105,7 +106,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
    <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">LUKI DO UZUPEŁNIENIA</span><h2>Wdrożenie tylko tam, gdzie jest potrzebne</h2></div><span className="bos-dashboard-count">silnik BOS · WYJAŚNIJ → POKAŻ → RAZEM → SAM → SPRAWDŹ</span></div>
    <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · 5 ETAPÓW</strong><p>Realizuj tylko czynności oznaczone DO WDROŻENIA. Etapów nie można przeskakiwać. Dla K pełna ścieżka jest obowiązkowa niezależnie od oceny wejściowej.</p></aside>
    <div className="bos-promotion-deployment-list">{p.tasks.filter(t=>t.effectiveAssessment==="TO_DEPLOY"&&t.assessmentId).map(t=><article className="bos-promotion-deployment-row" key={t.id}>
-    <div><span>{String(t.position).padStart(2,"0")}{t.isCritical?" · K":""}</span><strong>{t.name}</strong></div>
+    <div><span>{String(t.position).padStart(2,"0")}{t.isCritical?" · K":""}</span><strong>{t.name}</strong>{t.deploymentNote&&<small style={{whiteSpace:"pre-line"}}>ZAPIS WYKONANIA\n{t.deploymentNote}</small>}</div>
     <div className="bos-process-stage-flow">{stages.map(([stage,title,key],i)=>{const done=Boolean(t.stages[key]);const previousDone=i===0||Boolean(t.stages[stages[i-1][2]]);return <form action={advanceStage} key={stage} className="bos-process-stage"><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="assessmentId" value={t.assessmentId}/><input type="hidden" name="stage" value={stage}/><button className={done?"is-done":""} disabled={done||!previousDone}>{title}{done?" ✓":""}</button>{!done&&previousDone&&<input name="stageNote" placeholder="Notatka (opcjonalnie)"/>}</form>})}</div>
    </article>)}
    {!p.tasks.some(t=>t.effectiveAssessment==="TO_DEPLOY")&&<div className="bos-operational-empty"><strong>Brak czynności wymagających wdrożenia</strong><p>Po zakończeniu oceny wejściowej pojawią się tutaj wyłącznie czynności wymagające pełnej ścieżki BOS.</p></div>}
@@ -115,7 +116,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   <section className="bos-process-card" id="verification">
    <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZEJŚCIE A → B</span><h2>Gotowość roli B i przekazanie obowiązków</h2></div><span className="bos-dashboard-count">{readinessPassed}/{p.readiness.length} kryteriów · {transitionDone}/{p.transition.length} przekazanych</span></div>
    <div className="bos-promotions-verify-grid"><div>
-    <h3>Gotowość do roli B</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method}</small></div>{x.result&&x.result!=="UNRESOLVED"?<b data-result={x.result}>{x.result}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></>}</form>)}
+    <h3>Gotowość do roli B</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method==="INDEPENDENT_TASK"?"SAMODZIELNE ZADANIE":x.method==="OBSERVATION"?"OBSERWACJA":x.method==="WORK_SAMPLE"?"PRÓBKA PRACY":x.method==="CONTROL_QUESTIONS"?"PYTANIA KONTROLNE":x.method==="KNOWLEDGE_TEST"?"TEST WIEDZY":x.method==="OTHER"?"INNA METODA":x.method}</small></div>{x.result&&x.result!=="UNRESOLVED"?<b data-result={x.result}>{x.result}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></>}</form>)}
    </div><div className="bos-promotion-handover">
     <div className="bos-promotion-handover-head"><div><span>HANDOVER A → B</span><h3>Zamknięcie przejścia między rolami</h3></div><small>Zapisuj stan faktycznie wykonany, nie plan.</small></div>
     <div className="bos-promotion-handover-groups">{handoverGroups.map(([kind,title,description])=>{const items=p.transition.filter(x=>x.disposition===kind);return <section className="bos-promotion-handover-group" key={kind}><header><div><strong>{title}</strong><small>{description}</small></div><b>{items.filter(x=>x.confirmation==="DONE").length}/{items.length}</b></header>
