@@ -14,6 +14,7 @@ const productMeta = {
 
 const datePL=(value:string)=>new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date(value));
 const firstName=(name:string)=>name.trim().split(/\s+/)[0]||name;
+const promotionStatePL=(process:{gates:{readyAllowed:boolean};latestDecision?:string;lifecycleState:string})=>process.gates.readyAllowed?"DO DECYZJI":process.latestDecision==="NOT_YET"?"JESZCZE NIE":process.lifecycleState==="PLANNED"?"W TOKU":process.lifecycleState==="IN_PROGRESS"?"W TOKU":process.lifecycleState==="READY_TO_DECIDE"?"DO DECYZJI":process.lifecycleState==="CLOSED"?"ZAMKNIĘTY":process.lifecycleState==="STOPPED"?"ZATRZYMANY":process.lifecycleState;
 
 export const dynamic="force-dynamic";
 
@@ -75,7 +76,7 @@ export default async function BOSAppPage(){
       <div className="bos-home-updates">
        {promotionProcesses.slice(0,4).map(process=><Link href={`/app/promotions/processes/${process.id}`} key={process.id}>
         <div><strong>{process.employee}</strong><span>{process.fromRole} → {process.toRole} · {process.type}</span></div>
-        <time>{process.gates.readyAllowed?"DO DECYZJI":process.latestDecision==="NOT_YET"?"JESZCZE NIE":process.lifecycleState}</time>
+        <time>{promotionStatePL(process)}</time>
        </Link>)}
        {!promotionProcesses.length&&<div className="bos-home-empty">Brak zmian ról wymagających pracy.</div>}
       </div>
