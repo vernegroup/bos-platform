@@ -128,7 +128,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
   const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
     <div className="bos-standard-back"><Link href={returnTo==="promotions"?"/app/promotions/processes/new":returnTo==="onboarding"?"/app/onboarding/processes/new":"/app/standards"}>{returnTo==="promotions"?"← WRÓĆ DO NOWEJ ZMIANY":returnTo==="onboarding"?"← WRÓĆ DO NOWEGO WDROŻENIA":"← STANDARDY ORGANIZACJI"}</Link></div>
-    <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / ONBOARDING / STANDARD</div><h1>{standard.name}</h1>
+    <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / STANDARDY ORGANIZACJI / STANDARD</div><h1>{standard.name}</h1>
       <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
       <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
 
@@ -250,7 +250,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
 
     {isDraft&&<section id="gotowosc-publikacji" className="bos-standard-history">
       <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">KONTROLA KOMPLETNOŚCI</span><h2>Gotowość do publikacji</h2>
-        <p>System sprawdza dane Standardu przed udostępnieniem go do użycia w onboardingu.</p></div>
+        <p>System sprawdza dane Standardu przed udostępnieniem go do użycia w procesach BOS.</p></div>
         <span className="bos-dashboard-count">{completeness.complete?"GOTOWY":"BLOKADA"}</span></div>
       <div className="bos-standard-detail-head">
         {completeness.complete
