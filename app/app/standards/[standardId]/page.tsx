@@ -10,6 +10,7 @@ import {
 import { requireBOSAccess } from "@/lib/bos/access";
 
 const text = (formData: FormData, key: string) => String(formData.get(key) ?? "");
+const verificationMethodPL=(value:string)=>value==="OBSERVATION"?"OBSERWACJA":value==="INDEPENDENT_TASK"?"SAMODZIELNE ZADANIE":value==="WORK_SAMPLE"?"PRÓBKA PRACY":value==="CONTROL_QUESTIONS"?"PYTANIA KONTROLNE":value==="KNOWLEDGE_TEST"?"TEST WIEDZY":value==="OTHER"?"INNA METODA":value;
 const editorPath=(standardId:string,returnTo:string,anchor="")=>{
   const query=returnTo==="promotions"?"?returnTo=promotions":returnTo==="onboarding"?"?returnTo=onboarding":"";
   return `/app/standards/${standardId}${query}${anchor}`;
@@ -228,7 +229,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
       current.readinessCriteria.map((criterion,index)=><div className="bos-standard-detail-head" key={criterion.id}>
-        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span>
+        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {verificationMethodPL(criterion.verificationMethod)}</span>
           {!isDraft&&<><p>{criterion.criterion}</p>{criterion.verificationMethodOther&&<p>{criterion.verificationMethodOther}</p>}</>}</div>
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="criterionId" value={criterion.id}/>
