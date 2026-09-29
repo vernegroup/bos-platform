@@ -254,7 +254,7 @@ export async function advancePromotionDeployment(access:BOSAccess,input:{process
   await tx`INSERT INTO promotion_deployment_progress(organization_id,promotion_process_id,promotion_assessment_id)
     VALUES(${org},${input.processId},${input.assessmentId}) ON CONFLICT(promotion_assessment_id) DO NOTHING`;
   const column={EXPLAINED:"explained",SHOWN:"shown",TOGETHER:"together",SOLO:"solo",CHECKED:"checked"}[input.stage];
-  await tx.unsafe(`UPDATE promotion_deployment_progress SET ${column}_at=COALESCE(${column}_at,now()), ${column}_by_user_id=COALESCE(${column}_by_user_id,$1), note=CASE WHEN $2::text IS NULL THEN note WHEN note IS NULL OR note='' THEN $2 ELSE note || E'\n' || $2 END, updated_at=now() WHERE promotion_assessment_id=$3 AND promotion_process_id=$4 AND organization_id=$5`,[user,input.note?.trim()?`${input.stage}: ${input.note.trim()}`:null,input.assessmentId,input.processId,org]);
+  await tx.unsafe(`UPDATE promotion_deployment_progress SET ${column}_at=COALESCE(${column}_at,now()), ${column}_by_user_id=COALESCE(${column}_by_user_id,$1), note=CASE WHEN $2::text IS NULL THEN note WHEN note IS NULL OR note='' THEN $2 ELSE note || E'\n' || $2 END, updated_at=now() WHERE promotion_assessment_id=$3 AND promotion_process_id=$4 AND organization_id=$5`,[user,input.note?.trim()?`${{EXPLAINED:"WYJAŚNIJ",SHOWN:"POKAŻ",TOGETHER:"RAZEM",SOLO:"SAM",CHECKED:"SPRAWDŹ"}[input.stage]}: ${input.note.trim()}`:null,input.assessmentId,input.processId,org]);
  });
 }
 
