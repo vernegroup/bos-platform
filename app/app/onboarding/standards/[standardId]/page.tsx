@@ -140,7 +140,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
 
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><span className="is-active">CZYNNOŚCI</span><span>SZCZEGÓŁY</span><span>PLIKI</span><a href="#historia">HISTORIA WERSJI</a></nav>
     <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":"AKTYWNA WERSJA"}</span>
-      <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note}</p>
+      <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note&&current.note.toLowerCase()!=="wersja robocza"?current.note:"Opublikowana wersja Standardu."}</p>
       {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
       {!isDraft&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
@@ -275,7 +275,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
 
     <section id="historia" className="bos-standard-history"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">WERSJONOWANIE</span><h2>Historia wersji</h2></div>
       <span className="bos-dashboard-count">{standard.versions.length} wersje</span></div>
-      {standard.versions.map(version=><div className="bos-standard-version-row" key={version.version}><strong>{version.version}</strong><time>{version.date}</time><p>{version.note}</p>
+      {standard.versions.map(version=><div className="bos-standard-version-row" key={version.version}><strong>{version.version}</strong><time>{version.date}</time><p>{version.status==="PUBLISHED"&&version.note.toLowerCase()==="wersja robocza"?"Opublikowana wersja Standardu.":version.note}</p>
         <span>{version.tasks.length} czynności</span><b>{version.version===standard.currentVersion?"AKTYWNA":"ARCHIWALNA"}</b></div>)}</section>
   </>;
 }
