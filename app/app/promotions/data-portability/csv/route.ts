@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireBOSAccess } from "@/lib/bos/access";
+import { requireProductLicense } from "@/lib/bos/licenseRepository";
 import { buildPortableDataset,portableDatasetToCsvFiles } from "@/lib/bos/core/dataPortability";
 export const dynamic="force-dynamic";
-export async function GET(request:Request){const access=await requireBOSAccess();const data=await buildPortableDataset(access.organization.id);const files=portableDatasetToCsvFiles(data);const name=new URL(request.url).searchParams.get("file")||"promotion_processes.csv";if(!(name in files)||!name.startsWith("promotion_"))return new NextResponse("Unknown Promotions export file",{status:404});return new NextResponse(files[name as keyof typeof files],{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":`attachment; filename="${name}"`,"Cache-Control":"no-store"}});}
+export async function GET(request:Request){const access=await requireBOSAccess();await requireProductLicense(access,"promotions");const data=await buildPortableDataset(access.organization.id);const files=portableDatasetToCsvFiles(data);const name=new URL(request.url).searchParams.get("file")||"promotion_processes.csv";if(!(name in files)||!name.startsWith("promotion_"))return new NextResponse("Unknown Promotions export file",{status:404});return new NextResponse(files[name as keyof typeof files],{headers:{"Content-Type":"text/csv; charset=utf-8","Content-Disposition":`attachment; filename="${name}"`,"Cache-Control":"no-store"}});}
