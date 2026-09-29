@@ -105,7 +105,7 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
     bos_promotion_effective_assessment_for_task(
       pa.initial_assessment,pa.verification_result,ppt.is_critical_snapshot
     ) effective_assessment,
-    dp.explained_at,dp.shown_at,dp.together_at,dp.solo_at,dp.checked_at
+    dp.explained_at,dp.shown_at,dp.together_at,dp.solo_at,dp.checked_at,dp.note deployment_note
   FROM promotion_process_tasks ppt
   LEFT JOIN promotion_assessments pa
     ON pa.promotion_process_task_id=ppt.id AND pa.organization_id=ppt.organization_id
@@ -149,7 +149,7 @@ export async function getPromotionProcess(access:BOSAccess,id:string){
    initialAssessment:t.initial_assessment??undefined,evidenceNote:t.evidence_note??undefined,assessedAt:t.assessed_at?datePL(t.assessed_at):undefined,verificationResult:t.verification_result??undefined,verificationNote:t.verification_note??undefined,verificationAt:t.verification_at?datePL(t.verification_at):undefined,
    effectiveAssessment:t.effective_assessment??undefined,
    stages:{explained:!!t.explained_at,shown:!!t.shown_at,together:!!t.together_at,
-    solo:!!t.solo_at,checked:!!t.checked_at}})),
+    solo:!!t.solo_at,checked:!!t.checked_at},deploymentNote:t.deployment_note??undefined})),
   readiness:readiness.map(x=>({id:x.id,criterion:x.criterion_snapshot,
    method:x.verification_method_snapshot,result:x.result,checkedAt:x.checked_at?datePL(x.checked_at):undefined})),
   transition:transition.map(x=>({id:x.id,position:x.position,item:x.item,
@@ -254,7 +254,7 @@ export async function advancePromotionDeployment(access:BOSAccess,input:{process
   await tx`INSERT INTO promotion_deployment_progress(organization_id,promotion_process_id,promotion_assessment_id)
     VALUES(${org},${input.processId},${input.assessmentId}) ON CONFLICT(promotion_assessment_id) DO NOTHING`;
   const column={EXPLAINED:"explained",SHOWN:"shown",TOGETHER:"together",SOLO:"solo",CHECKED:"checked"}[input.stage];
-  await tx.unsafe(`UPDATE promotion_deployment_progress SET ${column}_at=COALESCE(${column}_at,now()), ${column}_by_user_id=COALESCE(${column}_by_user_id,$1), note=COALESCE($2,note), updated_at=now() WHERE promotion_assessment_id=$3 AND promotion_process_id=$4 AND organization_id=$5`,[user,input.note?.trim()||null,input.assessmentId,input.processId,org]);
+  await tx.unsafe(`UPDATE promotion_deployment_progress SET ${column}_at=COALESCE(${column}_at,now()), ${column}_by_user_id=COALESCE(${column}_by_user_id,$1), note=CASE WHEN $2::text IS NULL THEN note WHEN note IS NULL OR note='' THEN $2 ELSE note || E'\n' || $2 END, updated_at=now() WHERE promotion_assessment_id=$3 AND promotion_process_id=$4 AND organization_id=$5`,[user,input.note?.trim()?`${input.stage}: ${input.note.trim()}`:null,input.assessmentId,input.processId,org]);
  });
 }
 
