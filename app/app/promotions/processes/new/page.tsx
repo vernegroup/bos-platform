@@ -54,7 +54,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
         <div className="bos-process-new-field"><span>01 / PRACOWNIK</span><strong>Pracownik</strong>
           <select name="employeeId" required defaultValue="" style={{padding:10}}>
             <option value="" disabled>Wybierz pracownika</option>
-            {options.employees.map(e=><option value={e.id} key={e.id}>{e.name}{e.employeeNumber?` · ${e.employeeNumber}`:""}{e.position?` · ${e.position}`:""}</option>)}
+            {options.employees.map(e=><option value={e.id} key={e.id}>{e.name}{e.employeeNumber&&!e.employeeNumber.startsWith("legacy-")?` · ${e.employeeNumber}`:""}{e.position?` · ${e.position}`:""}</option>)}
           </select>
           <small>Tożsamość pochodzi z Employee Core. Historia procesu pozostanie przypisana do tego samego pracownika.</small>
         </div>
