@@ -23,7 +23,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
       <div className="bos-standard-back"><Link href="/app/onboarding/closed">← ZAKOŃCZONE WDROŻENIA</Link></div>
       <section className="bos-app-intro">
         <div>
-          <div className="bos-app-kicker">BOS / ONBOARDING / KARTA ZAKOŃCZENIA</div>
+          <div className="bos-app-kicker">BOS / WDROŻENIA / KARTA ZAKOŃCZENIA</div>
           <h1>{closure.employee}</h1>
           <p>{standard.name} · Standard {closure.standardVersion} · zamknięto {closure.closedAt}</p>
         </div>
