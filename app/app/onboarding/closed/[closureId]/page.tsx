@@ -31,7 +31,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-closure-summary">
-        <div><span>STANDARD</span><Link href={`/app/onboarding/standards/${standard.id}?version=${encodeURIComponent(closure.standardVersion)}`}>{standard.name} {closure.standardVersion} ↗</Link></div>
+        <div><span>STANDARD</span><Link href={`/app/standards/${standard.id}?version=${encodeURIComponent(closure.standardVersion)}&returnTo=onboarding`}>{standard.name} {closure.standardVersion} ↗</Link></div>
         <div><span>START</span><strong>{closure.startedAt}</strong></div>
         <div><span>ZAMKNIĘCIE</span><strong>{closure.closedAt}</strong></div>
         <div><span>PROWADZĄCY</span><strong>{closure.owner}</strong></div>
