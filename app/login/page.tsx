@@ -7,7 +7,10 @@ import "./login.css";
 type LoginPageProps = { searchParams: Promise<{ callbackUrl?: string }> };
 
 function safeCallbackUrl(value?: string) {
-  return value?.startsWith("/app") ? value : "/app";
+  if (!value) return "/app";
+  // Allow only local application routes, never lookalike paths or backslashes.
+  if (value === "/app" || (value.startsWith("/app/") && !value.includes("\\") && !value.includes("//"))) return value;
+  return "/app";
 }
 
 function GoogleMark() {
