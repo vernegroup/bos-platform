@@ -3712,3 +3712,16 @@
 .bos-promotions-preview-history time{font-size:9px}
 @media(max-width:850px){.bos-promotions-work-grid{grid-template-columns:1fr;gap:38px}.bos-promotions-preview-list>a{grid-template-columns:minmax(150px,1fr) 100px 90px 54px}}
 @media(max-width:600px){.bos-promotions-identity-path{grid-template-columns:1fr}.bos-promotions-identity-path>div{min-height:86px}.bos-promotions-preview-list>a{grid-template-columns:1fr 82px 44px}.bos-promotions-preview-history>a{grid-template-columns:74px 1fr}.bos-promotions-preview-history>a>b{grid-column:2}}
+
+
+/* FIX-12C — remove build metadata from product UI and separate Promotions history copy */
+.bos-promotions-preview-history>a>div{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+}
+.bos-promotions-preview-history>a>div strong,
+.bos-promotions-preview-history>a>div span{display:block;max-width:100%}
+.bos-promotions-preview-history>a>div span{line-height:1.45;white-space:normal}

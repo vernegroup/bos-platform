@@ -21,7 +21,6 @@ export default async function PromotionsEntryPage() {
           <h1>BOS Promotions</h1>
           <p>Kontrolowana zmiana roli A → B: porównaj pracownika ze Standardem roli docelowej, uzupełnij tylko rzeczywiste luki i zapisz wynik przejścia.</p>
         </div>
-        <div className="bos-app-build-state"><span>PRODUKT</span><strong>WEB 1.0 / DANE ORGANIZACJI</strong></div>
       </section>
 
       <section className="bos-promotions-commandbar" aria-label="Stan procesów Promotions">
