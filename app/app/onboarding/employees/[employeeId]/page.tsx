@@ -16,8 +16,8 @@ export default async function EmployeeHistoryPage({params}:{params:Promise<{empl
  if(!history) notFound();
  return <>
   <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA</Link></div>
-  <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / WDROŻENIA / HISTORIA PRACOWNIKA</div>
-   <h1>{history.employee.displayName}</h1><p>Historia wdrożeń wynika z zapisanych procesów i decyzji. Nie jest osobnym, ręcznie edytowanym profilem.</p></div>
+  <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / HISTORIA OPERACYJNA PRACOWNIKA</div>
+   <h1>{history.employee.displayName}</h1><p>Jedna osoba ma jedną historię operacyjną w BOS. Wdrożenia i zmiany roli wynikają z zapisanych procesów obu produktów, bez kopiowania profilu pracownika.</p></div>
    <div className="bos-app-build-state"><span>PRACOWNIK</span><strong>{history.employee.status==="ACTIVE"?"AKTYWNY":history.employee.status==="INACTIVE"?"NIEAKTYWNY":history.employee.status}</strong></div>
   </section>
   <div className="bos-onboarding-commandbar">
@@ -32,6 +32,14 @@ export default async function EmployeeHistoryPage({params}:{params:Promise<{empl
     <span>{decisionPL(item.latestDecision)}{item.decisionCount>1?` · #${item.decisionCount}`:""}</span><span>{datePL(item.latestDecisionAt)}</span><i aria-hidden="true">→</i>
    </Link>})}
    {!history.onboarding.length&&<div className="bos-operational-empty"><strong>Brak historii wdrożeń</strong><p>Ten pracownik nie ma jeszcze procesu Onboarding w BOS.</p></div>}
+  </section>
+  <section className="bos-process-list bos-operational-list">
+   <div className="bos-process-list-head"><span>ZMIANA ROLI</span><span>STANDARD B</span><span>STATUS</span><span>DECYZJA</span><span>DATA DECYZJI</span><span>ZAMKNIĘCIE</span><span /></div>
+   {history.promotions.map(item=>{const href=item.latestClosureId?`/app/promotions/closed/${item.latestClosureId}`:`/app/promotions/processes/${item.processId}`;return <Link href={href} className="bos-process-list-row" key={item.processId}>
+    <strong>{changeTypePL(item.changeType)} · {item.fromRole} → {item.toRole}</strong><span>{item.standardName?`${item.standardName}${item.standardVersion?` · ${item.standardVersion}`:""}`:"—"}</span><span>{promotionStatePL(item.lifecycleState)}</span>
+    <span>{decisionPL(item.latestDecision)}{item.decisionCount>1?` · #${item.decisionCount}`:""}</span><span>{datePL(item.latestDecisionAt)}</span><span>{datePL(item.closedAt)}</span><i aria-hidden="true">→</i>
+   </Link>})}
+   {!history.promotions.length&&<div className="bos-operational-empty"><strong>Brak historii zmian roli</strong><p>Ten pracownik nie ma jeszcze procesu Promotions w BOS.</p></div>}
   </section>
  </>;
 }
