@@ -38,3 +38,15 @@ Historical filename gaps (006 and 008) are not migrations in the integrated repo
 The ledger key is the full migration filename/name, not the numeric prefix. Therefore the parallel 013 and 014 migrations remain distinct and auditable.
 
 M8 does not apply migrations to the production/default Neon branch. Production promotion remains a separate explicit operation.
+
+## Clean migration audit — 2026-09-30
+
+A clean database `bos_m8_clean_audit` was created on the existing non-production Neon branch `promotions-migration-013-024-test` and the canonical Core + Onboarding + Promotions sequence was replayed from an empty schema.
+
+Result: PASS. All 26 ordered migration files executed successfully through `026_shared_organization_standards.sql`. The resulting BOS product schema contains 43 public tables, 6 public views, 40 non-internal triggers and 143 foreign keys (including the migration ledger table).
+
+The audit exposed and fixed one ledger inconsistency in migration 026: its internal ledger key omitted the `.sql` suffix. The canonical key is now `026_shared_organization_standards.sql`, matching the runner contract.
+
+The existing long-lived test database also contains `analytics_raw_events`, `auth_tokens`, and `user_credentials`. These are not produced by the canonical Core + Onboarding + Promotions migration files audited in M8 and are therefore not silently inserted into this sequence. They remain separate infrastructure/analytics concerns to reconcile in their owning workstream.
+
+No migration was applied to the production/default Neon branch during M8.
