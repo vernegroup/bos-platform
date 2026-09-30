@@ -12,7 +12,7 @@ import { requireBOSAccess } from "@/lib/bos/access";
 const text = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 const editorPath=(standardId:string,returnTo:string,anchor="")=>{
   const query=returnTo==="promotions"?"?returnTo=promotions":returnTo==="onboarding"?"?returnTo=onboarding":"";
-  return `/app/onboarding/standards/${standardId}${query}${anchor}`;
+  return `/app/standards/${standardId}${query}${anchor}`;
 };
 
 async function updateDraft(formData: FormData) {
