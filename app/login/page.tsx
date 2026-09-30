@@ -70,10 +70,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
       <aside className="bos-login-brand-panel" aria-label="Business Operating Standards">
         <div className="bos-login-brand-backdrop" aria-hidden="true" />
-        <div className="bos-login-brand-message">
-          <p>Uporządkowana praca.<br />Silniejsze organizacje.</p>
-          <span aria-hidden="true" />
-        </div>
       </aside>
     </main>
   );
