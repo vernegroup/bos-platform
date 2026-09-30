@@ -22,7 +22,7 @@ export default function AppProductRail({licensedProductKeys}:{licensedProductKey
         const active=product.href ? (pathname===product.href||pathname.startsWith(product.href+"/")) : false;
         return product.href
           ? <Link key={product.label} href={product.href} className={"bos-app-product-rail-item"+(active?" is-active":"")} aria-current={active?"page":undefined}>{product.label}<i aria-hidden="true"/></Link>
-          : <span key={product.label} className="bos-app-product-rail-item is-planned" aria-disabled="true">{product.label}<small>W PRZYGOTOWANIU</small></span>;
+          : <span key={product.label} className="bos-app-product-rail-item is-planned" aria-disabled="true">{product.label}</span>;
       })}
     </div>
   </nav>;

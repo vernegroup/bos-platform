@@ -33,15 +33,15 @@ export default async function PromotionsEntryPage() {
 
       <section className="bos-promotions-path">
         <div className="bos-dashboard-section-head">
-          <div><span className="bos-dashboard-section-kicker">MODEL PRODUKTU</span><h2>Rola A → mapa różnicy → rola B</h2></div>
+          <div><span className="bos-dashboard-section-kicker">MODEL PRODUKTU</span><h2>Rola obecna → różnice do uzupełnienia → rola docelowa</h2></div>
           <span className="bos-dashboard-count">Standard roli B wyznacza wymagania</span>
         </div>
         <div className="bos-promotions-identity-path">
-          <div><span>A</span><strong>ROLA OBECNA</strong><small>Punkt wyjścia pracownika</small></div>
+          <div><strong>ROLA OBECNA</strong><small>Punkt wyjścia pracownika</small></div>
           <i>→</i>
-          <div className="is-delta"><span>Δ</span><strong>MAPA RÓŻNICY</strong><small>Potwierdź · sprawdź · wdróż</small></div>
+          <div className="is-delta"><strong>RÓŻNICE DO UZUPEŁNIENIA</strong><small>Potwierdź · sprawdź · wdróż</small></div>
           <i>→</i>
-          <div><span>B</span><strong>ROLA DOCELOWA</strong><small>Gotowość + przekazanie</small></div>
+          <div><strong>ROLA DOCELOWA</strong><small>Gotowość + przekazanie</small></div>
         </div>
       </section>
 
