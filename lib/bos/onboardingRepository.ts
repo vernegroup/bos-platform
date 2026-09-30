@@ -137,12 +137,13 @@ export async function closeProcess(input:{organizationId?:string;processId:strin
     if(!["PLANNED","IN_PROGRESS","PAUSED","READY_TO_CLOSE"].includes(process.status)) throw new Error("Proces nie jest otwarty do decyzji.");
     if(input.decision==="READY") {
       const [gate]=await tx`SELECT
+        count(*)::int tasks_total,
         count(*) FILTER(WHERE tp.checked_at IS NULL)::int tasks_missing,
         count(*) FILTER(WHERE st.is_critical AND (tp.solo_at IS NULL OR tp.checked_at IS NULL))::int critical_missing
         FROM onboarding_task_progress tp JOIN standard_tasks st ON st.id=tp.standard_task_id AND st.organization_id=tp.organization_id
         WHERE tp.onboarding_process_id=${process.id} AND tp.organization_id=${organizationId}`;
-      const [readiness]=await tx`SELECT count(*) FILTER(WHERE is_passed=false)::int missing FROM onboarding_readiness_checks WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
-      if((gate?.tasks_missing??1)>0||(gate?.critical_missing??1)>0||(readiness?.missing??1)>0) throw new Error("Readiness Gate nie jest kompletny.");
+      const [readiness]=await tx`SELECT count(*)::int criteria_total,count(*) FILTER(WHERE is_passed IS DISTINCT FROM true)::int missing FROM onboarding_readiness_checks WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
+      if((gate?.tasks_total??0)===0||(readiness?.criteria_total??0)===0||(gate?.tasks_missing??1)>0||(gate?.critical_missing??1)>0||(readiness?.missing??1)>0) throw new Error("Readiness Gate nie jest kompletny.");
     }
     const [seq]=await tx`SELECT COALESCE(max(decision_sequence),0)::int+1 sequence FROM onboarding_closures WHERE onboarding_process_id=${process.id} AND organization_id=${organizationId}`;
     const [employee]=await tx`SELECT e.position,e.department FROM onboarding_processes p LEFT JOIN employees e ON e.id=p.employee_id AND e.organization_id=p.organization_id WHERE p.id=${process.id} AND p.organization_id=${organizationId} LIMIT 1`;
