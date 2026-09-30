@@ -59,7 +59,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
 
       <section className="bos-app-intro">
         <div>
-          <div className="bos-app-kicker">BOS / ONBOARDING / KARTA POSTĘPU</div>
+          <div className="bos-app-kicker">BOS / WDROŻENIA / KARTA POSTĘPU</div>
           <h1>{process.employee}</h1>
           <p>{standard.name} · Standard {process.standardVersion} · prowadzący: {process.owner}</p>
         </div>
@@ -127,7 +127,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-process-card">
-        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">OCENA GOTOWOŚCI</span><h2>Readiness Gate</h2></div><span className={`bos-dashboard-count bos-readiness-status ${readinessGate?"is-pass":""}`}>{readinessGate?"✓ KRYTERIA POTWIERDZONE":"KRYTERIA DO POTWIERDZENIA"}</span></div>
+        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">OCENA GOTOWOŚCI</span><h2>Bramka gotowości</h2></div><span className={`bos-dashboard-count bos-readiness-status ${readinessGate?"is-pass":""}`}>{readinessGate?"✓ KRYTERIA POTWIERDZONE":"KRYTERIA DO POTWIERDZENIA"}</span></div>
         <div className="bos-readiness-gates">
           <div className={tasksGate?"is-pass":""}><span>01</span><strong>Wszystkie czynności</strong><b>{tasksGate?"TAK":"NIE"}</b></div>
           <div className={criticalGate?"is-pass":""}><span>02</span><strong>Wszystkie K: SAM + SPRAWDŹ</strong><b>{criticalGate?"TAK":"NIE"}</b></div>
