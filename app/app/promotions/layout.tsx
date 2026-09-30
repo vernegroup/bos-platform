@@ -15,7 +15,7 @@ export default async function PromotionsLayout({ children }: { children: React.R
     <div className="bos-product-shell bos-promotions-shell">
       <header className="bos-product-header">
         <div className="bos-product-identity">
-          <Link href="/app/promotions" className="bos-product-name">BOS Promotions</Link>
+          <Link href="/app/promotions" className="bos-product-name">BOS Awanse</Link>
           <span>Zmiana stanowiska jako kontrolowany proces operacyjny</span>
         </div>
         <div className="bos-product-context">
@@ -24,7 +24,7 @@ export default async function PromotionsLayout({ children }: { children: React.R
         </div>
       </header>
 
-      <nav className="bos-product-flow bos-promotions-product-flow" aria-label="Proces BOS Promotions">
+      <nav className="bos-product-flow bos-promotions-product-flow" aria-label="Proces BOS Awanse">
         {productNavigation.map((item) => (
           <Link href={item.href} className="bos-product-flow-step" key={item.stage}>
             <span className="bos-product-flow-number">{item.step}</span>
