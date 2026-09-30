@@ -32,7 +32,7 @@ export default async function CloseProcessPage({params,searchParams}:{params:Pro
  const ready=progress.total>0&&progress.completed===progress.total&&criticalDone===critical.length&&version.readinessCriteria.length>0&&readinessDone===version.readinessCriteria.length;
  return <><div className="bos-standard-back"><Link href={`/app/onboarding/processes/${process.id}`}>← KARTA POSTĘPU</Link></div>
  <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
-   <Link href="/app/onboarding/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
+   <Link href="/app/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
    <Link href={`/app/onboarding/processes/${process.id}`}><span>02</span><strong>PRZEPROWADŹ</strong><small>Karta Postępu</small></Link>
    <Link href="/app/onboarding/closed" className="is-active"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
  </nav>
