@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { confirmReadinessCriterion, confirmStartRequirement, confirmTaskStage, getProcess, getProcessProgress, getStandard, updateTaskNote, type OnboardingTaskStage } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
@@ -8,21 +9,21 @@ async function confirmStage(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const standardTaskId=String(formData.get("standardTaskId")??""); const stage=String(formData.get("stage")??"") as OnboardingTaskStage;
   if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap BOS.");
-  await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
+  await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
 async function confirmStart(formData:FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const requirementId=String(formData.get("requirementId")??"");
-  await confirmStartRequirement({organizationId:access.organization.id,processId,requirementId,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
+  await confirmStartRequirement({organizationId:access.organization.id,processId,requirementId,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}`);
 }
 async function saveNote(formData:FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const standardTaskId=String(formData.get("standardTaskId")??""); const note=String(formData.get("note")??"");
-  await updateTaskNote({organizationId:access.organization.id,processId,standardTaskId,note,userId:access.user.id}); redirect(`/app/onboarding/processes/${processId}`);
+  await updateTaskNote({organizationId:access.organization.id,processId,standardTaskId,note,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
 async function confirmReadiness(formData:FormData) {
   "use server"; const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const criterionId=String(formData.get("criterionId")??""); const note=String(formData.get("note")??"");
-  await confirmReadinessCriterion({organizationId:access.organization.id,processId,criterionId,userId:access.user.id,note}); redirect(`/app/onboarding/processes/${processId}`);
+  await confirmReadinessCriterion({organizationId:access.organization.id,processId,criterionId,userId:access.user.id,note}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}#readiness-${criterionId}`);
 }
 const stageLabels=[["EXPLAINED","WYJAŚNIJ","explainedAt","explainedBy"],["SHOWN","POKAŻ","shownAt","shownBy"],["TOGETHER","RAZEM","togetherAt","togetherBy"],["SOLO","SAM","soloAt","soloBy"],["CHECKED","SPRAWDŹ","checkedAt","checkedBy"]] as const;
 const shortDate=(value?:string|Date)=>value?new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit"}).format(new Date(value)):"";
@@ -50,6 +51,11 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
+      <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
+        <Link href="/app/onboarding/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
+        <Link href="/app/onboarding/processes" className="is-active"><span>02</span><strong>PRZEPROWADŹ</strong><small>Karta Postępu</small></Link>
+        <Link href="/app/onboarding/closed"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
+      </nav>
 
       <section className="bos-app-intro">
         <div>
@@ -61,7 +67,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-process-summary">
-        <div><span>STANDARD</span><Link href={`/app/onboarding/standards/${standard.id}`}>{standard.name} {process.standardVersion} ↗</Link></div>
+        <div><span>STANDARD</span><Link href={`/app/onboarding/standards/${standard.id}?version=${encodeURIComponent(process.standardVersion)}`}>{standard.name} {process.standardVersion} ↗</Link></div>
         <div><span>START</span><strong>{process.startedAt}</strong></div>
         <div><span>CEL</span><strong>{process.targetDate}</strong></div>
         <div><span>POSTĘP CZYNNOŚCI</span><strong>{progress.percent}%</strong></div><div><span>K — KRYTYCZNE</span><strong>{criticalCompleted}/{criticalTasks.length}</strong></div>
@@ -74,7 +80,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <span className="bos-dashboard-count">{process.startChecks.filter(x=>x.isSatisfied).length} z {version.startRequirements.length} potwierdzonych</span></div>
         {version.startRequirements.length===0?<div className="bos-operational-empty"><strong>Brak dodatkowych warunków rozpoczęcia</strong><p>Standard nie definiuje warunków wymagających potwierdzenia.</p></div>:
           <div className="bos-start-check-list">{version.startRequirements.map(req=>{const check=process.startChecks.find(x=>x.requirementId===req.id);const done=Boolean(check?.isSatisfied);return <div className="bos-start-check-row" key={req.id}>
-            <span>{String(req.order).padStart(2,"0")}</span><div><strong>{req.requirement}</strong><small>{req.category}</small></div>
+            <span>{String(req.order).padStart(2,"0")}</span><div><strong>{req.requirement}</strong><small>{({TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"} as Record<string,string>)[req.category]??req.category}</small></div>
             <form action={confirmStart}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="requirementId" value={req.id}/><button className={done?"is-done":""} disabled={done}>{done?"POTWIERDZONE ✓":"POTWIERDŹ"}</button></form>
           </div>})}</div>}
         {!startComplete&&<div className="bos-operational-empty"><strong>Realizacja jeszcze zablokowana</strong><p>Potwierdź wszystkie warunki rozpoczęcia. Dopiero wtedy proces przejdzie z PLANOWANE do W TOKU i odblokuje etapy BOS.</p></div>}
@@ -86,7 +92,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           <span className="bos-dashboard-count">{progress.completed} z {progress.total} czynności gotowych</span>
         </div>
 
-        <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · 5 ETAPÓW</strong><p>WYJAŚNIJ — omów. POKAŻ — zademonstruj. RAZEM — wykonajcie wspólnie. SAM — pracownik wykonuje bez pomocy. SPRAWDŹ — oceń rezultat według warunku zaliczenia. Deklaracja „wiem” nie zastępuje SAM.</p></aside>
+        <aside className="bos-guidance bos-guidance-primary"><div><span className="bos-guidance-eyebrow">TERAZ · PRZEPROWADŹ</span><strong>Prowadź każdą czynność przez 5 etapów</strong><p>Nie zaliczaj wiedzy deklarowanej. Etapy opisują rzeczywistą pracę: najpierw wyjaśnij i pokaż, potem oddawaj wykonanie pracownikowi, aż zrobi je sam i rezultat zostanie sprawdzony.</p></div><details><summary>? Jak działa 5 etapów</summary><p><b>WYJAŚNIJ</b> — pracownik rozumie co, po co i na co uważać. <b>POKAŻ</b> — widzi prawidłowe wykonanie. <b>RAZEM</b> — wykonuje z pomocą. <b>SAM</b> — wykonuje bez prowadzenia krok po kroku. <b>SPRAWDŹ</b> — oceniasz rzeczywisty rezultat według Standardu.</p></details></aside>
         <div className="bos-process-task-head">
           <span>LP.</span><span>CZYNNOŚĆ ZE STANDARDU</span><span>CO SPRAWDZIĆ</span><span>POSTĘP BOS</span>
         </div>
@@ -94,14 +100,26 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
           const state = process.tasks.find((item: { standardTaskId: string }) => item.standardTaskId === task.id);
           if (!state) return null;
           return (
-            <article className="bos-process-task-row" key={task.id}>
+            <article className="bos-process-task-row" id={`task-${task.id}`} key={task.id}>
               <span>{String(task.order).padStart(2, "0")}{task.isCritical ? " · K" : ""}</span>
               <div><strong>{task.name}</strong><p>{task.execution}</p>{task.isCritical&&<small className="bos-context-inline">K — błąd w tej czynności może mieć poważne konsekwencje. K nie oznacza po prostu „ważne”.</small>}{task.hint&&<small>WSKAZÓWKA: {task.hint}</small>}</div>
               <p>{task.readyWhen}</p>
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
                 {stageLabels.map(([stage,label,key,actorKey],stageIndex)=>{ const done=Boolean(state[key]); const previousKey=stageIndex>0?stageLabels[stageIndex-1][2]:null; const previousDone=stageIndex===0||Boolean(previousKey&&state[previousKey]);
-                  return <div className="bos-process-stage" key={stage}><form action={confirmStage}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><input type="hidden" name="stage" value={stage}/><button type="submit" className={done?"is-done":""} disabled={done||!previousDone||!startComplete} aria-pressed={done}>{label}{done?" ✓":""}</button></form>{done&&<small>{shortDate(state[key])} · {state[actorKey]||"—"}</small>}</div>; })}
-                <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Dwukrotnie wybrał zły kod produktu — wrócić do listy kodów."/></label><div><small>Zapisz fakt lub działanie do powtórzenia, nie ocenę osoby. Błąd nie kasuje wcześniejszych etapów — popraw, powtórz i sprawdź ponownie.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
+                  const guidance={
+                    EXPLAINED:["Powiedz, co ma zrobić, po co, jaki ma być rezultat i na co uważać.","Przejdź dalej, gdy pracownik potrafi własnymi słowami opisać zadanie."],
+                    SHOWN:["Wykonaj czynność tak, jak robi się ją naprawdę. Pokazuj rezultat i punkty kontroli.","Przejdź dalej po rzeczywistej demonstracji, nie po samym omówieniu."],
+                    TOGETHER:["Pracownik wykonuje czynność. Ty pomagasz tylko tam, gdzie jest to potrzebne.","RAZEM nie oznacza wykonania zadania za pracownika."],
+                    SOLO:["Oddaj wykonanie pracownikowi bez prowadzenia krok po kroku.","SAM zaznacz dopiero po rzeczywistym samodzielnym wykonaniu. „Rozumiem” nie wystarcza."],
+                    CHECKED:["Porównaj rzeczywisty rezultat z prawidłowym wykonaniem i warunkiem SPRAWDŹ.","Potwierdź dopiero wtedy, gdy rezultat spełnia Standard."]
+                  }[stage];
+                  return <div className={`bos-process-stage ${!done&&previousDone?"is-current":""}`} key={stage}>
+                    <div className="bos-stage-guidance"><span>{String(stageIndex+1).padStart(2,"0")}</span><div><strong>{label}</strong><p>{guidance[0]}</p><small>{guidance[1]}</small></div></div>
+                    <form action={confirmStage}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><input type="hidden" name="stage" value={stage}/><button type="submit" className={done?"is-done":""} disabled={done||!previousDone||!startComplete} aria-pressed={done}>{done?`${label} ✓`:`POTWIERDŹ ${label}`}</button></form>
+                    {done&&<small className="bos-stage-audit">{shortDate(state[key])} · {state[actorKey]||"—"}</small>}
+                  </div>; })}
+                <details className="bos-error-recovery"><summary>WYSTĄPIŁ BŁĄD — jak wrócić do prawidłowego wykonania?</summary><div><b>ZATRZYMAJ → WSKAŻ → POPRAW → POWTÓRZ → SPRAWDŹ</b><p>Błąd nie kasuje wcześniejszych etapów. Zatrzymaj błędne wykonanie, wskaż konkretną różnicę względem Standardu, popraw sposób działania, pozwól powtórzyć czynność i sprawdź rezultat ponownie.</p><small>W notatce zapisuj fakt, np. „Pominięto sprawdzenie uszkodzenia opakowania”, a nie ocenę osoby, np. „nieuważny”.</small></div></details>
+                <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Pominięto sprawdzenie kodu produktu — powtórzyć czynność i sprawdzić rezultat."/></label><div><small>Zapisz zaobserwowany fakt lub działanie do powtórzenia. Nie oceniaj osoby.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
               </div>
             </article>
           );
@@ -109,21 +127,21 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-process-card">
-        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">OCENA GOTOWOŚCI</span><h2>Readiness Gate</h2></div><span className="bos-dashboard-count">{readinessPassed}/{version.readinessCriteria.length} kryteriów</span></div>
+        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">OCENA GOTOWOŚCI</span><h2>Readiness Gate</h2></div><span className={`bos-dashboard-count bos-readiness-status ${readinessGate?"is-pass":""}`}>{readinessGate?"✓ KRYTERIA POTWIERDZONE":"KRYTERIA DO POTWIERDZENIA"}</span></div>
         <div className="bos-readiness-gates">
           <div className={tasksGate?"is-pass":""}><span>01</span><strong>Wszystkie czynności</strong><b>{tasksGate?"TAK":"NIE"}</b></div>
           <div className={criticalGate?"is-pass":""}><span>02</span><strong>Wszystkie K: SAM + SPRAWDŹ</strong><b>{criticalGate?"TAK":"NIE"}</b></div>
-          <div className={readinessGate?"is-pass":""}><span>03</span><strong>Kryteria gotowości</strong><b>{readinessGate?"TAK":"NIE"}</b></div>
+          <div className={readinessGate?"is-pass":""}><span>03</span><strong>Kryteria gotowości</strong><b>{readinessGate?"✓":"NIE"}</b></div>
           <div className={readyForDecision?"is-pass":""}><span>04</span><strong>Gotowe do decyzji człowieka</strong><b>{readyForDecision?"TAK":"NIE"}</b></div>
         </div>
         <aside className="bos-context-guide"><strong>4×TAK · TEST JAKOŚCI KRYTERIUM</strong><p>Przed potwierdzeniem sprawdź: czy rezultat jest obserwowalny? Czy da się go sprawdzić w realnej pracy? Czy dwie osoby powinny dojść do podobnej oceny? Czy kryteria obejmują wszystkie czynności K? To kontrola jakości oceny — nie automatyczna decyzja o pracowniku.</p></aside>
-        <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id}>
-          <div><span>{String(c.order).padStart(2,"0")} · {c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>}</div>
-          {passed?<b className="bos-readiness-pass">POTWIERDZONE ✓</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
+        <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id} id={`readiness-${c.id}`}>
+          <div><span>{String(c.order).padStart(2,"0")} · {({OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"} as Record<string,string>)[c.verificationMethod]??c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<><small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>{check?.note&&<p className="bos-readiness-evidence"><b>Zapisany fakt:</b> {check.note}</p>}</>}</div>
+          {passed?<b className="bos-readiness-pass">✓ KRYTERIUM POTWIERDZONE</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
         </article>})}</div>
       </section>
 
-      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · HANDOVER</strong><p>Przy przekazaniu procesu następna osoba powinna oprzeć się na zapisanych etapach, datach i faktach. Nie zaczynaj wdrożenia od początku tylko dlatego, że zmienił się prowadzący.</p></aside>
+      <aside className="bos-context-guide"><strong>WSKAZÓWKA BOS · PRZEKAZANIE</strong><p>Przy przekazaniu procesu następna osoba powinna oprzeć się na zapisanych etapach, datach i faktach. Nie zaczynaj wdrożenia od początku tylko dlatego, że zmienił się prowadzący.</p></aside>
       <section className="bos-process-next">
         <div>
           <span className="bos-dashboard-section-kicker">NASTĘPNY KROK</span>
@@ -132,11 +150,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         </div>
         <div className="bos-process-next-action">
           <span>{progress.percent}%</span>
-          {readyForDecision ? (
-            <Link href={`/app/onboarding/processes/${process.id}/close`}>PRZEJDŹ DO DECYZJI →</Link>
-          ) : (
-            <b>ZAMKNIĘCIE NIEDOSTĘPNE</b>
-          )}
+          <Link className={`bos-decision-cta ${readyForDecision?"is-ready":""}`} href={`/app/onboarding/processes/${process.id}/close`}>{readyForDecision ? "PRZEJDŹ DO DECYZJI →" : "JESZCZE NIE / STOP →"}</Link>
         </div>
       </section>
     </>
