@@ -17,13 +17,13 @@ export default async function PromotionsEntryPage() {
     <>
       <section className="bos-app-intro bos-promotions-intro">
         <div>
-          <div className="bos-app-kicker">BOS / PROMOTIONS</div>
-          <h1>BOS Promotions</h1>
+          <div className="bos-app-kicker">BOS / AWANSE</div>
+          <h1>BOS Awanse</h1>
           <p>Kontrolowana zmiana roli A → B: porównaj pracownika ze Standardem roli docelowej, uzupełnij tylko rzeczywiste luki i zapisz wynik przejścia.</p>
         </div>
       </section>
 
-      <section className="bos-promotions-commandbar" aria-label="Stan procesów Promotions">
+      <section className="bos-promotions-commandbar" aria-label="Stan procesów awansów">
         <div><span>W TOKU</span><strong>{active.length}</strong></div>
         <div><span>GOTOWE DO DECYZJI</span><strong>{ready}</strong></div>
         <div><span>ZAMKNIĘTE</span><strong>{closed.length}</strong></div>
