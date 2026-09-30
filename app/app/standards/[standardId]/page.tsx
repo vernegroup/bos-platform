@@ -19,7 +19,7 @@ async function updateDraft(formData: FormData) {
   "use server";
   const access = await requireBOSAccess();
   const standardId=text(formData,"standardId");
-  await updateDraftStandard({organizationId:access.organization.id,standardId,name:text(formData,"name"),area:text(formData,"area")});
+  await updateDraftStandard({organizationId:access.organization.id,standardId,name:text(formData,"name"),area:text(formData,"area"),roleDescription:text(formData,"roleDescription")});
   redirect(editorPath(standardId,text(formData,"returnTo")));
 }
 async function addTask(formData: FormData) {
@@ -126,7 +126,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
   const current=requestedVersion?standard.versions.find(v=>v.version===requestedVersion):(standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]); if(!current) notFound();
   const isHistoricalVersion=Boolean(requestedVersion&&requestedVersion!==standard.currentVersion);
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
-  const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
+  const completeness=validateStandardCompleteness({name:standard.name,roleDescription:current.roleDescription,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
     <div className="bos-standard-back"><Link href={returnTo==="promotions"?"/app/promotions/processes/new":returnTo==="onboarding"?"/app/onboarding/processes/new":"/app/standards"}>{returnTo==="promotions"?"← WRÓĆ DO NOWEJ ZMIANY":returnTo==="onboarding"?"← WRÓĆ DO NOWEGO WDROŻENIA":"← STANDARDY ORGANIZACJI"}</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / STANDARDY ORGANIZACJI / STANDARD</div><h1>{standard.name}</h1>
@@ -137,7 +137,8 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <div style={{display:"grid",gap:10,width:"100%",maxWidth:720}}><span className="bos-dashboard-section-kicker">WERSJA ROBOCZA — DANE PODSTAWOWE</span>
       <input name="name" required maxLength={160} defaultValue={standard.name} style={{padding:10}}/>
       <input name="area" maxLength={160} defaultValue={standard.area} placeholder="Obszar" style={{padding:10}}/>
-      <div><button type="submit" className="bos-standard-primary-action">ZAPISZ DRAFT</button></div></div></form>}
+      <label style={{display:"grid",gap:6}}><span className="bos-dashboard-section-kicker">OPIS STANOWISKA</span><textarea name="roleDescription" required maxLength={1200} defaultValue={current.roleDescription} placeholder="Opisz stanowisko własnymi słowami: za co odpowiada pracownik i jaki jest oczekiwany rezultat jego pracy." rows={4} style={{padding:10}}/></label>
+      <div><button type="submit" className="bos-standard-primary-action">ZAPISZ WERSJĘ ROBOCZĄ</button></div></div></form>}
 
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><span className="is-active">CZYNNOŚCI</span><span>SZCZEGÓŁY</span><span>PLIKI</span><a href="#historia">HISTORIA WERSJI</a></nav>
     <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":isHistoricalVersion?"WERSJA HISTORYCZNA":"AKTYWNA WERSJA"}</span>
