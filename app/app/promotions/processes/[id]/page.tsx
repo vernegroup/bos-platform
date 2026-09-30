@@ -50,7 +50,9 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
  const {id:processId}=await params; const access=await requireBOSAccess();
  const p=await getPromotionProcess(access,processId); if(!p) notFound();
  const assessed=p.tasks.filter(t=>t.initialAssessment).length;
- const passed=[p.gates.standard,p.gates.process,p.gates.entry,p.gates.deployment,p.gates.k,p.gates.readiness,p.gates.transition].filter(Boolean).length;
+ const gateChecks=[p.gates.standard,p.gates.process,p.gates.entry,p.gates.deployment,p.gates.k,p.gates.readiness,p.gates.transition];
+ const passed=gateChecks.filter(Boolean).length;
+ const firstPendingGate=gateChecks.findIndex(ok=>!ok);
  const readinessPassed=p.readiness.filter(x=>x.result==="PASS").length;
  const transitionDone=p.transition.filter(x=>x.confirmation==="DONE").length;
  const lifecyclePL=p.lifecycleState==="PLANNED"?(assessed>0?"W TOKU":"PLANOWANE"):p.lifecycleState==="IN_PROGRESS"?"W TOKU":p.lifecycleState==="READY_TO_DECIDE"?"GOTOWY DO DECYZJI":p.lifecycleState==="CLOSED"?"ZAMKNIĘTY":p.lifecycleState==="STOPPED"?"ZATRZYMANY":p.lifecycleState;
@@ -77,7 +79,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   </section>
 
   <section className="bos-promotion-gate-strip" aria-label="Final Integrity Gate">
-   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===passed?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"PASS":"—"}</b></div>)}
+   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===firstPendingGate?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"PASS":"—"}</b></div>)}
   </section>
 
   <section className="bos-process-card" id="assessment">
@@ -133,7 +135,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   </section>
 
   <section className="bos-process-next bos-promotion-next" id="decision">
-   <div><span className="bos-dashboard-section-kicker">DECYZJA O ZMIANIE</span><strong>{p.gates.readyAllowed?"Wszystkie bramki spełnione — możliwa decyzja GOTOWY":"Proces wymaga dalszej pracy"}</strong><p>GOTOWY jest dostępne dopiero przy 7/7. JESZCZE NIE zachowuje proces otwarty. STOP kończy wyłącznie bieżącą próbę A → B.</p></div>
+   <div><span className="bos-dashboard-section-kicker">DECYZJA O ZMIANIE</span><strong>{p.gates.readyAllowed?"Wszystkie bramki spełnione — można podjąć decyzję GOTOWY":"Proces wymaga dalszej pracy"}</strong><p>GOTOWY jest dostępne dopiero przy 7/7. JESZCZE NIE zachowuje proces otwarty. STOP kończy wyłącznie bieżącą próbę A → B.</p></div>
    <div className="bos-promotion-decision-box"><strong>{passed}/7</strong><span>BRAMEK</span><form action={decide}><input type="hidden" name="processId" value={p.id}/><textarea name="note" placeholder="Uzasadnienie / uwaga"/><div><button name="decision" value="READY" disabled={!p.gates.readyAllowed}>GOTOWY</button><button name="decision" value="NOT_YET">JESZCZE NIE</button><button name="decision" value="STOP">STOP</button></div></form></div>
   </section>
 
