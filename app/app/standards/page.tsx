@@ -10,7 +10,7 @@ export default async function OrganizationStandardsPage(){
  return <>
   <section className="bos-app-intro">
    <div><div className="bos-app-kicker">BOS / ZASOBY ORGANIZACJI</div><h1>Standardy organizacji</h1>
-   <p>Jedno repozytorium definicji pracy dla produktów BOS. Standard utworzony tutaj może być używany przez Onboarding i Promotions bez kopiowania danych.</p></div>
+   <p>Jedno repozytorium definicji pracy dla produktów BOS. Standard utworzony tutaj może być używany we Wdrożeniach i Awansach bez kopiowania danych.</p></div>
    <Link href="/app/standards/new" className="bos-standard-primary-action">+ NOWY STANDARD</Link>
   </section>
   <div className="bos-onboarding-commandbar">
@@ -21,7 +21,7 @@ export default async function OrganizationStandardsPage(){
   <section className="bos-standard-list bos-operational-list">
    <div className="bos-standard-list-head"><span>STANDARD</span><span>OBSZAR</span><span>WERSJA</span><span>CZYNNOŚCI</span><span>AKTUALIZACJA</span><span>STATUS</span><span /></div>
    {standards.map(s=><Link href={`/app/standards/${s.id}`} className="bos-standard-list-row" key={s.id}>
-    <strong>{s.name}</strong><span>{s.area||"—"}</span><b>{s.currentVersion||"DRAFT"}</b>
+    <strong>{s.name}</strong><span>{s.area||"—"}</span><b>{s.currentVersion||"ROBOCZA"}</b>
     <span>{String("taskCount" in s?s.taskCount:0)}</span><span>{s.updatedAt||"—"}</span><em data-status={s.status}>{s.status}</em><i>→</i>
    </Link>)}
    {!standards.length&&<div className="bos-operational-empty"><strong>Brak Standardów organizacji</strong><p>Utwórz pierwszy Standard. Będzie dostępny dla procesów BOS, które korzystają ze Standardów.</p></div>}
