@@ -9,9 +9,7 @@ type RailProduct={label:string;href?:string;key?:ProductKey};
 const products:RailProduct[]=[
   {label:"WDROŻENIA",href:"/app/onboarding",key:"onboarding"},
   {label:"AWANSE",href:"/app/promotions",key:"promotions"},
-  {label:"PRACA"},
   {label:"WYCENA"},
-  {label:"ZGODNOŚĆ"},
 ];
 
 export default function AppProductRail({licensedProductKeys}:{licensedProductKeys:ProductKey[]}){

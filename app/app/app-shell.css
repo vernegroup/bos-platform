@@ -3664,3 +3664,28 @@
  .bos-outcome-task-table{overflow-x:auto!important}
  .bos-outcome-task-head,.bos-outcome-task-row{min-width:620px!important}
 }
+
+
+/* FIX-12A — usability regression: compact product rail, clickable Standards, readable 5-stage control */
+.bos-app-product-rail{gap:34px}
+.bos-app-product-rail-track{gap:38px}
+.bos-app-product-rail-item{font-size:10px;letter-spacing:.11em}
+.bos-onboarding-standard-link{color:inherit;text-decoration:none;cursor:pointer;transition:background .15s ease,color .15s ease}
+.bos-onboarding-standard-link:hover,.bos-onboarding-standard-link:focus-visible{background:#eeece6;color:var(--app-navy)}
+.bos-onboarding-standard-link strong{text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px;transition:text-decoration-color .15s ease}
+.bos-onboarding-standard-link:hover strong,.bos-onboarding-standard-link:focus-visible strong{text-decoration-color:#b98732}
+.bos-process-stage-flow{display:grid!important;grid-template-columns:repeat(5,minmax(82px,1fr));gap:7px!important;align-items:start}
+.bos-process-stage{display:block;min-width:0}
+.bos-process-stage form{display:block;width:100%}
+.bos-process-stage-flow .bos-process-stage button{width:100%;min-height:46px;padding:7px 8px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:6px;text-align:left;font-size:8px;letter-spacing:.04em}
+.bos-process-stage-flow .bos-process-stage button span{font-size:7px;font-weight:700;opacity:.65}
+.bos-process-stage-flow .bos-process-stage button strong{font-size:9px;letter-spacing:.06em}
+.bos-process-stage-flow .bos-process-stage button i{font-style:normal;font-size:11px}
+.bos-process-stage.is-current button{border-color:#b98732;color:#173044;background:#fbf8f1}
+.bos-stage-current-guidance{grid-column:1/-1;margin-top:7px;padding:9px 10px;border-left:2px solid #b98732;background:#f3f2ee}
+.bos-stage-current-guidance p{margin:0;font-size:9px!important;line-height:1.45}
+.bos-stage-current-guidance small{display:block;margin-top:3px;font-size:7px!important;line-height:1.4;color:var(--app-muted)}
+.bos-process-stage>small.bos-stage-audit{display:block;margin-top:4px;max-width:100%;font-size:7px!important}
+.bos-process-note-form,.bos-error-recovery{grid-column:1/-1}
+@media(max-width:850px){.bos-process-stage-flow{grid-template-columns:repeat(5,minmax(70px,1fr))}}
+@media(max-width:600px){.bos-process-stage-flow{grid-template-columns:repeat(2,minmax(0,1fr))}.bos-process-stage:last-of-type{grid-column:1/-1}.bos-process-stage-flow .bos-process-stage button{min-height:44px}.bos-app-product-rail-track{gap:26px}}
