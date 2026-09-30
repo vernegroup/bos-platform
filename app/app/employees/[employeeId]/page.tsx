@@ -32,7 +32,7 @@ export default async function EmployeeHistoryPage({params}:{params:Promise<{empl
     <strong>{item.standardName}</strong><b>{item.standardVersion}</b><span>{datePL(item.startedOn)}</span><span>{statusPL(item.processStatus)}</span>
     <span>{decisionPL(item.latestDecision)}{item.decisionCount>1?` · #${item.decisionCount}`:""}</span><span>{datePL(item.latestDecisionAt)}</span><i aria-hidden="true">→</i>
    </Link>})}
-   {!history.onboarding.length&&<div className="bos-operational-empty"><strong>Brak historii wdrożeń</strong><p>Ten pracownik nie ma jeszcze procesu Onboarding w BOS.</p></div>}
+   {!history.onboarding.length&&<div className="bos-operational-empty"><strong>Brak historii wdrożeń</strong><p>Ten pracownik nie ma jeszcze procesu Wdrożenia w BOS.</p></div>}
   </section>
   <section className="bos-process-list bos-operational-list">
    <div className="bos-process-list-head"><span>ZMIANA ROLI</span><span>STANDARD B</span><span>STATUS</span><span>DECYZJA</span><span>DATA DECYZJI</span><span>ZAMKNIĘCIE</span><span /></div>
@@ -40,7 +40,7 @@ export default async function EmployeeHistoryPage({params}:{params:Promise<{empl
     <strong>{changeTypePL(item.changeType)} · {item.fromRole} → {item.toRole}</strong><span>{item.standardName?`${item.standardName}${item.standardVersion?` · ${item.standardVersion}`:""}`:"—"}</span><span>{promotionStatePL(item.lifecycleState)}</span>
     <span>{decisionPL(item.latestDecision)}{item.decisionCount>1?` · #${item.decisionCount}`:""}</span><span>{datePL(item.latestDecisionAt)}</span><span>{datePL(item.closedAt)}</span><i aria-hidden="true">→</i>
    </Link>})}
-   {!history.promotions.length&&<div className="bos-operational-empty"><strong>Brak historii zmian roli</strong><p>Ten pracownik nie ma jeszcze procesu Promotions w BOS.</p></div>}
+   {!history.promotions.length&&<div className="bos-operational-empty"><strong>Brak historii zmian roli</strong><p>Ten pracownik nie ma jeszcze procesu Awansu w BOS.</p></div>}
   </section>
  </>;
 }
