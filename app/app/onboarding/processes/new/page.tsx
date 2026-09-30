@@ -18,6 +18,7 @@ async function startOnboarding(fd:FormData){
   if(!employeeId) throw new Error("Wybierz istniejącego pracownika albo dodaj nowego.");
   const standardChoice=text(fd,"standardVersion");
   const [standardId,standardVersionId]=standardChoice.split(":");
+  if(!standardId || !standardVersionId) throw new Error("Wybierz opublikowaną wersję Standardu.");
   const buddyUserId=text(fd,"buddyUserId");
   const processId=await createProcess({
     organizationId:access.organization.id,productId:text(fd,"productId"),
