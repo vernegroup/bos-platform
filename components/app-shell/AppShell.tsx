@@ -11,6 +11,7 @@ type AppShellProps = {
   children: React.ReactNode;
   account: { name: string; email: string; image: string | null; role: string };
   organizationName: string;
+  licensedProductKeys: ("onboarding"|"promotions")[];
 };
 
 type IconName = "home"|"products"|"users"|"company"|"search"|"updates"|"settings"|"help"|"logout"|"bell"|"chevron"|"chat";
@@ -48,7 +49,7 @@ function Icon({name}:{name:IconName}) {
 function isCurrentPath(pathname:string,href:string){return href==="/app"?pathname===href:pathname===href||pathname.startsWith(href+"/");}
 function initials(name:string){return name.split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]?.toUpperCase()).join("")||"B";}
 
-export default function AppShell({children,account,organizationName}:AppShellProps){
+export default function AppShell({children,account,organizationName,licensedProductKeys}:AppShellProps){
   const pathname=usePathname();
   const router=useRouter();
   const [mobileOpen,setMobileOpen]=useState(false);
@@ -115,7 +116,7 @@ export default function AppShell({children,account,organizationName}:AppShellPro
           </div>
         </div>
       </header>
-      <AppProductRail />
+      <AppProductRail licensedProductKeys={licensedProductKeys} />
       <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
       <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>
     </div>
