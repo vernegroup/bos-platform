@@ -31,8 +31,8 @@ export async function searchOrganization(access: BOSAccess, rawQuery: string): P
   ]);
 
   return [
-    ...standards.map(r=>({id:r.id,type:"STANDARD" as const,title:r.name,context:r.context,href:`/app/onboarding/standards/${r.id}`})),
-    ...tasks.map(r=>({id:r.id,type:"TASK" as const,title:r.name,context:r.context,href:`/app/onboarding/standards/${r.standard_id}`})),
+    ...standards.map(r=>({id:r.id,type:"STANDARD" as const,title:r.name,context:r.context,href:`/app/standards/${r.id}`})),
+    ...tasks.map(r=>({id:r.id,type:"TASK" as const,title:r.name,context:r.context,href:`/app/standards/${r.standard_id}`})),
     ...processes.map(r=>({id:r.id,type:"ONBOARDING" as const,title:r.title,context:r.context,href:`/app/onboarding/processes/${r.id}`})),
     ...closures.map(r=>({id:r.id,type:"CLOSURE" as const,title:r.title,context:r.context,href:`/app/onboarding/closed/${r.id}`})),
     ...promotions.map(r=>({id:r.id,type:"PROMOTION" as const,title:r.title,context:r.context,href:`/app/promotions/processes/${r.id}`})),
