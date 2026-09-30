@@ -120,16 +120,17 @@ async function publishStandard(formData: FormData) {
   redirect(returnTo==="promotions"?`/app/promotions/processes/new?standardId=${standardId}`:returnTo==="onboarding"?`/app/onboarding/processes/new?standardId=${standardId}`:`/app/standards/${standardId}`);
 }
 
-export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>;searchParams?:Promise<{returnTo?:"promotions"|"onboarding"}>}) {
-  const access=await requireBOSAccess(); const {standardId}=await params; const returnTo=(await searchParams)?.returnTo;
+export default async function StandardDetailPage({params,searchParams}:{params:Promise<{standardId:string}>;searchParams?:Promise<{returnTo?:"promotions"|"onboarding";version?:string}>}) {
+  const access=await requireBOSAccess(); const {standardId}=await params; const query=await searchParams; const returnTo=query?.returnTo; const requestedVersion=query?.version;
   const standard=await getStandard(standardId,access.organization.id); if(!standard) notFound();
-  const current=standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]; if(!current) notFound();
+  const current=requestedVersion?standard.versions.find(v=>v.version===requestedVersion):(standard.versions.find(v=>v.version===standard.currentVersion)??standard.versions[0]); if(!current) notFound();
+  const isHistoricalVersion=Boolean(requestedVersion&&requestedVersion!==standard.currentVersion);
   const isDraft=current.status==="DRAFT", canAdd=isDraft&&current.tasks.length<18, canAddCriterion=isDraft&&current.readinessCriteria.length<3;
   const completeness=validateStandardCompleteness({name:standard.name,tasks:current.tasks,startRequirements:current.startRequirements,readinessCriteria:current.readinessCriteria});
   return <>
     <div className="bos-standard-back"><Link href={returnTo==="promotions"?"/app/promotions/processes/new":returnTo==="onboarding"?"/app/onboarding/processes/new":"/app/standards"}>{returnTo==="promotions"?"← WRÓĆ DO NOWEJ ZMIANY":returnTo==="onboarding"?"← WRÓĆ DO NOWEGO WDROŻENIA":"← STANDARDY ORGANIZACJI"}</Link></div>
     <section className="bos-app-intro"><div><div className="bos-app-kicker">BOS / STANDARDY ORGANIZACJI / STANDARD</div><h1>{standard.name}</h1>
-      <p>{standard.area} · aktywna wersja {standard.currentVersion} · aktualizacja {standard.updatedAt}</p></div>
+      <p>{standard.area} · {isHistoricalVersion?`wersja historyczna ${current.version}`:`aktywna wersja ${standard.currentVersion}`} · aktualizacja {standard.updatedAt}</p></div>
       <div className="bos-app-build-state"><span>STATUS</span><strong>{standard.status}</strong></div></section>
 
     {isDraft&&<form action={updateDraft} className="bos-standard-detail-head"><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/>
@@ -143,7 +144,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note&&current.note.toLowerCase()!=="wersja robocza"?current.note:"Opublikowana wersja Standardu."}</p>
       {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
-      {!isDraft&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
+      {!isDraft&&!isHistoricalVersion&&<Link href={`/app/onboarding/standards/${standard.id}/new-version`} className="bos-standard-primary-action">UTWÓRZ NOWĄ WERSJĘ</Link>}</section>
 
     {isDraft&&<section className="bos-standard-detail-head" aria-label="Dodaj czynność"><form action={addTask} style={{display:"grid",gap:10,width:"100%"}}>
       <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><span className="bos-dashboard-section-kicker">NOWA CZYNNOŚĆ</span>
