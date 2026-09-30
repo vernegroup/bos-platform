@@ -52,7 +52,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
     <>
       <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
       <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
-        <Link href="/app/onboarding/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
+        <Link href="/app/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
         <Link href="/app/onboarding/processes" className="is-active"><span>02</span><strong>PRZEPROWADŹ</strong><small>Karta Postępu</small></Link>
         <Link href="/app/onboarding/closed"><span>03</span><strong>ZAMKNIJ</strong><small>Karta Zakończenia</small></Link>
       </nav>
@@ -67,7 +67,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-process-summary">
-        <div><span>STANDARD</span><Link href={`/app/onboarding/standards/${standard.id}?version=${encodeURIComponent(process.standardVersion)}`}>{standard.name} {process.standardVersion} ↗</Link></div>
+        <div><span>STANDARD</span><Link href={`/app/standards/${standard.id}?version=${encodeURIComponent(process.standardVersion)}&returnTo=onboarding`}>{standard.name} {process.standardVersion} ↗</Link></div>
         <div><span>START</span><strong>{process.startedAt}</strong></div>
         <div><span>CEL</span><strong>{process.targetDate}</strong></div>
         <div><span>POSTĘP CZYNNOŚCI</span><strong>{progress.percent}%</strong></div><div><span>K — KRYTYCZNE</span><strong>{criticalCompleted}/{criticalTasks.length}</strong></div>
