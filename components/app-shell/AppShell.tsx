@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { signOut } from "next-auth/react";
 import AppProductRail from "./AppProductRail";
 
 type AppShellProps = {
@@ -55,6 +56,7 @@ export default function AppShell({children,account,organizationName,licensedProd
   const [mobileOpen,setMobileOpen]=useState(false);
   const [accountOpen,setAccountOpen]=useState(false);
   const [search,setSearch]=useState("");
+  const [signoutOpen,setSignoutOpen]=useState(false);
   const closeButtonRef=useRef<HTMLButtonElement>(null);
   const menuButtonRef=useRef<HTMLButtonElement>(null);
   const accountRef=useRef<HTMLDivElement>(null);
@@ -87,7 +89,7 @@ export default function AppShell({children,account,organizationName,licensedProd
       </nav>
       <div className="bos-app-sidebar-bottom">
         <Link href="/app/help" className={"bos-app-nav-link"+(isCurrentPath(pathname,"/app/help")?" is-active":"")} aria-current={isCurrentPath(pathname,"/app/help")?"page":undefined} onClick={()=>setMobileOpen(false)}><Icon name="help"/><span>Pomoc</span></Link>
-        <Link href="/api/auth/signout" className="bos-app-nav-link"><Icon name="logout"/><span>Wyloguj</span></Link>
+        <button type="button" className="bos-app-nav-link bos-app-nav-button" onClick={()=>setSignoutOpen(true)}><Icon name="logout"/><span>Wyloguj</span></button>
       </div>
     </aside>
     {mobileOpen&&<button className="bos-app-scrim" aria-label="Zamknij menu" onClick={()=>setMobileOpen(false)}/>}
@@ -111,13 +113,14 @@ export default function AppShell({children,account,organizationName,licensedProd
               <Link href="/app/organization" onClick={()=>setAccountOpen(false)}>Firma</Link>
               <Link href="/app/help" onClick={()=>setAccountOpen(false)}>Pomoc</Link>
               <div className="bos-app-account-divider"/>
-              <Link href="/api/auth/signout">Wyloguj</Link>
+              <button type="button" className="bos-app-account-signout" onClick={()=>{setAccountOpen(false);setSignoutOpen(true)}}>Wyloguj</button>
             </div>}
           </div>
         </div>
       </header>
       <AppProductRail licensedProductKeys={licensedProductKeys} />
       <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
+      {signoutOpen&&<div className="bos-signout-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSignoutOpen(false)}}><section className="bos-signout-dialog" role="dialog" aria-modal="true" aria-labelledby="bos-signout-title"><h2 id="bos-signout-title">Wylogowanie</h2><p>Czy na pewno chcesz się wylogować?</p><div><button type="button" onClick={()=>setSignoutOpen(false)}>Anuluj</button><button type="button" onClick={()=>signOut({callbackUrl:"/"})}>Wyloguj się</button></div></section></div>}
       <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>
     </div>
   </div>;
