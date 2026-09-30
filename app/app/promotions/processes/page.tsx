@@ -31,7 +31,7 @@ export default async function PromotionProcessesPage() {
         {rows.map((row) => {
           return (
             <Link href={`/app/promotions/processes/${row.id}`} className="bos-promotion-row" key={row.id}>
-              <strong><Link href={`/app/onboarding/employees/${row.employeeId}`} title="Historia pracownika">{row.employee} ↗</Link></strong>
+              <strong>{row.employee}</strong>
               <span>{row.fromRole} → {row.toRole}</span>
               <b>{row.type}</b>
               <span>{row.effectiveOn}</span>
