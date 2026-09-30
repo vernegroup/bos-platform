@@ -83,6 +83,7 @@ export default async function PromotionsEntryPage() {
           </div>
         </div>
       </section>
+      <p><Link href="/app/promotions/data-portability" className="bos-onboarding-text-link">EKSPORT DANYCH →</Link></p>
     </>
   );
 }
