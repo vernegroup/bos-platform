@@ -1,0 +1,218 @@
+/* SCENE MATCH FIX — luminous architectural corridor inspired by the approved reference.
+   Procedural CSS only: deep black space, rectilinear planes, electric blue/violet and warm amber portals. */
+:root{--bos-public-scroll:0;--bos-public-mouse-x:0;--bos-public-mouse-y:0;--bos-public-black:#02050a;--bos-public-navy:#030914;--bos-public-gold:#d49a50}
+.bos-public-root{position:relative;isolation:isolate;min-height:100vh;background:var(--bos-public-black);color:#fff}
+.bos-public-content{position:relative;z-index:2}
+.bos-public-scene{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#02050a;perspective:1550px}
+.bos-public-scene>*{position:absolute}
+.bos-public-scene__base{inset:0;background:
+ radial-gradient(ellipse at 64% 48%,rgba(8,23,42,.76),transparent 42%),
+ radial-gradient(ellipse at 82% 51%,rgba(37,12,54,.31),transparent 38%),
+ linear-gradient(180deg,#010205 0%,#020611 56%,#010204 100%)}
+.bos-public-scene__mist{width:62vw;height:62vw;border-radius:50%;filter:blur(125px);opacity:.16;will-change:transform}
+.bos-public-scene__mist--left{left:-25vw;top:8vh;background:#07558c;transform:translate3d(calc(var(--bos-public-mouse-x)*-1vw),calc(var(--bos-public-scroll)*-4vh),-120px)}
+.bos-public-scene__mist--right{right:-22vw;top:10vh;background:#4d176d;transform:translate3d(calc(var(--bos-public-mouse-x)*.8vw),calc(var(--bos-public-scroll)*5vh),-180px)}
+.bos-public-scene__architecture{inset:-8%;transform-style:preserve-3d;transform:translate3d(calc(var(--bos-public-mouse-x)*-.32vw),calc(var(--bos-public-mouse-y)*-.22vh),-80px)}
+.bos-public-edge{position:absolute;display:block;opacity:.72;filter:drop-shadow(0 0 8px currentColor)}
+.bos-public-edge--left{left:38%;top:4%;width:1px;height:73%;color:#319cff;background:linear-gradient(transparent,currentColor 18%,currentColor 82%,transparent);box-shadow:110px 210px 0 rgba(57,155,255,.52)}
+.bos-public-edge--right{right:24%;top:13%;width:2px;height:64%;color:#ffb55d;background:linear-gradient(transparent,currentColor 8%,currentColor 92%,transparent);box-shadow:-1px 0 18px rgba(255,151,55,.72)}
+.bos-public-edge--top{left:38%;top:35%;width:25vw;height:1px;color:#5bb1ff;background:linear-gradient(90deg,currentColor,rgba(67,151,255,.55),transparent);transform:rotate(15deg);transform-origin:left}
+.bos-public-edge--deep{right:7%;top:46%;width:31vw;height:1px;color:#f3a04b;background:linear-gradient(90deg,transparent,currentColor 30%,currentColor);transform:rotate(-9deg);box-shadow:0 0 16px rgba(255,146,43,.5)}
+.bos-public-scene__beams{inset:0;transform-style:preserve-3d}
+.bos-public-beam{position:absolute;display:block;border-radius:1px;opacity:.8;transform-origin:center;will-change:transform}
+.bos-public-beam:after{content:"";position:absolute;inset:-9px;background:inherit;filter:blur(14px);opacity:.42}
+.bos-public-beam--ice,.bos-public-beam--blue{background:linear-gradient(90deg,transparent,#2c91ff 18%,#9ed8ff 52%,#2b8cff 82%,transparent);box-shadow:0 0 10px rgba(43,145,255,.65)}
+.bos-public-beam--violet,.bos-public-beam--rose{background:linear-gradient(90deg,transparent,#6937ff 18%,#c05cff 54%,#6c36ff 82%,transparent);box-shadow:0 0 12px rgba(137,65,255,.62)}
+.bos-public-beam--gold{background:linear-gradient(90deg,transparent,#e47c2e 15%,#ffd18b 52%,#e98a39 84%,transparent);box-shadow:0 0 13px rgba(255,139,48,.68)}
+.bos-public-beam--near{height:2px}.bos-public-beam--mid{height:1px;opacity:.62}.bos-public-beam--far{height:1px;opacity:.36}
+.bos-public-beam--n1{left:33vw;top:31vh;width:22vw;transform:rotate(15deg) translate3d(calc(var(--bos-public-scroll)*-3vw + var(--bos-public-mouse-x)*-1.5vw),0,180px)}
+.bos-public-beam--n2{left:48vw;top:61vh;width:19vw;transform:rotate(-7deg) translate3d(calc(var(--bos-public-scroll)*2vw),0,-120px)}
+.bos-public-beam--n3{left:46vw;top:52vh;width:18vw;transform:rotate(90deg) translate3d(calc(var(--bos-public-scroll)*-2vw),0,80px)}
+.bos-public-beam--n4{right:5vw;top:43vh;width:22vw;transform:rotate(90deg) translate3d(calc(var(--bos-public-scroll)*3vw + var(--bos-public-mouse-x)*1.4vw),0,150px)}
+.bos-public-beam--n5{right:0;top:32vh;width:34vw;transform:rotate(-11deg) translate3d(calc(var(--bos-public-scroll)*3vw),0,-40px)}
+.bos-public-beam--n6{left:36vw;top:67vh;width:23vw;transform:rotate(-5deg) translate3d(calc(var(--bos-public-scroll)*-2vw),0,-100px)}
+.bos-public-beam--n7{left:48vw;top:68vh;width:30vw;transform:rotate(0deg) translate3d(calc(var(--bos-public-scroll)*-3vw + var(--bos-public-mouse-x)*-1vw),0,120px)}
+.bos-public-beam--n8{right:13vw;top:66vh;width:22vw;transform:rotate(0deg) translate3d(calc(var(--bos-public-scroll)*2vw),0,-180px)}
+.bos-public-beam--n9{right:9vw;top:68vh;width:32vw;transform:rotate(-4deg) translate3d(calc(var(--bos-public-scroll)*3vw),0,40px)}
+.bos-public-scene__haze{inset:0;background:
+ linear-gradient(90deg,transparent 28%,rgba(16,72,119,.13) 43%,transparent 60%),
+ linear-gradient(105deg,transparent 54%,rgba(109,41,137,.1) 72%,transparent 88%),
+ linear-gradient(0deg,rgba(9,21,38,.46),transparent 32%);filter:blur(15px)}
+.bos-public-scene__vignette{inset:0;background:
+ radial-gradient(ellipse at 58% 48%,transparent 25%,rgba(0,0,0,.12) 61%,rgba(0,0,0,.72) 100%),
+ linear-gradient(90deg,rgba(0,0,0,.55),transparent 25%,transparent 84%,rgba(0,0,0,.45))}
+.bos-public-scene__grain{inset:0;opacity:.014;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E")}
+@media(max-width:800px){.bos-public-scene{perspective:780px}.bos-public-scene__mist{width:125vw;height:125vw}.bos-public-edge--left{left:50%}.bos-public-edge--right{right:11%}.bos-public-edge--top{left:49%;width:42vw}.bos-public-edge--deep{width:48vw}.bos-public-beam--n1{left:45vw}.bos-public-beam--n7{left:40vw}.bos-public-beam--n9{right:-7vw}}
+@media(prefers-reduced-motion:reduce){.bos-public-scene__mist,.bos-public-beam{will-change:auto}}
+
+/* HORIZONTAL DEPTH FIX — long vanishing lines pull the scene away from the viewer. */
+.bos-public-scene__architecture{inset:-12% -18%;transform:translate3d(calc(var(--bos-public-mouse-x)*-.22vw),calc(var(--bos-public-mouse-y)*-.14vh),-190px) scaleX(1.14)}
+.bos-public-edge--left{left:34%;height:66%;opacity:.48}
+.bos-public-edge--right{right:19%;height:58%;opacity:.62}
+.bos-public-edge--top{left:34%;top:32%;width:43vw;transform:rotate(8deg)}
+.bos-public-edge--deep{right:2%;top:49%;width:55vw;transform:rotate(-5deg)}
+.bos-public-beam--n1{left:29vw;top:31vh;width:42vw;transform:rotate(9deg) translate3d(calc(var(--bos-public-scroll)*-2vw + var(--bos-public-mouse-x)*-1vw),0,80px)}
+.bos-public-beam--n2{left:40vw;top:59vh;width:36vw;transform:rotate(-4deg) translate3d(calc(var(--bos-public-scroll)*1.5vw),0,-220px)}
+.bos-public-beam--n5{right:-9vw;top:33vh;width:58vw;transform:rotate(-7deg) translate3d(calc(var(--bos-public-scroll)*2vw),0,-180px)}
+.bos-public-beam--n6{left:30vw;top:64vh;width:48vw;transform:rotate(-3deg) translate3d(calc(var(--bos-public-scroll)*-1.5vw),0,-240px)}
+.bos-public-beam--n7{left:38vw;top:67vh;width:51vw;transform:rotate(0deg) translate3d(calc(var(--bos-public-scroll)*-2vw + var(--bos-public-mouse-x)*-.7vw),0,40px)}
+.bos-public-beam--n8{right:4vw;top:64vh;width:38vw;transform:rotate(0deg) translate3d(calc(var(--bos-public-scroll)*1.5vw),0,-280px)}
+.bos-public-beam--n9{right:-12vw;top:68vh;width:55vw;transform:rotate(-2deg) translate3d(calc(var(--bos-public-scroll)*2vw),0,-80px)}
+.bos-public-scene__haze{background:linear-gradient(90deg,transparent 18%,rgba(12,61,105,.11) 45%,transparent 72%),linear-gradient(96deg,transparent 52%,rgba(102,35,132,.09) 76%,transparent 96%),linear-gradient(0deg,rgba(7,17,31,.38),transparent 28%);filter:blur(18px)}
+
+/* BALANCE FIX — compact luminous structure on the right, dark breathing room on the left. */
+.bos-public-scene__architecture{
+  inset:2% -2% 8% 38%;
+  transform:translate3d(calc(var(--bos-public-mouse-x)*-.18vw),calc(var(--bos-public-mouse-y)*-.12vh),-330px) scale(.78,.82);
+  transform-origin:72% 50%;
+}
+.bos-public-scene__beams{
+  inset:4% -1% 10% 36%;
+  transform:translate3d(0,0,-250px) scale(.82);
+  transform-origin:74% 52%;
+}
+.bos-public-scene__mist--left{opacity:.08}
+.bos-public-scene__mist--right{right:-14vw;top:13vh;width:52vw;height:52vw;opacity:.13}
+.bos-public-scene__base{background:
+ radial-gradient(ellipse at 73% 47%,rgba(7,25,45,.62),transparent 31%),
+ radial-gradient(ellipse at 84% 50%,rgba(45,13,63,.27),transparent 30%),
+ linear-gradient(180deg,#010205 0%,#020611 54%,#010204 100%)}
+.bos-public-scene__vignette{background:
+ radial-gradient(ellipse at 73% 48%,transparent 18%,rgba(0,0,0,.12) 55%,rgba(0,0,0,.7) 100%),
+ linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.18) 34%,transparent 58%,rgba(0,0,0,.38))}
+
+/* DARK HALL — viewer stands in a black corridor looking into a barely lit hall.
+   The visual focus is the empty darkness below the wordmark; neon only hints at distant structure. */
+.bos-public-scene{perspective:1850px;background:#02050a}
+.bos-public-scene__base{background:
+ radial-gradient(ellipse 31% 23% at 50% 59%,rgba(5,13,21,.34),rgba(1,4,8,.12) 45%,transparent 76%),
+ linear-gradient(90deg,#01040a 0%,#020812 20%,#020711 50%,#030712 79%,#01040a 100%)}
+.bos-public-scene__architecture{
+ inset:11% 4% 15% 29%;
+ opacity:.34;
+ transform:translate3d(calc(var(--bos-public-mouse-x)*-.1vw),calc(var(--bos-public-mouse-y)*-.07vh),-620px) scale(.68,.72);
+ transform-origin:50% 58%;
+}
+.bos-public-scene__beams{
+ inset:12% 5% 16% 28%;
+ opacity:.3;
+ transform:translate3d(0,0,-570px) scale(.68);
+ transform-origin:50% 58%;
+}
+.bos-public-edge{opacity:.22;filter:drop-shadow(0 0 5px currentColor)}
+.bos-public-edge--left{left:18%;top:17%;height:61%;color:#2384cf}
+.bos-public-edge--right{right:17%;top:20%;height:55%;color:#b96d30}
+.bos-public-edge--top{left:18%;top:29%;width:55vw;transform:rotate(4deg);opacity:.14}
+.bos-public-edge--deep{right:10%;top:63%;width:57vw;transform:rotate(-2deg);opacity:.16}
+.bos-public-beam{opacity:.25}
+.bos-public-beam:after{inset:-6px;filter:blur(12px);opacity:.24}
+.bos-public-beam--near{height:1px}.bos-public-beam--mid,.bos-public-beam--far{height:1px;opacity:.2}
+.bos-public-beam--n1{left:18vw;top:29vh;width:28vw;transform:rotate(6deg) translate3d(calc(var(--bos-public-scroll)*-.8vw),0,-120px)}
+.bos-public-beam--n2{left:31vw;top:64vh;width:23vw;transform:rotate(-2deg) translate3d(0,0,-330px)}
+.bos-public-beam--n3{left:27vw;top:49vh;width:13vw;transform:rotate(90deg) translate3d(0,0,-220px)}
+.bos-public-beam--n4{right:14vw;top:46vh;width:14vw;transform:rotate(90deg) translate3d(0,0,-180px)}
+.bos-public-beam--n5{right:8vw;top:36vh;width:25vw;transform:rotate(-4deg) translate3d(0,0,-350px)}
+.bos-public-beam--n6{left:25vw;top:67vh;width:25vw;transform:rotate(-1deg) translate3d(0,0,-390px)}
+.bos-public-beam--n7{left:38vw;top:66vh;width:27vw;transform:none}
+.bos-public-beam--n8{right:18vw;top:64vh;width:18vw;transform:none}
+.bos-public-beam--n9{right:8vw;top:67vh;width:24vw;transform:rotate(-1deg)}
+.bos-public-scene__mist{filter:blur(160px)}
+.bos-public-scene__mist--left{left:-28vw;top:16vh;width:48vw;height:48vw;opacity:.035}
+.bos-public-scene__mist--right{right:-20vw;top:18vh;width:45vw;height:45vw;opacity:.045}
+.bos-public-scene__haze{background:
+ radial-gradient(ellipse 38% 20% at 50% 63%,rgba(17,37,55,.08),transparent 72%),
+ linear-gradient(90deg,rgba(0,0,0,.62),transparent 24%,transparent 76%,rgba(0,0,0,.58));filter:blur(20px)}
+.bos-public-scene__vignette{background:
+ radial-gradient(ellipse 35% 28% at 50% 59%,transparent 0%,rgba(0,0,0,.1) 48%,rgba(0,0,0,.48) 78%,rgba(0,0,0,.82) 100%),
+ linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.16) 30%,rgba(0,0,0,.12) 70%,rgba(0,0,0,.86)),
+ linear-gradient(180deg,rgba(0,0,0,.7),transparent 28%,transparent 70%,rgba(0,0,0,.55))}
+
+
+/* ROOM DEPTH LAB 01 — implied physical room, still almost entirely swallowed by darkness.
+   Large converging planes catch only reflected neon; the center stays empty and deep. */
+.bos-public-scene__base:after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:
+ linear-gradient(152deg,rgba(31,94,145,.055) 0 1px,transparent 1px 100%),
+ linear-gradient(28deg,transparent 0 67%,rgba(158,83,43,.045) 67% 67.15%,transparent 67.15%),
+ radial-gradient(ellipse 15% 18% at 55% 55%,rgba(4,10,15,.18),rgba(0,0,0,.62) 72%);
+ clip-path:polygon(7% 5%,94% 8%,79% 91%,19% 92%);
+ opacity:.78;
+}
+.bos-public-scene__architecture:before{
+ content:"";position:absolute;inset:-28% -38%;pointer-events:none;
+ background:
+ linear-gradient(166deg,rgba(12,36,56,.16),rgba(0,0,0,.02) 29%,transparent 29.3%) left/50% 100% no-repeat,
+ linear-gradient(194deg,rgba(34,20,42,.12),rgba(0,0,0,.02) 30%,transparent 30.3%) right/50% 100% no-repeat,
+ linear-gradient(180deg,rgba(15,31,45,.10),transparent 32%) top/100% 48% no-repeat,
+ linear-gradient(0deg,rgba(10,24,35,.18),transparent 38%) bottom/100% 54% no-repeat;
+ opacity:.72;filter:blur(.35px);
+}
+.bos-public-scene__architecture:after{
+ content:"";position:absolute;left:19%;right:18%;top:20%;bottom:13%;pointer-events:none;
+ border:1px solid rgba(95,147,184,.035);
+ box-shadow:inset 0 0 70px rgba(3,12,20,.44),0 0 110px rgba(0,0,0,.75);
+ transform:perspective(900px) rotateX(-1deg);
+ background:
+ linear-gradient(90deg,rgba(39,115,168,.045),transparent 8%,transparent 91%,rgba(183,94,43,.04)),
+ linear-gradient(180deg,rgba(36,91,130,.025),transparent 25%,transparent 76%,rgba(31,72,96,.035));
+}
+.bos-public-scene__haze:after{
+ content:"";position:absolute;left:24%;right:21%;bottom:5%;height:42%;
+ background:
+ repeating-linear-gradient(171deg,transparent 0 8.5%,rgba(83,137,170,.018) 8.7% 8.85%,transparent 9.05% 17%),
+ linear-gradient(180deg,transparent,rgba(14,34,48,.09));
+ clip-path:polygon(43% 0,57% 0,100% 100%,0 100%);
+ filter:blur(.25px);opacity:.72;
+}
+@media(max-width:800px){
+ .bos-public-scene__base:after{clip-path:polygon(0 7%,100% 8%,92% 92%,7% 92%)}
+ .bos-public-scene__architecture:after{left:7%;right:6%}
+ .bos-public-scene__haze:after{left:8%;right:7%}
+}
+
+
+
+
+/* WALLPAPER LAB 02 — raw home.jpg quality/scale check. No image filters or dimming. */
+.bos-public-scene:before{
+ content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+ background-image:url("/images/HOME%202.jpg");
+ background-position:center center;
+ background-size:cover;
+ background-repeat:no-repeat;
+ opacity:1;
+ transform:none;
+ filter:none;
+}
+.bos-public-scene:after{content:none}
+.bos-public-scene__base,.bos-public-scene__mist,.bos-public-scene__architecture,.bos-public-scene__beams,.bos-public-scene__haze{display:none}
+.bos-public-scene__vignette,.bos-public-scene__grain{display:none}
+
+
+/* MOBILE WALLPAPER LAB — dedicated portrait composition; desktop remains untouched. */
+@media(max-width:800px){
+ .bos-public-scene:before{
+  inset:0;
+  background-image:url("/_next/image?url=%2Fimages%2FHOME%25202%2520MOBILE.png&w=1080&q=82");
+  background-position:center center;
+  background-size:cover;
+  background-repeat:no-repeat;
+  opacity:1;
+  transform:none;
+  filter:none;
+ }
+}
+
+/* ANDROID MOBILE VIEWPORT FIX — keep the portrait wallpaper canvas stable while Chrome UI expands/collapses.
+   100svh uses the small viewport as a fixed reference, preventing background-size:cover from re-cropping the scene mid-scroll. */
+@media(max-width:800px){
+ .bos-public-scene{
+  inset:auto;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  height:100svh;
+ }
+}

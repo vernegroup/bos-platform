@@ -1,0 +1,113 @@
+/* WORDMARK HERO — brand presence, not a marketing slogan. */
+.bos-public-root .bos-home{background:transparent}
+.bos-public-hero{
+  position:relative;
+  height:78vh;
+  min-height:560px;
+  color:#f5f3ee;
+}
+.bos-public-hero__sticky{
+  position:relative;
+  height:78vh;
+  min-height:560px;
+  overflow:hidden;
+}
+.bos-public-wordmark{
+  position:absolute;
+  z-index:5;
+  left:clamp(28px,4.2vw,78px);
+  top:48%;
+  display:flex;
+  align-items:baseline;
+  gap:clamp(18px,2vw,38px);
+  width:max-content;
+  max-width:84vw;
+  margin:0;
+  transform:translateY(-50%);
+  color:#f5f6f7;
+  font-family:"Arial Narrow","Aptos Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif;
+  font-size:clamp(13px,1.26vw,24px);
+  font-weight:500;
+  line-height:1;
+  letter-spacing:.24em;
+  white-space:nowrap;
+  text-transform:uppercase;
+  text-shadow:
+    0 0 7px rgba(204,229,255,.32),
+    0 0 22px rgba(74,155,255,.14),
+    0 2px 14px rgba(0,0,0,.9);
+}
+.bos-public-wordmark:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-3%;
+  right:-3%;
+  top:50%;
+  height:150%;
+  transform:translateY(-50%);
+  background:radial-gradient(ellipse at center,rgba(0,8,17,.64) 0%,rgba(0,5,12,.42) 44%,transparent 78%);
+  filter:blur(14px);
+}
+.bos-public-wordmark em{
+  color:#dda85c;
+  font-style:normal;
+  text-shadow:
+    0 0 7px rgba(255,203,126,.38),
+    0 0 22px rgba(224,145,48,.15),
+    0 2px 14px rgba(0,0,0,.9);
+}
+.bos-public-hero__marker{
+  position:absolute;
+  left:clamp(28px,4.2vw,78px);
+  bottom:34px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  color:rgba(225,231,238,.34);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.25em;
+}
+.bos-public-hero__marker i{
+  display:block;
+  width:62px;
+  height:1px;
+  background:linear-gradient(90deg,rgba(210,164,91,.75),transparent);
+}
+@media(max-width:1000px){
+  .bos-public-wordmark{
+    left:6vw;
+    gap:16px;
+    font-size:clamp(12px,1.4vw,16px);
+    letter-spacing:.2em;
+  }
+  .bos-public-hero__marker{left:6vw}
+}
+@media(max-width:700px){
+  .bos-public-hero,.bos-public-hero__sticky{min-height:620px}
+  .bos-public-wordmark{
+    left:24px;
+    top:48%;
+    display:block;
+    width:calc(100vw - 48px);
+    max-width:none;
+    font-size:clamp(18px,5vw,25px);
+    line-height:1.22;
+    letter-spacing:.16em;
+    white-space:normal;
+  }
+  .bos-public-wordmark span,.bos-public-wordmark em{display:block}
+  .bos-public-wordmark em{margin:8px 0}
+  .bos-public-hero__marker{left:24px;bottom:24px}
+}
+@media(prefers-reduced-motion:reduce){.bos-public-hero__marker{display:none}}
+
+/* CLEANUP: no legacy scroll marker. */
+.bos-public-hero__marker{display:none!important}
+
+
+/* MOBILE CLEANUP — wallpaper provides sufficient contrast; remove legacy wordmark halo only on mobile. */
+@media(max-width:800px){
+  .bos-public-wordmark:after{content:none;display:none}
+}

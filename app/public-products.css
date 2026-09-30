@@ -1,0 +1,129 @@
+/* PUBLIC-06 / SCALE FIX — product navigation is a rail, not a card section. */
+.bos-product-rail{
+  position:relative;
+  min-height:auto;
+  padding:clamp(44px,6vh,68px) 0 clamp(54px,7vh,78px);
+  color:#f4f2ed;
+  overflow:hidden;
+}
+.bos-product-rail__intro{
+  width:auto;
+  margin:0 clamp(28px,4.2vw,78px) clamp(38px,5vh,58px);
+}
+.bos-product-rail__intro>span{color:rgba(224,229,235,.38);font-size:8px;font-weight:800;letter-spacing:.3em}
+.bos-product-rail__intro h2{
+  max-width:620px;
+  margin:18px 0 0;
+  color:#f4f2ed;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(36px,3.8vw,68px);
+  font-weight:400;
+  line-height:.94;
+  letter-spacing:-.04em;
+}
+.bos-product-rail__viewport{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-inline:contain}
+.bos-product-rail__viewport::-webkit-scrollbar{display:none}
+.bos-product-rail__track{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+  gap:clamp(34px,4.6vw,88px);
+  width:max-content;
+  min-width:100%;
+  padding:0 clamp(28px,4.2vw,78px);
+}
+.bos-product-rail__track:after{
+  content:"";position:absolute;left:clamp(28px,4.2vw,78px);right:clamp(28px,4.2vw,78px);bottom:0;height:1px;background:rgba(255,255,255,.13)
+}
+.bos-product-rail__item{
+  position:relative;
+  flex:0 0 auto;
+  min-width:max-content;
+  min-height:78px;
+  display:flex;
+  align-items:flex-start;
+  padding:0 0 28px;
+  overflow:visible;
+}
+.bos-product-rail__name{
+  position:relative;z-index:2;padding:0;
+  color:rgba(246,244,239,.82);
+  font-family:var(--font-product-rail),Arial,sans-serif;
+  font-size:clamp(10px,.72vw,14px);
+  font-weight:700;
+  font-synthesis:none;
+  font-feature-settings:"kern" 1,"liga" 1;
+  letter-spacing:.19em;
+  line-height:1;
+  transition:color .22s ease,transform .22s ease;
+}
+.bos-product-rail__item:first-child .bos-product-rail__name{color:#fff}
+.bos-product-rail__item:first-child:after{
+  content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:#d2a45b;z-index:3;box-shadow:0 0 10px rgba(210,164,91,.22)
+}
+.bos-product-rail__item:first-child:before{
+  content:"";position:absolute;left:0;bottom:-2px;width:5px;height:5px;border-radius:50%;background:#f4dfb4;z-index:4
+}
+.bos-product-rail__reveal{
+  position:absolute;left:0;top:24px;z-index:4;
+  width:max-content;height:auto;padding:0;border:0;background:none;
+  color:rgba(244,242,237,.72);opacity:0;cursor:pointer;
+  font-size:8px;font-weight:800;letter-spacing:.18em;
+  transform:translateY(5px);transition:opacity .2s ease,transform .2s ease
+}
+.bos-product-rail__reveal span{margin-left:9px;color:#d2a45b;font-size:12px}
+.bos-product-rail__item:not(.is-planned):hover .bos-product-rail__reveal,
+.bos-product-rail__item:not(.is-planned):focus-within .bos-product-rail__reveal{opacity:1;transform:none}
+.bos-product-rail__item:not(.is-planned):hover .bos-product-rail__name,
+.bos-product-rail__item:not(.is-planned):focus-within .bos-product-rail__name{transform:translateY(-2px);color:#fff}
+.bos-product-rail__planned{
+  position:absolute;left:0;top:24px;
+  color:rgba(224,229,235,.24);font-size:7px;font-weight:700;letter-spacing:.16em;white-space:nowrap
+}
+.bos-product-rail__item.is-planned .bos-product-rail__name{color:rgba(246,244,239,.28)}
+/* dark product modal retained */
+.bos-public-root .bos-product-modal-backdrop{background:rgba(0,3,7,.84);backdrop-filter:blur(14px)}
+.bos-public-root .bos-product-modal{border:1px solid rgba(255,255,255,.1);background:#07111d;color:#eef1f4;box-shadow:0 40px 120px rgba(0,0,0,.65)}
+.bos-public-root .bos-product-modal-close{background:rgba(255,255,255,.06);color:#fff;box-shadow:none}
+.bos-public-root .bos-product-modal-kicker{color:#d2a45b}
+.bos-public-root .bos-product-modal-copy>h2,.bos-public-root .bos-product-modal-benefits h3,.bos-public-root .bos-product-modal-steps h3{color:#f4f2ed}
+.bos-public-root .bos-product-modal-lead,.bos-public-root .bos-product-modal-benefits p,.bos-public-root .bos-product-modal-steps p{color:rgba(225,231,238,.58)}
+.bos-public-root .bos-product-modal-audience{background:rgba(255,255,255,.04)}
+.bos-public-root .bos-product-modal-audience p{color:rgba(225,231,238,.58)}
+.bos-public-root .bos-product-modal-cta{background:#b8873e;color:#07111d}
+.bos-public-root .bos-product-modal-steps{border-color:rgba(255,255,255,.09)}
+/* Keep the fixed support control from covering the last rail item at narrow effective widths / browser zoom. */
+@media(max-width:1200px){
+  .bos-product-rail__track{padding-right:clamp(128px,12vw,168px)}
+  .bos-product-rail__track:after{right:clamp(128px,12vw,168px)}
+}
+@media(max-width:800px){
+  .bos-product-rail{min-height:auto;padding:72px 0 84px}
+  .bos-product-rail__intro{width:calc(100vw - 48px);margin-bottom:62px}
+  .bos-product-rail__intro h2{font-size:clamp(38px,11vw,58px)}
+  .bos-product-rail__track{gap:38px;padding-left:24px;padding-right:24px}
+  .bos-product-rail__track:after{left:24px;right:24px}
+  .bos-product-rail__name{font-size:11px}
+}
+@media(hover:none){.bos-product-rail__reveal{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.bos-product-rail__name,.bos-product-rail__reveal{transition:none}}
+
+
+/* PRODUCT MODAL UI ALIGNMENT — application structure adapted to the dark BOS public surface; dimensions unchanged. */
+.bos-public-root .bos-product-modal{border-radius:0;border:1px solid rgba(123,139,153,.34);background:#101820;color:#eef1f4;box-shadow:0 28px 90px rgba(0,0,0,.52)}
+.bos-public-root .bos-product-modal-copy{background:#101820;border-right:1px solid rgba(217,222,225,.16)}
+.bos-public-root .bos-product-modal-close{border:1px solid rgba(217,222,225,.18);border-radius:0;background:rgba(255,255,255,.06);color:#fff}
+.bos-public-root .bos-product-modal-kicker{color:#d2a45b}
+.bos-public-root .bos-product-modal-copy>h2{color:#f4f2ed;font-family:Arial,"Helvetica Neue",sans-serif;font-weight:700;letter-spacing:-.035em}
+.bos-public-root .bos-product-modal-lead,.bos-public-root .bos-product-modal-benefits p,.bos-public-root .bos-product-modal-steps p{color:rgba(225,231,238,.58)}
+.bos-public-root .bos-product-modal-benefits{gap:0;border-top:1px solid rgba(217,222,225,.16)}
+.bos-public-root .bos-product-modal-benefits article{display:block;padding:16px 0;border-bottom:1px solid rgba(217,222,225,.16)}
+.bos-public-root .bos-product-modal-benefits h3,.bos-public-root .bos-product-modal-steps h3{color:#f4f2ed;font-family:Arial,"Helvetica Neue",sans-serif;font-weight:700}
+.bos-public-root .bos-product-modal-audience{border:1px solid rgba(225,228,230,.16);background:rgba(255,255,255,.04)}
+.bos-public-root .bos-product-modal-audience p{color:rgba(225,231,238,.58)}
+.bos-public-root .bos-product-modal-cta{border-radius:0;background:#c38d31;color:#fff}
+.bos-public-root .bos-product-modal-demo{background:#0d1721}
+.bos-public-root .bos-product-demo-frame{border-radius:0;border:1px solid rgba(207,213,216,.28);background:#0b1823;box-shadow:none}
+.bos-public-root .bos-product-modal-steps{border-color:rgba(207,213,216,.22)}
+.bos-public-root .bos-product-modal-steps article{display:block;padding-left:14px;border-left:1px solid rgba(217,222,225,.16)}
+.bos-public-root .bos-product-modal-steps article:first-child{border-left:0}
