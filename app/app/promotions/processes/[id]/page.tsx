@@ -59,7 +59,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
  return <>
   <div className="bos-standard-back"><Link href="/app/promotions/processes">← ZMIANY W TOKU</Link></div>
   <section className="bos-app-intro bos-promotions-view-head"><div>
-   <div className="bos-app-kicker">BOS / PROMOTIONS / MAPA ZMIANY</div>
+   <div className="bos-app-kicker">BOS / AWANSE / MAPA ZMIANY</div>
    <h1>{p.employee}</h1><p>{p.type} · prowadzący: {p.owner}</p>
   </div><div className="bos-app-build-state"><span>STAN PROCESU</span><strong>{lifecyclePL}</strong></div></section>
 
@@ -78,8 +78,8 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
    <div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong></div>
   </section>
 
-  <section className="bos-promotion-gate-strip" aria-label="Final Integrity Gate">
-   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===firstPendingGate?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"PASS":"—"}</b></div>)}
+  <section className="bos-promotion-gate-strip" aria-label="Bramki decyzji">
+   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===firstPendingGate?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"SPEŁNIONA":"—"}</b></div>)}
   </section>
 
   <section className="bos-process-card" id="assessment">
@@ -99,7 +99,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
      </form>
      {(t.evidenceNote||t.verificationResult)&&<div className="bos-promotion-evidence-record"><span>EVIDENCE / CONTEXT</span>{t.evidenceNote&&<p>{t.evidenceNote}</p>}{t.verificationResult&&<small>SPRAWDŹ: <b>{t.verificationResult}</b>{t.verificationNote?` · ${t.verificationNote}`:""}{t.verificationAt?` · ${t.verificationAt}`:""}</small>}</div>}
     </div>
-    {t.initialAssessment==="TO_VERIFY"&&!t.verificationResult&&<form action={verifyAssessment} className="bos-promotion-verify-form"><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="assessmentId" value={t.assessmentId}/><input name="verificationNote" placeholder="Co sprawdzono i na jakiej podstawie?"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></form>}
+    {t.initialAssessment==="TO_VERIFY"&&!t.verificationResult&&<form action={verifyAssessment} className="bos-promotion-verify-form"><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="assessmentId" value={t.assessmentId}/><input name="verificationNote" placeholder="Co sprawdzono i na jakiej podstawie?"/><button name="result" value="PASS">SPEŁNIONE</button><button name="result" value="FAIL">NIESPEŁNIONE</button></form>}
    </article>)}
    </div>
   </section>
@@ -118,7 +118,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   <section className="bos-process-card" id="verification">
    <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">PRZEJŚCIE A → B</span><h2>Gotowość roli B i przekazanie obowiązków</h2></div><span className="bos-dashboard-count">{readinessPassed}/{p.readiness.length} kryteriów · {transitionDone}/{p.transition.length} przekazanych</span></div>
    <div className="bos-promotions-verify-grid"><div>
-    <h3>Gotowość do roli B</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method==="INDEPENDENT_TASK"?"SAMODZIELNE ZADANIE":x.method==="OBSERVATION"?"OBSERWACJA":x.method==="WORK_SAMPLE"?"PRÓBKA PRACY":x.method==="CONTROL_QUESTIONS"?"PYTANIA KONTROLNE":x.method==="KNOWLEDGE_TEST"?"TEST WIEDZY":x.method==="OTHER"?"INNA METODA":x.method}</small></div>{x.result&&x.result!=="UNRESOLVED"?<b data-result={x.result}>{x.result}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">PASS</button><button name="result" value="FAIL">FAIL</button></>}</form>)}
+    <h3>Gotowość do roli B</h3>{p.readiness.map(x=><form action={saveReadiness} className="bos-promotion-readiness-row" key={x.id}><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="checkId" value={x.id}/><div><strong>{x.criterion}</strong><small>{x.method==="INDEPENDENT_TASK"?"SAMODZIELNE ZADANIE":x.method==="OBSERVATION"?"OBSERWACJA":x.method==="WORK_SAMPLE"?"PRÓBKA PRACY":x.method==="CONTROL_QUESTIONS"?"PYTANIA KONTROLNE":x.method==="KNOWLEDGE_TEST"?"TEST WIEDZY":x.method==="OTHER"?"INNA METODA":x.method}</small></div>{x.result&&x.result!=="UNRESOLVED"?<b data-result={x.result}>{x.result==="PASS"?"SPEŁNIONE":"NIESPEŁNIONE"}</b>:<><input name="note" placeholder="Fakt z weryfikacji"/><button name="result" value="PASS">SPEŁNIONE</button><button name="result" value="FAIL">NIESPEŁNIONE</button></>}</form>)}
    </div><div className="bos-promotion-handover">
     <div className="bos-promotion-handover-head"><div><span>HANDOVER A → B</span><h3>Zamknięcie przejścia między rolami</h3></div><small>Zapisuj stan faktycznie wykonany, nie plan.</small></div>
     <div className="bos-promotion-handover-groups">{handoverGroups.map(([kind,title,description])=>{const items=p.transition.filter(x=>x.disposition===kind);return <section className="bos-promotion-handover-group" key={kind}><header><div><strong>{title}</strong><small>{description}</small></div><b>{items.filter(x=>x.confirmation==="DONE").length}/{items.length}</b></header>
