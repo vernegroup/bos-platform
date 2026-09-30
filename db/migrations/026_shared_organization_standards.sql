@@ -5,7 +5,7 @@ BEGIN;
 ALTER TABLE standards ALTER COLUMN product_id DROP NOT NULL;
 
 INSERT INTO bos_schema_migrations(name)
-VALUES ('026_shared_organization_standards')
+VALUES ('026_shared_organization_standards.sql')
 ON CONFLICT (name) DO NOTHING;
 
 COMMIT;
