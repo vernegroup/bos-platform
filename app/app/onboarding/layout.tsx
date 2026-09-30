@@ -16,7 +16,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
     <div className="bos-product-shell bos-onboarding-shell">
       <header className="bos-product-header">
         <div className="bos-product-identity">
-          <Link href="/app/onboarding" className="bos-product-name">BOS Onboarding</Link>
+          <Link href="/app/onboarding" className="bos-product-name">BOS Wdrożenia</Link>
           <span>Wdrożenie pracownika jako kontrolowany proces operacyjny</span>
         </div>
         <div className="bos-product-context">
@@ -25,7 +25,7 @@ export default async function OnboardingLayout({ children }: { children: React.R
         </div>
       </header>
 
-      <nav className="bos-product-flow" aria-label="Proces BOS Onboarding">
+      <nav className="bos-product-flow" aria-label="Proces BOS Wdrożenia">
         {productNavigation.map((item) => (
           <Link href={item.href} className="bos-product-flow-step" key={item.stage}>
             <span className="bos-product-flow-number">{item.step}</span>
