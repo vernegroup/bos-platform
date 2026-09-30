@@ -140,7 +140,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <div><button type="submit" className="bos-standard-primary-action">ZAPISZ DRAFT</button></div></div></form>}
 
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><span className="is-active">CZYNNOŚCI</span><span>SZCZEGÓŁY</span><span>PLIKI</span><a href="#historia">HISTORIA WERSJI</a></nav>
-    <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":"AKTYWNA WERSJA"}</span>
+    <section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">{isDraft?"WERSJA ROBOCZA":isHistoricalVersion?"WERSJA HISTORYCZNA":"AKTYWNA WERSJA"}</span>
       <h2>{current.version}</h2><p>{isDraft?"Zdefiniuj maksymalnie 18 czynności. K oznacza czynność krytyczną.":current.note&&current.note.toLowerCase()!=="wersja robocza"?current.note:"Opublikowana wersja Standardu."}</p>
       {!isDraft&&current.publishedBy&&<p>Opublikował: {current.publishedBy} · {current.date}</p>}</div>
       <div><span>CZYNNOŚCI</span><strong>{current.tasks.length}/18</strong></div>
