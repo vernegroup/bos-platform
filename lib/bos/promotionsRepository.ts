@@ -7,7 +7,7 @@ const typePL=(v:string)=>v==="PROMOTION"?"AWANS":"PRZESUNIĘCIE";
 
 export async function listPromotionProcesses(access:BOSAccess){
  const rows=await db().unsafe(`
-  SELECT pp.id,pp.employee_name_snapshot,pp.from_role,pp.to_role,pp.change_type,
+  SELECT pp.id,pp.employee_id,pp.employee_name_snapshot,pp.from_role,pp.to_role,pp.change_type,
     pp.started_on,pp.effective_on,u.display_name owner,
     bos_promotion_lifecycle_state(pp.id) lifecycle_state,
     fis.standard_pass,fis.process_pass,fis.entry_pass,fis.deployment_pass,
@@ -23,7 +23,7 @@ export async function listPromotionProcesses(access:BOSAccess){
     AND bos_promotion_lifecycle_state(pp.id) NOT IN ('CLOSED','STOPPED')
   ORDER BY pp.started_on DESC,pp.created_at DESC`,[access.organization.id]);
  return rows.map(r=>({
-  id:r.id,employee:r.employee_name_snapshot,fromRole:r.from_role,toRole:r.to_role,
+  id:r.id,employeeId:r.employee_id,employee:r.employee_name_snapshot,fromRole:r.from_role,toRole:r.to_role,
   type:typePL(r.change_type),lifecycleState:r.lifecycle_state,startedOn:datePL(r.started_on),
   effectiveOn:datePL(r.effective_on),owner:r.owner,latestDecision:r.latest_decision??undefined,
   latestDecisionAt:r.latest_decision_at?datePL(r.latest_decision_at):undefined,
