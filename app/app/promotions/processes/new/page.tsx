@@ -37,7 +37,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
   return <>
     <div className="bos-standard-back"><Link href="/app/promotions/processes">← ZMIANY W TOKU</Link></div>
     <section className="bos-app-intro">
-      <div><div className="bos-app-kicker">BOS / PROMOTIONS / NOWA ZMIANA</div>
+      <div><div className="bos-app-kicker">BOS / AWANSE / NOWA ZMIANA</div>
         <h1>Rozpocznij zmianę roli</h1>
         <p>Proces A → B zostanie przypisany do pracownika i dokładnej opublikowanej wersji Standardu roli docelowej.</p>
       </div>
@@ -46,7 +46,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
 
     <section className="bos-process-new">
       {!canStart?<div className="bos-operational-empty"><strong>Nie można utworzyć procesu</strong>
-        <p>Potrzebujesz aktywnego pracownika, opublikowanego Standardu roli B, aktywnego członka BOS oraz licencji Promotions.</p>
+        <p>Potrzebujesz aktywnego pracownika, opublikowanego Standardu roli B, aktywnego członka BOS oraz licencji Awanse.</p>
         {!options.standards.length&&<div style={{marginTop:14}}><Link href="/app/standards/new?returnTo=promotions" className="bos-standard-primary-action">+ UTWÓRZ STANDARD ROLI B</Link></div>}</div>:
       <form action={startPromotion} style={{display:"grid",gap:18}}>
         <input type="hidden" name="productId" value={product!.id}/>
@@ -56,7 +56,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
             <option value="" disabled>Wybierz pracownika</option>
             {options.employees.map(e=><option value={e.id} key={e.id}>{e.name}{e.employeeNumber&&!e.employeeNumber.startsWith("legacy-")?` · ${e.employeeNumber}`:""}{e.position?` · ${e.position}`:""}</option>)}
           </select>
-          <small>Tożsamość pochodzi z Employee Core. Historia procesu pozostanie przypisana do tego samego pracownika.</small>
+          <small>Historia procesu pozostanie przypisana do tego samego pracownika.</small>
         </div>
 
         <div className="bos-process-new-field"><span>02 / ZMIANA</span><strong>Rola A → rola B</strong>
@@ -82,7 +82,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
             <Link href="/app/standards/new?returnTo=promotions" className="bos-standard-primary-action">+ UTWÓRZ NOWY STANDARD B</Link>
           </div>
           {selectedStandard&&<div className="bos-onboarding-rule-note"><span>STANDARD GOTOWY</span><p>{selectedStandard.name} · {selectedStandard.version} został wybrany z repozytorium organizacji.</p></div>}
-          <small>Promotions korzysta ze wspólnego repozytorium Standardów organizacji. Proces zamrozi dokładną opublikowaną wersję Standardu B; późniejsze wersje nie zmienią historii procesu.</small>
+          <small>Awanse korzystają ze wspólnego repozytorium Standardów organizacji. Proces zamrozi dokładną opublikowaną wersję Standardu B; późniejsze wersje nie zmienią historii procesu.</small>
         </div>
 
         <div className="bos-process-new-field"><span>04 / ODPOWIEDZIALNOŚĆ</span><strong>Prowadzący i terminy</strong>
@@ -96,7 +96,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
         </div>
 
         <div className="bos-process-new-lock"><span>05</span><div><strong>UTWÓRZ PROCES A → B</strong>
-          <p>System zamrozi wersję Standardu roli B, utworzy zestaw jego czynności oraz kryteria Readiness. Następny krok to Entry Assessment.</p>
+          <p>System zamrozi wersję Standardu roli B, utworzy zestaw jego czynności oraz kryteria gotowości. Następny krok to ocena wejściowa.</p>
           <button type="submit" className="bos-standard-primary-action">UTWÓRZ ZMIANĘ</button>
         </div></div>
       </form>}
