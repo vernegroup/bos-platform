@@ -28,7 +28,23 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
     const buyerEmail = session.customer_details?.email?.trim().toLowerCase() || session.customer_email?.trim().toLowerCase() || null;
     if (!buyerEmail) throw new Error("Paid BOS purchase has no buyer email.");
 
-    let organizationId = session.metadata?.organization_id || null;
+    const checkoutOrganizationId = session.metadata?.organization_id || null;
+    const checkoutUserId = session.metadata?.bos_user_id || null;
+    let organizationId = checkoutOrganizationId;
+
+    if (checkoutOrganizationId || checkoutUserId) {
+      if (!checkoutOrganizationId || !checkoutUserId) {
+        throw new Error("Authenticated BOS purchase has incomplete organization/user metadata.");
+      }
+      const checkoutOwner = await tx.unsafe(
+        "SELECT 1 FROM users u JOIN memberships m ON m.user_id=u.id JOIN organizations o ON o.id=m.organization_id WHERE u.id=$1 AND lower(u.email)=$2 AND m.organization_id=$3 AND m.status='ACTIVE' AND o.status='ACTIVE' LIMIT 1",
+        [checkoutUserId, buyerEmail, checkoutOrganizationId],
+      );
+      if (!checkoutOwner.length) {
+        throw new Error("Authenticated BOS purchase metadata does not match an active organization membership.");
+      }
+    }
+
     if (!organizationId) {
       const existing = await tx.unsafe(
         "SELECT o.id FROM users u JOIN memberships m ON m.user_id=u.id AND m.status='ACTIVE' JOIN organizations o ON o.id=m.organization_id AND o.status='ACTIVE' WHERE lower(u.email)=$1 ORDER BY m.created_at LIMIT 1",
