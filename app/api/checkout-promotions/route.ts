@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { resolveBOSAccess } from "@/lib/bos/access";
-export async function POST(request: Request) {
+import { bosAppUrl } from "@/lib/bos/app-url";
+
+export async function POST() {
  try {
   const priceId=process.env.STRIPE_PRICE_ID_PROMOTIONS;
   if(!priceId)return NextResponse.json({error:"STRIPE_PRICE_ID_PROMOTIONS is not set"},{status:500});
-  const origin=request.headers.get("origin")??new URL(request.url).origin;
+  const origin=bosAppUrl();
   const access=await resolveBOSAccess();
   const session=await stripe.checkout.sessions.create({
    mode:"payment",line_items:[{price:priceId,quantity:1}],

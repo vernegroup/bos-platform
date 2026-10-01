@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { bosAppUrl } from "@/lib/bos/app-url";
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const priceId = process.env.STRIPE_PRICE_ID_PRICING;
 
@@ -12,8 +13,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const origin =
-      request.headers.get("origin") ?? new URL(request.url).origin;
+    const origin = bosAppUrl();
 
     const session = await stripe.checkout.sessions.create(
       {

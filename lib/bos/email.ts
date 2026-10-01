@@ -1,4 +1,5 @@
 import "server-only";
+import { bosAppUrl } from "@/lib/bos/app-url";
 
 type PasswordResetEmailInput = {
   to: string;
@@ -18,23 +19,6 @@ type VerificationEmailInput = {
   token: string;
 };
 
-function appUrl() {
-  const explicitUrl =
-    process.env.AUTH_URL ||
-    process.env.NEXTAUTH_URL ||
-    process.env.NEXT_PUBLIC_APP_URL;
-
-  if (explicitUrl) return explicitUrl.replace(/\/$/, "");
-
-  const vercelUrl =
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
-    process.env.VERCEL_URL;
-
-  if (vercelUrl) return `https://${vercelUrl}`.replace(/\/$/, "");
-
-  return "http://localhost:3000";
-}
-
 export async function sendPurchaseClaimEmail(input: PurchaseClaimEmailInput) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.BOS_EMAIL_FROM;
@@ -45,7 +29,7 @@ export async function sendPurchaseClaimEmail(input: PurchaseClaimEmailInput) {
     });
     throw new Error("EMAIL_NOT_CONFIGURED");
   }
-  const claimUrl = `${appUrl()}/claim-purchase?token=${encodeURIComponent(input.token)}`;
+  const claimUrl = `${bosAppUrl()}/claim-purchase?token=${encodeURIComponent(input.token)}`;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -87,7 +71,7 @@ export async function sendVerificationEmail(input: VerificationEmailInput) {
     throw new Error("EMAIL_NOT_CONFIGURED");
   }
 
-  const verifyUrl = `${appUrl()}/verify-email?token=${encodeURIComponent(input.token)}`;
+  const verifyUrl = `${bosAppUrl()}/verify-email?token=${encodeURIComponent(input.token)}`;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -148,7 +132,7 @@ export async function sendPasswordResetEmail(input: PasswordResetEmailInput) {
     throw new Error("EMAIL_NOT_CONFIGURED");
   }
 
-  const resetUrl = `${appUrl()}/reset-password?token=${encodeURIComponent(input.token)}`;
+  const resetUrl = `${bosAppUrl()}/reset-password?token=${encodeURIComponent(input.token)}`;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
