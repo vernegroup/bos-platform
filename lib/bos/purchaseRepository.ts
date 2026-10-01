@@ -3,6 +3,8 @@ import "server-only";
 import type Stripe from "stripe";
 import { db } from "@/lib/db";
 import type { BOSProductKey } from "@/lib/bos/licenseRepository";
+import { issueAuthToken } from "@/lib/bos/authRepository";
+import { sendPurchaseClaimEmail } from "@/lib/bos/email";
 
 function objectId(value: string | { id: string } | null | undefined) {
   if (!value) return null;
@@ -18,7 +20,7 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
   if (session.payment_status !== "paid") return { fulfilled: false, reason: "not_paid" as const };
 
   const sql = db();
-  return sql.begin(async (tx) => {
+  const fulfillment = await sql.begin(async (tx) => {
     const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
     if (seen.length) return { fulfilled: false, reason: "duplicate_event" as const };
 
@@ -53,6 +55,9 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
       if (existing.length) organizationId = existing[0].id;
     }
 
+    let claimUserId: string | null = null;
+    let purchaseNeedsClaim = false;
+
     if (!organizationId) {
       const label = buyerEmail.split("@")[0] || "Klient";
       const organizations = await tx.unsafe(
@@ -65,9 +70,11 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
         "INSERT INTO users(display_name,email,status) VALUES($1,$2,'INVITED') ON CONFLICT(email) DO UPDATE SET updated_at=now() RETURNING id",
         [label, buyerEmail],
       );
+      claimUserId = users[0].id as string;
+      purchaseNeedsClaim = true;
       await tx.unsafe(
-        "INSERT INTO memberships(organization_id,user_id,role,status,invited_at) VALUES($1,$2,'OWNER','ACTIVE',now()) ON CONFLICT(organization_id,user_id) DO UPDATE SET role='OWNER',status='ACTIVE',updated_at=now()",
-        [organizationId, users[0].id],
+        "INSERT INTO memberships(organization_id,user_id,role,status,invited_at) VALUES($1,$2,'OWNER','INVITED',now()) ON CONFLICT(organization_id,user_id) DO UPDATE SET role='OWNER',status='INVITED',updated_at=now()",
+        [organizationId, claimUserId],
       );
     }
 
@@ -81,6 +88,17 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
       [purchases[0].organization_id, products[0].id, purchases[0].id],
     );
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "checkout.session.paid"]);
-    return { fulfilled: true, purchaseId: purchases[0].id, organizationId: purchases[0].organization_id };
+    return { fulfilled: true, purchaseId: purchases[0].id, organizationId: purchases[0].organization_id, purchaseNeedsClaim, claimUserId, buyerEmail };
   });
+
+  if (fulfillment.fulfilled && fulfillment.purchaseNeedsClaim && fulfillment.claimUserId && fulfillment.buyerEmail) {
+    const token = await issueAuthToken(fulfillment.claimUserId, "CLAIM_PURCHASE", 60 * 24);
+    await sendPurchaseClaimEmail({
+      to: fulfillment.buyerEmail,
+      displayName: fulfillment.buyerEmail.split("@")[0] || "Kliencie",
+      token,
+    });
+  }
+
+  return fulfillment;
 }

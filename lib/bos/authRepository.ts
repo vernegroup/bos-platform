@@ -3,7 +3,7 @@ import "server-only";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 
-export type AuthTokenPurpose = "VERIFY_EMAIL" | "RESET_PASSWORD";
+export type AuthTokenPurpose = "VERIFY_EMAIL" | "RESET_PASSWORD" | "CLAIM_PURCHASE";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
