@@ -16,7 +16,7 @@ export default function ProductStage({
   const titleId = `bos-product-stage-title-${product.id}-${instanceId}`;
 
   async function handleCheckout() {
-    const response = await fetch(product.purchase.checkoutEndpoint, {
+    const response = await fetch(product.offer.checkoutEndpoint, {
       method: "POST",
     });
 
@@ -97,18 +97,18 @@ export default function ProductStage({
               type="button"
               className="bos-product-stage-purchase"
               onClick={handleCheckout}
-              aria-label={product.purchase.ariaLabel}
+              aria-label={product.offer.ariaLabel}
             >
               <span className="bos-product-stage-purchase-label">
-                {product.purchase.label}
+                {product.offer.label}
               </span>
 
               <span className="bos-product-stage-purchase-title">
-                {product.purchase.title}
+                {product.offer.title}
               </span>
 
               <span className="bos-product-stage-purchase-description">
-                {product.purchase.description}
+                {product.offer.description}
               </span>
 
               <span className="bos-product-stage-purchase-action">
