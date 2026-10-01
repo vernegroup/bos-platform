@@ -983,3 +983,12 @@ button{
 /* ===================================================================
    END
    =================================================================== */
+/* COMMERCE-11 — web entitlement post-purchase state. */
+.bos-purchase-complete{max-width:980px;margin:0 auto}
+.bos-purchase-lead{max-width:760px;margin:28px 0 0;color:var(--text-light);font-size:18px;line-height:1.7}
+.bos-purchase-state{display:grid;grid-template-columns:max-content 1fr;gap:10px 28px;margin:42px 0;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bos-purchase-state span{color:#8a94a1;font-size:12px;letter-spacing:1.4px;text-transform:uppercase}
+.bos-purchase-state strong{color:var(--text);font-size:15px}
+.bos-purchase-actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bos-purchase-actions .bos-download,.bos-purchase-actions .bos-portal-button{width:auto;min-width:190px;padding:0 24px}
+.bos-purchase-note{margin:30px 0 0;max-width:720px;color:#6d7784;font-size:14px;line-height:1.7}
