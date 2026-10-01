@@ -162,3 +162,12 @@ export async function refundCharge(charge: Stripe.Charge, eventId: string) {
     return { handled: true, refundedPurchases: purchases.length };
   });
 }
+
+export async function recoverPaidCheckoutSession(session: Stripe.Checkout.Session) {
+  if (session.payment_status !== "paid") return { fulfilled: false, reason: "not_paid" as const };
+  const sql = db();
+  const existing = await sql.unsafe("SELECT id,status FROM purchases WHERE stripe_checkout_session_id=$1 LIMIT 1", [session.id]);
+  if (existing.length) return { fulfilled: false, reason: "purchase_exists" as const, purchaseId: existing[0].id };
+  console.info("[commerce.recovery] recovering paid checkout", { sessionId: session.id });
+  return fulfillCheckoutSession(session, `recovery:${session.id}`);
+}
