@@ -3743,3 +3743,9 @@
 /* COMMERCE-03 — unlicensed catalog items stay visible and open the shared sales modal. */
 .bos-app-product-rail-sale{display:flex;align-items:stretch}
 .bos-app-product-rail-item--sale{border:0;background:transparent;font:inherit;cursor:pointer;padding:0}
+
+/* COMMERCE-07 — licensed products enter workspace; unlicensed products open shared sales UI. */
+.bos-product-card.is-unlicensed{border-color:#ddd9cf;background:#fbfaf7}
+.bos-product-status.is-unlicensed{background:#f2efe8;color:#88734e}
+.bos-product-card>.bos-product-more{width:100%;height:36px;margin:0;border:1px solid #b78a3e;border-radius:3px;background:transparent;color:#8b682e;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-size:9px;font-weight:700;letter-spacing:.025em;cursor:pointer}
+.bos-product-card>.bos-product-more:hover{background:#b78a3e;color:#fff}

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import ProductDetailsModal from "@/components/home/ProductDetailsModal";
+import { bosProducts } from "@/data/products";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 
@@ -11,23 +13,29 @@ export const dynamic="force-dynamic";
 
 export default async function ProductsPage(){
   const access=await requireBOSAccess();
-  const products=await listLicensedProducts(access);
+  const licenses=await listLicensedProducts(access);
+  const licensedByKey=new Map(licenses.map(product=>[product.key,product]));
   return <>
     <section className="bos-products-header">
-      <div><h1>Produkty</h1><p>Licencje produktowe organizacji {access.organization.name}. Konto i organizacja działają niezależnie od liczby aktywnych licencji.</p></div>
-      <span>{products.length} {products.length===1?"aktywny produkt":"aktywne produkty"}</span>
+      <div><h1>Produkty</h1><p>Produkty BOS dla organizacji {access.organization.name}. Licencja odblokowuje konkretny moduł; pozostałe produkty możesz poznać i kupić bez opuszczania panelu.</p></div>
+      <span>{licenses.length} {licenses.length===1?"aktywny produkt":"aktywne produkty"}</span>
     </section>
-    <section className="bos-products-grid" aria-label="Aktywne produkty BOS">
-      {products.map(product=>{
-        const meta=productMeta[product.key]; if(!meta)return null;
-        return <article className="bos-product-card" key={product.key}>
-          <div className="bos-product-card-top"><div className="bos-product-brand">BOS</div><span className="bos-product-status"><i aria-hidden="true"/>Aktywny</span></div>
-          <div className="bos-product-card-body"><h2>{product.name}</h2><strong>{meta.description}</strong><p>{meta.detail}</p></div>
-          <dl className="bos-product-meta"><div><dt>Licencja</dt><dd>Dożywotnia</dd></div><div><dt>Wersja</dt><dd>{product.currentVersion??"—"}</dd></div></dl>
-          <Link href={meta.href}>Otwórz produkt <span aria-hidden="true">→</span></Link>
+    <section className="bos-products-grid" aria-label="Produkty BOS">
+      {bosProducts.map(product=>{
+        const license=licensedByKey.get(product.id);
+        const meta=productMeta[product.id];
+        return <article className={"bos-product-card"+(license?"":" is-unlicensed")} key={product.id}>
+          <div className="bos-product-card-top"><div className="bos-product-brand">BOS</div><span className={"bos-product-status"+(license?"":" is-unlicensed")}><i aria-hidden="true"/>{license?"Aktywny":"Bez licencji"}</span></div>
+          <div className="bos-product-card-body"><h2>{product.displayName}</h2><strong>{meta.description}</strong><p>{meta.detail}</p></div>
+          <dl className="bos-product-meta">
+            <div><dt>Licencja</dt><dd>{license?"Dożywotnia":"Nieaktywna"}</dd></div>
+            <div><dt>Wersja</dt><dd>{license?.currentVersion??"—"}</dd></div>
+          </dl>
+          {license
+            ? <Link href={meta.href}>Otwórz produkt <span aria-hidden="true">→</span></Link>
+            : <ProductDetailsModal product={product.id}/>}
         </article>;
       })}
-      {!products.length&&<div className="bos-products-empty"><strong>Organizacja nie ma jeszcze aktywnych licencji</strong><p>To prawidłowy stan konta BOS. Licencje odblokowują konkretne produkty i nie są wymagane do korzystania z panelu organizacji.</p></div>}
     </section>
   </>;
 }
