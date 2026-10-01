@@ -134,8 +134,12 @@
 .bos-public-root .bos-bottom-bar-inner{
   min-height:92px;
   padding:22px 0 18px;
-  grid-template-columns:1.35fr .8fr .65fr;
-  gap:clamp(32px,5vw,72px);
+  grid-template-columns:minmax(0,1fr) max-content max-content;
+  gap:clamp(28px,3vw,48px);
+}
+.bos-public-root .bos-footer-company,
+.bos-public-root .bos-footer-contact{
+  justify-self:end;
 }
 .bos-public-root .bos-footer-brand-mark{font-size:22px}
 .bos-public-root .bos-footer-brand-name{margin-top:5px;font-size:7px}
