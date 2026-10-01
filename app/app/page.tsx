@@ -57,7 +57,7 @@ export default async function BOSAppPage(){
             <Link href={meta.href}>Otwórz produkt →</Link>
           </article>;
         })}
-        {!products.length&&<div className="bos-home-empty">Brak aktywnych produktów przypisanych do organizacji.</div>}
+        {!products.length&&<div className="bos-home-empty"><strong>Organizacja jest aktywna.</strong><p>Nie ma jeszcze aktywnych licencji produktowych. Konto, użytkownicy, firma, standardy, wyszukiwarka, aktualizacje, ustawienia i pomoc pozostają dostępne.</p><Link href="/app/products">Zobacz produkty BOS →</Link></div>}
       </div>
     </section>
 

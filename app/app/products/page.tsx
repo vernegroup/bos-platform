@@ -14,7 +14,7 @@ export default async function ProductsPage(){
   const products=await listLicensedProducts(access);
   return <>
     <section className="bos-products-header">
-      <div><h1>Produkty</h1><p>Produkty BOS dostępne dla organizacji {access.organization.name}.</p></div>
+      <div><h1>Produkty</h1><p>Licencje produktowe organizacji {access.organization.name}. Konto i organizacja działają niezależnie od liczby aktywnych licencji.</p></div>
       <span>{products.length} {products.length===1?"aktywny produkt":"aktywne produkty"}</span>
     </section>
     <section className="bos-products-grid" aria-label="Aktywne produkty BOS">
@@ -27,7 +27,7 @@ export default async function ProductsPage(){
           <Link href={meta.href}>Otwórz produkt <span aria-hidden="true">→</span></Link>
         </article>;
       })}
-      {!products.length&&<div className="bos-products-empty"><strong>Brak aktywnych produktów</strong><p>Organizacja nie ma obecnie przypisanej aktywnej licencji BOS.</p></div>}
+      {!products.length&&<div className="bos-products-empty"><strong>Organizacja nie ma jeszcze aktywnych licencji</strong><p>To prawidłowy stan konta BOS. Licencje odblokowują konkretne produkty i nie są wymagane do korzystania z panelu organizacji.</p></div>}
     </section>
   </>;
 }
