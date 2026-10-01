@@ -3739,3 +3739,7 @@
 .bos-signout-dialog button{min-height:40px;padding:0 18px;border:1px solid #0d1f31;border-radius:4px;background:#0d1f31;color:#fff;font:inherit;font-size:10px;font-weight:700;cursor:pointer}
 .bos-signout-dialog button:first-child{background:transparent;color:#0d1f31}
 .bos-signout-dialog button:hover,.bos-signout-dialog button:focus-visible{background:#14293a;color:#fff}
+
+/* COMMERCE-03 — unlicensed catalog items stay visible and open the shared sales modal. */
+.bos-app-product-rail-sale{display:flex;align-items:stretch}
+.bos-app-product-rail-item--sale{border:0;background:transparent;font:inherit;cursor:pointer;padding:0}
