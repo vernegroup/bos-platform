@@ -6,6 +6,7 @@ import { listProcesses } from "@/lib/bos/onboardingRepository";
 import { listStandards } from "@/lib/bos/core/standardRepository";
 import { listProductUpdates } from "@/lib/bos/productUpdateRepository";
 import { listPromotionProcesses, listPromotionClosures } from "@/lib/bos/promotionsRepository";
+import { getBOSProduct } from "@/data/products";
 
 const productMeta = {
   onboarding: { description:"System wdrażania pracownika", href:"/app/onboarding" },
@@ -53,7 +54,7 @@ export default async function BOSAppPage(){
           const meta=productMeta[product.key];
           if(!meta)return null;
           return <article className="bos-home-product" key={product.key}>
-            <div className="bos-home-product-head"><div><h3>{product.name}</h3><p>{meta.description}</p></div><span>Aktywny</span></div>
+            <div className="bos-home-product-head"><div><h3>{getBOSProduct(product.key).displayName}</h3><p>{meta.description}</p></div><span>Aktywny</span></div>
             <Link href={meta.href}>Otwórz produkt →</Link>
           </article>;
         })}
