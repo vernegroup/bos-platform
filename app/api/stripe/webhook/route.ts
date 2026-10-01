@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { stripe } from "@/lib/stripe";
-import { fulfillCheckoutSession } from "@/lib/bos/purchaseRepository";
+import { failCheckoutSession, fulfillCheckoutSession, refundCharge } from "@/lib/bos/purchaseRepository";
 
 export const runtime = "nodejs";
 
@@ -24,6 +24,10 @@ export async function POST(request: Request) {
   try {
     if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
       await fulfillCheckoutSession(event.data.object, event.id);
+    } else if (event.type === "checkout.session.async_payment_failed") {
+      await failCheckoutSession(event.data.object, event.id);
+    } else if (event.type === "charge.refunded") {
+      await refundCharge(event.data.object, event.id);
     }
     return NextResponse.json({ received: true });
   } catch (error) {

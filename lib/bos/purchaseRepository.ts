@@ -22,7 +22,15 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
   const sql = db();
   const fulfillment = await sql.begin(async (tx) => {
     const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
-    if (seen.length) return { fulfilled: false, reason: "duplicate_event" as const };
+    if (seen.length) {
+      const retry = await tx.unsafe(
+        "SELECT p.id,p.organization_id,p.buyer_email,u.id AS user_id FROM purchases p LEFT JOIN users u ON lower(u.email)=lower(p.buyer_email) LEFT JOIN memberships m ON m.user_id=u.id AND m.organization_id=p.organization_id AND m.role='OWNER' WHERE p.stripe_checkout_session_id=$1 AND p.status='PAID' AND u.status='INVITED' AND m.status='INVITED' LIMIT 1",
+        [session.id],
+      );
+      return retry.length
+        ? { fulfilled: true, purchaseId: retry[0].id, organizationId: retry[0].organization_id, purchaseNeedsClaim: true, claimUserId: retry[0].user_id as string, buyerEmail: retry[0].buyer_email as string, retry: true }
+        : { fulfilled: false, reason: "duplicate_event" as const };
+    }
 
     const products = await tx.unsafe("SELECT id FROM products WHERE key=$1 AND status='ACTIVE' LIMIT 1", [productKey]);
     if (!products.length) throw new Error("BOS product not found.");
@@ -101,4 +109,56 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
   }
 
   return fulfillment;
+}
+
+
+export async function failCheckoutSession(session: Stripe.Checkout.Session, eventId: string) {
+  const sql = db();
+  return sql.begin(async (tx) => {
+    const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
+    if (seen.length) return { handled: false, reason: "duplicate_event" as const };
+    await tx.unsafe(
+      "UPDATE purchases SET status='FAILED',updated_at=now() WHERE stripe_checkout_session_id=$1 AND status='PENDING'",
+      [session.id],
+    );
+    await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "checkout.session.async_payment_failed"]);
+    return { handled: true };
+  });
+}
+
+export async function refundCharge(charge: Stripe.Charge, eventId: string) {
+  const paymentIntentId = objectId(charge.payment_intent);
+  if (!paymentIntentId) return { handled: false, reason: "missing_payment_intent" as const };
+
+  const sql = db();
+  return sql.begin(async (tx) => {
+    const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
+    if (seen.length) return { handled: false, reason: "duplicate_event" as const };
+
+    const purchases = await tx.unsafe(
+      "UPDATE purchases SET status='REFUNDED',updated_at=now() WHERE stripe_payment_intent_id=$1 AND status='PAID' RETURNING id,organization_id,product_id",
+      [paymentIntentId],
+    );
+
+    for (const purchase of purchases) {
+      const replacement = await tx.unsafe(
+        "SELECT id FROM purchases WHERE organization_id=$1 AND product_id=$2 AND status='PAID' AND id<>$3 ORDER BY paid_at DESC NULLS LAST,created_at DESC LIMIT 1",
+        [purchase.organization_id, purchase.product_id, purchase.id],
+      );
+      if (replacement.length) {
+        await tx.unsafe(
+          "UPDATE licenses SET source_purchase_id=$1,updated_at=now() WHERE organization_id=$2 AND product_id=$3 AND status='ACTIVE' AND source_purchase_id=$4",
+          [replacement[0].id, purchase.organization_id, purchase.product_id, purchase.id],
+        );
+      } else {
+        await tx.unsafe(
+          "UPDATE licenses SET status='REVOKED',revoked_at=COALESCE(revoked_at,now()),updated_at=now() WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE'",
+          [purchase.organization_id, purchase.product_id],
+        );
+      }
+    }
+
+    await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "charge.refunded"]);
+    return { handled: true, refundedPurchases: purchases.length };
+  });
 }
