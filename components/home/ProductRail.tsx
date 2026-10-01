@@ -1,12 +1,7 @@
 "use client";
 
+import { bosProducts, plannedBosProducts } from "@/data/products";
 import ProductDetailsModal from "./ProductDetailsModal";
-
-const products = [
-  { id:"onboarding", label:"WDROŻENIA", modal:"onboarding", available:true },
-  { id:"promotions", label:"AWANSE", modal:"promotions", available:true },
-  { id:"pricing", label:"WYCENA", available:false },
-] as const;
 
 export default function ProductRail(){
   return (
@@ -17,12 +12,15 @@ export default function ProductRail(){
       </div>
       <div className="bos-product-rail__viewport">
         <div className="bos-product-rail__track">
-          {products.map(product=>(
-            <article className={"bos-product-rail__item"+(product.available?"":" is-planned")} key={product.id}>
-              <div className="bos-product-rail__name">{product.label}</div>
-              {product.available && product.modal ? (
-                <ProductDetailsModal product={product.modal} variant="rail" />
-              ) : null}
+          {bosProducts.map(product=>(
+            <article className="bos-product-rail__item" key={product.id}>
+              <div className="bos-product-rail__name">{product.displayName}</div>
+              <ProductDetailsModal product={product.id} variant="rail" />
+            </article>
+          ))}
+          {plannedBosProducts.map(product=>(
+            <article className="bos-product-rail__item is-planned" key={product.id}>
+              <div className="bos-product-rail__name">{product.displayName}</div>
             </article>
           ))}
         </div>
