@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { verifyCheckout } from "@/lib/verifyCheckout";
 import type { BOSProductKey } from "@/data/products";
 import { getBOSProduct } from "@/data/products";
+import ResendClaimButton from "./ResendClaimButton";
 import "../styles.css";
 
 type Props={sessionId:string;product:BOSProductKey};
@@ -16,6 +17,6 @@ export default async function PurchaseComplete({sessionId,product}:Props){
   <p className="bos-purchase-lead">{authenticated?(entitlementReady?"Licencja jest aktywna w Twojej organizacji BOS.":"Płatność jest potwierdzona. Kończymy aktywację licencji w Twojej organizacji."):"Na adres e-mail użyty podczas płatności wysyłamy bezpieczny link do aktywacji dostępu BOS."}</p>
   <div className="bos-purchase-state"><span>Płatność</span><strong>Potwierdzona</strong><span>Dostęp</span><strong>{entitlementReady?"Aktywny":"Aktywacja"}</strong></div>
   <div className="bos-purchase-actions">{authenticated&&entitlementReady?<Link className="bos-download" href={productHref}>OTWÓRZ PRODUKT</Link>:authenticated?<Link className="bos-download" href="/app/products">PRZEJDŹ DO PRODUKTÓW</Link>:<Link className="bos-download" href="/login">PRZEJDŹ DO LOGOWANIA</Link>}<Link className="bos-portal-button" href={authenticated?"/app":"/"}>{authenticated?"PANEL BOS":"STRONA GŁÓWNA"}</Link></div>
-  {!authenticated&&<p className="bos-purchase-note">Nie twórz drugiego konta dla tego zakupu. Użyj linku aktywacyjnego z wiadomości e-mail; jest jednorazowy i prowadzi do ustawienia hasła.</p>}
+  {!authenticated&&<><p className="bos-purchase-note">Nie twórz drugiego konta dla tego zakupu. Użyj linku aktywacyjnego z wiadomości e-mail; jest jednorazowy i prowadzi do ustawienia hasła.</p><ResendClaimButton sessionId={sessionId}/></>}
  </div></section></div></main>;
 }
