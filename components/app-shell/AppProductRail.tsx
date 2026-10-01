@@ -2,28 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ProductDetailsModal from "@/components/home/ProductDetailsModal";
+import { bosProducts, plannedBosProducts, type BOSProductKey } from "@/data/products";
 
-type ProductKey="onboarding"|"promotions";
-type RailProduct={label:string;href?:string;key?:ProductKey};
+const productHrefs: Record<BOSProductKey,string> = {
+  onboarding: "/app/onboarding",
+  promotions: "/app/promotions",
+};
 
-const products:RailProduct[]=[
-  {label:"WDROŻENIA",href:"/app/onboarding",key:"onboarding"},
-  {label:"AWANSE",href:"/app/promotions",key:"promotions"},
-  {label:"WYCENA"},
-];
-
-export default function AppProductRail({licensedProductKeys}:{licensedProductKeys:ProductKey[]}){
+export default function AppProductRail({licensedProductKeys}:{licensedProductKeys:BOSProductKey[]}){
   const pathname=usePathname();
   return <nav className="bos-app-product-rail" aria-label="Produkty BOS">
     <span className="bos-app-product-rail-label">BOS</span>
     <div className="bos-app-product-rail-track">
-      {products.map(product=>{
-        if(product.key&&!licensedProductKeys.includes(product.key))return null;
-        const active=product.href ? (pathname===product.href||pathname.startsWith(product.href+"/")) : false;
-        return product.href
-          ? <Link key={product.label} href={product.href} className={"bos-app-product-rail-item"+(active?" is-active":"")} aria-current={active?"page":undefined}>{product.label}<i aria-hidden="true"/></Link>
-          : <span key={product.label} className="bos-app-product-rail-item is-planned" aria-disabled="true">{product.label}</span>;
+      {bosProducts.map(product=>{
+        const licensed=licensedProductKeys.includes(product.id);
+        const href=productHrefs[product.id];
+        const active=licensed&&(pathname===href||pathname.startsWith(href+"/"));
+        return licensed
+          ? <Link key={product.id} href={href} className={"bos-app-product-rail-item"+(active?" is-active":"")} aria-current={active?"page":undefined}>{product.displayName}<i aria-hidden="true"/></Link>
+          : <div key={product.id} className="bos-app-product-rail-sale"><ProductDetailsModal product={product.id} variant="appRail"/></div>;
       })}
+      {plannedBosProducts.map(product=><span key={product.id} className="bos-app-product-rail-item is-planned" aria-disabled="true">{product.displayName}</span>)}
     </div>
   </nav>;
 }
