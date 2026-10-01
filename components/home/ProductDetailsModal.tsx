@@ -1,29 +1,12 @@
 "use client";
+
 import Link from "next/link";
 import { useEffect,useRef,useState } from "react";
+import { getBOSProduct, type BOSProductKey } from "@/data/products";
 
-type ProductKey="onboarding"|"promotions";
-const data={
- onboarding:{
-  kicker:"BOS WDROŻENIA",title:"Uporządkuj wdrożenie. Skróć drogę do samodzielności.",
-  description:"BOS Wdrożenia prowadzi menedżera przez przygotowanie, realizację i zamknięcie wdrożenia pracownika w jednym, powtarzalnym procesie.",
-  benefits:[["Jeden standard","Stanowisko, czynności krytyczne i oczekiwany rezultat są zapisane w jednym miejscu."],["Kontrola postępu","Menedżer widzi etap procesu, realizację zadań i moment gotowości pracownika."],["Mniej improwizacji","Kolejne wdrożenia wykorzystują ten sam sprawdzony mechanizm zamiast zaczynać od zera."]],
-  audience:"Dla właścicieli i menedżerów MŚP, którzy chcą wdrażać pracowników w sposób powtarzalny i możliwy do kontrolowania.",
-  steps:[["01","Przygotuj","Zdefiniuj stanowisko i standard."],["02","Przeprowadź","Realizuj kolejne etapy wdrożenia."],["03","Zamknij","Zweryfikuj gotowość i zachowaj historię."]],
-  demo:"/videos/bos-onboarding-demo.webm"
- },
- promotions:{
-  kicker:"BOS AWANSE",title:"Zmieniaj role bez utraty kontroli nad procesem.",
-  description:"BOS Awanse porządkuje awanse i przesunięcia poziome jako proces wejścia pracownika w nową rolę, z własnym standardem i kryterium gotowości.",
-  benefits:[["Nowa rola, nowy standard","Kompetencje wymagane na nowym stanowisku są opisane niezależnie od poprzedniej roli."],["Ciągłość pracownika","Proces może korzystać z historii osoby w organizacji bez skracania wymagań nowego stanowiska."],["Decyzja oparta na gotowości","Zamknięcie zmiany następuje po weryfikacji wykonania i gotowości do samodzielnej pracy."]],
-  audience:"Dla firm, które rozwijają ludzi wewnętrznie i chcą prowadzić awanse oraz przesunięcia według jasnego, udokumentowanego procesu.",
-  steps:[["01","Przygotuj zmianę","Wybierz osobę, rolę i standard."],["02","Przeprowadź","Realizuj wymagania nowego stanowiska."],["03","Zweryfikuj","Zamknij zmianę po potwierdzeniu gotowości."]],
-  demo:"/videos/bos-promotions-demo.webm"
- }
-} as const;
-
-export default function ProductDetailsModal({product,variant="default"}:{product:ProductKey;variant?:"default"|"rail"}){
- const [open,setOpen]=useState(false); const closeRef=useRef<HTMLButtonElement>(null); const triggerRef=useRef<HTMLButtonElement>(null); const d=data[product];
+export default function ProductDetailsModal({product,variant="default"}:{product:BOSProductKey;variant?:"default"|"rail"}){
+ const [open,setOpen]=useState(false); const closeRef=useRef<HTMLButtonElement>(null); const triggerRef=useRef<HTMLButtonElement>(null);
+ const catalogProduct=getBOSProduct(product); const d=catalogProduct.sales;
  // No product demo .webm files are published yet; avoid a guaranteed failed request.
  const demoAvailable=false;
  useEffect(()=>{if(!open)return;const previous=document.body.style.overflow;document.body.style.overflow="hidden";closeRef.current?.focus();const key=(e:KeyboardEvent)=>{if(e.key==="Escape")setOpen(false);if(e.key==="Tab"){const modal=closeRef.current?.closest<HTMLElement>('[role="dialog"]');if(!modal)return;const items=Array.from(modal.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],video[controls],[tabindex]:not([tabindex="-1"])'));const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}}};document.addEventListener("keydown",key);return()=>{document.body.style.overflow=previous;document.removeEventListener("keydown",key);triggerRef.current?.focus()}},[open]);
