@@ -12,7 +12,7 @@ type AppShellProps = {
   children: React.ReactNode;
   account: { name: string; email: string; image: string | null; role: string };
   organizationName: string;
-  licensedProductKeys: ("onboarding"|"promotions")[];
+  productEntitlements: { key: "onboarding"|"promotions"; licensed: boolean }[];
 };
 
 type IconName = "home"|"products"|"users"|"company"|"search"|"updates"|"settings"|"help"|"logout"|"bell"|"chevron"|"chat";
@@ -50,7 +50,7 @@ function Icon({name}:{name:IconName}) {
 function isCurrentPath(pathname:string,href:string){return href==="/app"?pathname===href:pathname===href||pathname.startsWith(href+"/");}
 function initials(name:string){return name.split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]?.toUpperCase()).join("")||"B";}
 
-export default function AppShell({children,account,organizationName,licensedProductKeys}:AppShellProps){
+export default function AppShell({children,account,organizationName,productEntitlements}:AppShellProps){
   const pathname=usePathname();
   const router=useRouter();
   const [mobileOpen,setMobileOpen]=useState(false);
@@ -118,7 +118,7 @@ export default function AppShell({children,account,organizationName,licensedProd
           </div>
         </div>
       </header>
-      <AppProductRail licensedProductKeys={licensedProductKeys} />
+      <AppProductRail productEntitlements={productEntitlements} />
       <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
       {signoutOpen&&<div className="bos-signout-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSignoutOpen(false)}}><section className="bos-signout-dialog" role="dialog" aria-modal="true" aria-labelledby="bos-signout-title"><h2 id="bos-signout-title">Wylogowanie</h2><p>Czy na pewno chcesz się wylogować?</p><div><button type="button" onClick={()=>setSignoutOpen(false)}>Anuluj</button><button type="button" onClick={()=>signOut({callbackUrl:"/"})}>Wyloguj się</button></div></section></div>}
       <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>

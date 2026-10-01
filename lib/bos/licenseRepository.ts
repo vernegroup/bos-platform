@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import type { BOSAccess } from "@/lib/bos/access";
 
-export type BOSProductKey = "onboarding" | "promotions";
+import { bosProducts, type BOSProductKey } from "@/data/products";
+
+export type { BOSProductKey };
 
 export type LicensedProduct = {
   key: BOSProductKey;
@@ -29,6 +31,17 @@ export async function listLicensedProducts(access: BOSAccess): Promise<LicensedP
     licenseType: row.license_type,
     grantedAt: row.granted_at instanceof Date ? row.granted_at.toISOString() : String(row.granted_at),
   }));
+}
+
+export type ProductEntitlement = {
+  key: BOSProductKey;
+  licensed: boolean;
+};
+
+export async function listProductEntitlements(access: BOSAccess): Promise<ProductEntitlement[]> {
+  const licensed = await listLicensedProducts(access);
+  const licensedKeys = new Set(licensed.map((product) => product.key));
+  return bosProducts.map((product) => ({ key: product.id, licensed: licensedKeys.has(product.id) }));
 }
 
 export async function hasProductLicense(access: BOSAccess, productKey: BOSProductKey) {

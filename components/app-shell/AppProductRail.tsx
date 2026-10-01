@@ -10,13 +10,13 @@ const productHrefs: Record<BOSProductKey,string> = {
   promotions: "/app/promotions",
 };
 
-export default function AppProductRail({licensedProductKeys}:{licensedProductKeys:BOSProductKey[]}){
+export default function AppProductRail({productEntitlements}:{productEntitlements:{key:BOSProductKey;licensed:boolean}[]}){
   const pathname=usePathname();
   return <nav className="bos-app-product-rail" aria-label="Produkty BOS">
     <span className="bos-app-product-rail-label">BOS</span>
     <div className="bos-app-product-rail-track">
       {bosProducts.map(product=>{
-        const licensed=licensedProductKeys.includes(product.id);
+        const licensed=productEntitlements.find(entitlement=>entitlement.key===product.id)?.licensed===true;
         const href=productHrefs[product.id];
         const active=licensed&&(pathname===href||pathname.startsWith(href+"/"));
         return licensed
