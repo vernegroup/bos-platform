@@ -6,19 +6,19 @@ function tenantId(id?:string){if(!id) throw new Error("organizationId is require
 export type EmployeeStatus="ACTIVE"|"INACTIVE";
 export type EmployeeRecord={id:string;employeeNumber?:string;firstName:string;lastName:string;displayName:string;position?:string;department?:string;status:EmployeeStatus;linkedUserId?:string};
 
-const map=(x:any):EmployeeRecord=>({id:x.id,employeeNumber:x.employee_number??undefined,firstName:x.first_name,lastName:x.last_name??"",displayName:[x.first_name,x.last_name].filter(Boolean).join(" "),position:x.position??undefined,department:x.department??undefined,status:x.status,linkedUserId:x.linked_user_id??undefined});
+const map=(x:any):EmployeeRecord=>({id:x.id,employeeNumber:x.employee_number??undefined,firstName:x.first_name,lastName:x.last_name??"",displayName:[x.first_name,x.last_name].filter(Boolean).join(" "),position:x.effective_position??x.position??undefined,department:x.department??undefined,status:x.status,linkedUserId:x.linked_user_id??undefined});
 
 export async function listEmployees(organizationId?:string,includeInactive=false){
  requireDb();const sql=db();const org=tenantId(organizationId);
  const rows=includeInactive
-  ? await sql`SELECT * FROM employees WHERE organization_id=${org} ORDER BY last_name,first_name,created_at`
-  : await sql`SELECT * FROM employees WHERE organization_id=${org} AND status='ACTIVE' ORDER BY last_name,first_name,created_at`;
+  ? await sql`SELECT e.*,COALESCE((SELECT c.to_role_snapshot FROM promotion_closure_events c WHERE c.organization_id=e.organization_id AND c.employee_id=e.id AND c.closure_kind='READY' ORDER BY c.closed_at DESC,c.closure_sequence DESC LIMIT 1),e.position) effective_position FROM employees e WHERE e.organization_id=${org} ORDER BY e.last_name,e.first_name,e.created_at`
+  : await sql`SELECT e.*,COALESCE((SELECT c.to_role_snapshot FROM promotion_closure_events c WHERE c.organization_id=e.organization_id AND c.employee_id=e.id AND c.closure_kind='READY' ORDER BY c.closed_at DESC,c.closure_sequence DESC LIMIT 1),e.position) effective_position FROM employees e WHERE e.organization_id=${org} AND e.status='ACTIVE' ORDER BY e.last_name,e.first_name,e.created_at`;
  return rows.map(map);
 }
 
 export async function getEmployee(employeeId:string,organizationId?:string){
  requireDb();const sql=db();const org=tenantId(organizationId);
- const [row]=await sql`SELECT * FROM employees WHERE id=${employeeId} AND organization_id=${org} LIMIT 1`;
+ const [row]=await sql`SELECT e.*,COALESCE((SELECT c.to_role_snapshot FROM promotion_closure_events c WHERE c.organization_id=e.organization_id AND c.employee_id=e.id AND c.closure_kind='READY' ORDER BY c.closed_at DESC,c.closure_sequence DESC LIMIT 1),e.position) effective_position FROM employees e WHERE e.id=${employeeId} AND e.organization_id=${org} LIMIT 1`;
  return row?map(row):null;
 }
 
