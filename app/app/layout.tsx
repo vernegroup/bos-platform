@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import AppShell from "@/components/app-shell/AppShell";
 import { requireBOSAccess } from "@/lib/bos/access";
 import "./app-shell.css";
+import "../public-products.css";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 
 export const metadata: Metadata = {
