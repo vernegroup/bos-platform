@@ -4,7 +4,7 @@ import type { BOSAccess } from "@/lib/bos/access";
 
 export async function resolveBillingCustomerId(access:BOSAccess){
  const rows=await db().unsafe(
-  "SELECT stripe_customer_id FROM (SELECT stripe_customer_id,updated_at FROM subscriptions WHERE organization_id=$1 AND stripe_customer_id IS NOT NULL UNION ALL SELECT stripe_customer_id,updated_at FROM purchases WHERE organization_id=$1 AND stripe_customer_id IS NOT NULL) c ORDER BY updated_at DESC LIMIT 1",
+  "SELECT stripe_customer_id FROM (SELECT stripe_customer_id,updated_at FROM subscriptions WHERE organization_id=$1 AND stripe_customer_id IS NOT NULL UNION ALL SELECT stripe_customer_id,updated_at FROM purchases WHERE organization_id=$1 AND stripe_customer_id IS NOT NULL) c ORDER BY created_at ASC LIMIT 1",
   [access.organization.id],
  );
  return rows.length?String(rows[0].stripe_customer_id):null;
