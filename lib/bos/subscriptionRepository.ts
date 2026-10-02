@@ -90,9 +90,10 @@ export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,even
   await compensatePerpetualDuplicate(session,subscription);
   await sql.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2) ON CONFLICT(id) DO NOTHING",[eventId,"checkout.session.subscription.perpetual_duplicate_refunded"]);
  }
- if(result.fulfilled){
+ if(result.reason!=="perpetual_duplicate"){
+  const bound=await sql.unsafe("SELECT 1 FROM subscriptions WHERE stripe_subscription_id=$1 LIMIT 1",[subscriptionId]);
   const invoiceId=objectId(subscription.latest_invoice);
-  if(invoiceId){
+  if(bound.length&&invoiceId){
    const invoice=await stripe.invoices.retrieve(invoiceId);
    await recordAnnualInvoice(invoice,`checkout.recovery.invoice:${session.id}:${invoiceId}`,true);
   }
