@@ -6,8 +6,9 @@ import { annualOffer } from "@/lib/bos/commerceCatalog";
 import { hasProductLicense, type BOSProductKey } from "@/lib/bos/licenseRepository";
 import { resolveBillingCustomerId } from "@/lib/bos/billingRepository";
 
-export async function createAnnualCheckout(product:BOSProductKey){
+export async function createAnnualCheckout(product:BOSProductKey,options?:{requireAccess?:boolean}){
  const access=await resolveBOSAccess();
+ if(options?.requireAccess&&!access)return {authRequired:true as const,alreadyLicensed:false as const,url:null};
  if(access && await hasProductLicense(access,product)) return {alreadyLicensed:true as const,url:null};
  const offer=annualOffer(product);
  const origin=bosAppUrl();
@@ -24,5 +25,5 @@ export async function createAnnualCheckout(product:BOSProductKey){
   cancel_url:origin+"/",
  });
  if(!session.url) throw new Error("Missing checkout URL");
- return {alreadyLicensed:false as const,url:session.url};
+ return {authRequired:false as const,alreadyLicensed:false as const,url:session.url};
 }
