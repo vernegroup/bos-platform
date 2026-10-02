@@ -21,15 +21,15 @@ function period(s:any){
 }
 function slugPart(v:string){return v.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,36)||"firma"}
 
-async function compensatePerpetualDuplicate(session:Stripe.Checkout.Session,subscription:Stripe.Subscription){
+async function compensateRejectedAnnualCheckout(session:Stripe.Checkout.Session,subscription:Stripe.Subscription,reason:string){
  const invoiceId=objectId(subscription.latest_invoice);
- if(!invoiceId)throw new Error("Duplicate perpetual purchase has no initial invoice");
+ if(!invoiceId)throw new Error("Rejected annual purchase has no initial invoice");
  const invoice:any=await stripe.invoices.retrieve(invoiceId,{expand:["payments"]});
  const payment=invoice?.payments?.data?.find((item:any)=>item?.status==="paid"&&item?.payment?.type==="payment_intent");
  const paymentIntentId=objectId(payment?.payment?.payment_intent);
- if(!paymentIntentId)throw new Error("Duplicate perpetual purchase has no refundable payment");
- await stripe.subscriptions.cancel(subscription.id,{invoice_now:false,prorate:false},{idempotencyKey:`bos-perpetual-cancel:${session.id}`});
- await stripe.refunds.create({payment_intent:paymentIntentId,metadata:{reason:"bos_existing_perpetual_license",checkout_session_id:session.id}},{idempotencyKey:`bos-perpetual-refund:${session.id}`});
+ if(!paymentIntentId)throw new Error("Rejected annual purchase has no refundable payment");
+ await stripe.subscriptions.cancel(subscription.id,{invoice_now:false,prorate:false},{idempotencyKey:`bos-rejected-cancel:${session.id}`});
+ await stripe.refunds.create({payment_intent:paymentIntentId,metadata:{reason,checkout_session_id:session.id}},{idempotencyKey:`bos-rejected-refund:${session.id}`});
 }
 
 export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,eventId:string){
@@ -64,6 +64,11 @@ export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,even
    const existingOrg=await tx.unsafe("SELECT o.id FROM users u JOIN memberships m ON m.user_id=u.id AND m.status='ACTIVE' JOIN organizations o ON o.id=m.organization_id AND o.status='ACTIVE' WHERE lower(u.email)=$1 ORDER BY m.created_at LIMIT 1",[buyerEmail]);
    if(existingOrg.length)organizationId=existingOrg[0].id;
   }
+  if(organizationId&&!checkoutOrg){
+   const canonical=await tx.unsafe("SELECT stripe_customer_id FROM (SELECT stripe_customer_id,created_at FROM subscriptions WHERE organization_id=$1 AND stripe_customer_id IS NOT NULL UNION ALL SELECT stripe_customer_id,created_at FROM purchases WHERE organization_id=$1 AND stripe_customer_id IS NOT NULL) c ORDER BY created_at ASC LIMIT 1",[organizationId]);
+   const checkoutCustomer=objectId(session.customer);
+   if(canonical.length&&checkoutCustomer&&String(canonical[0].stripe_customer_id)!==checkoutCustomer)return {fulfilled:false,reason:"customer_mismatch" as const,organizationId,buyerEmail};
+  }
   const perpetual=await tx.unsafe("SELECT 1 FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' AND license_type='PERPETUAL' LIMIT 1",[organizationId,products[0].id]);
   if(perpetual.length)return {fulfilled:false,reason:"perpetual_duplicate" as const,organizationId,buyerEmail};
   let claimUserId:string|null=null,purchaseNeedsClaim=false;
@@ -87,10 +92,14 @@ export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,even
   return {fulfilled:true,purchaseId:purchase[0].id,organizationId,purchaseNeedsClaim,claimUserId,buyerEmail};
  });
  if(!result.fulfilled&&result.reason==="perpetual_duplicate"){
-  await compensatePerpetualDuplicate(session,subscription);
+  await compensateRejectedAnnualCheckout(session,subscription,"bos_existing_perpetual_license");
   await sql.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2) ON CONFLICT(id) DO NOTHING",[eventId,"checkout.session.subscription.perpetual_duplicate_refunded"]);
  }
- if(result.reason!=="perpetual_duplicate"){
+ if(!result.fulfilled&&result.reason==="customer_mismatch"){
+  await compensateRejectedAnnualCheckout(session,subscription,"bos_existing_customer_requires_login");
+  await sql.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2) ON CONFLICT(id) DO NOTHING",[eventId,"checkout.session.subscription.customer_mismatch_refunded"]);
+ }
+ if(result.reason!=="perpetual_duplicate"&&result.reason!=="customer_mismatch"){
   const bound=await sql.unsafe("SELECT 1 FROM subscriptions WHERE stripe_subscription_id=$1 LIMIT 1",[subscriptionId]);
   const invoiceId=objectId(subscription.latest_invoice);
   if(bound.length&&invoiceId){
