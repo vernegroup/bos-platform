@@ -33,7 +33,7 @@ export default async function ProductsPage(){
           </dl>
           {license
             ? <Link href={meta.href}>Otwórz produkt <span aria-hidden="true">→</span></Link>
-            : <ProductDetailsModal product={product.id}/>}
+            : <ProductDetailsModal product={product.id} requireAccess/>}
         </article>;
       })}
     </section>
