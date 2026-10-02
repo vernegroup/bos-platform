@@ -3,8 +3,12 @@ import "server-only";
 export const BOS_PRODUCTION_URL = "https://www.standardybiznesu.pl";
 
 export function bosAppUrl() {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.VERCEL_ENV === "production") {
     return BOS_PRODUCTION_URL;
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL.replace(/\/$/, "")}`;
   }
 
   const explicitUrl =
@@ -14,5 +18,6 @@ export function bosAppUrl() {
 
   if (explicitUrl) return explicitUrl.replace(/\/$/, "");
 
+  if (process.env.NODE_ENV === "production") return BOS_PRODUCTION_URL;
   return "http://localhost:3000";
 }
