@@ -11,6 +11,6 @@ export default function ProductPlatformPreview({product}:{product:BOSProduct}){
   <header><span>{p.label}</span><b>WEB 1.0</b></header>
   <div className="bos-platform-preview-head"><div><strong>{p.title}</strong></div><em>{p.metric}</em></div>
   <div className="bos-platform-preview-grid">{p.rows.map(r=><div key={r[0]}><strong>{r[0]}</strong><small>{r[1]}</small><i>→</i></div>)}</div>
-  <footer><span>LICENCJA DOŻYWOTNIA</span><span>AKTUALIZACJE W APLIKACJI</span></footer>
+  <footer><span>LICENCJA ROCZNA</span><span>AKTUALIZACJE W APLIKACJI</span></footer>
  </div>;
 }

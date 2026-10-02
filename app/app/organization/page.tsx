@@ -19,7 +19,7 @@ export default async function OrganizationPage(){
   <section className="p8-summary" aria-label="Podsumowanie organizacji">
    <article><span>Użytkownicy</span><strong>{activeMembers}</strong></article>
    <article><span>Aktywne produkty</span><strong>{licenses.length}</strong></article>
-   <article><span>Model licencji</span><strong className="text">Dożywotnia</strong></article>
+   <article><span>Model licencji</span><strong className="text">{licenses.some(l=>l.licenseType==="ANNUAL")?"Roczna / historyczna":"Historyczna"}</strong></article>
    <article><span>Twoja rola</span><strong className="text">{roleLabels[access.membership.role]}</strong></article>
   </section>
 
@@ -41,7 +41,7 @@ export default async function OrganizationPage(){
     {licenses.map(license=><article key={license.licenseId}>
      <div className="top"><span>BOS</span><b>Aktywna</b></div>
      <h3>{license.name}</h3><small>Wersja {license.currentVersion??"—"}</small>
-     <dl><div><dt>Licencja</dt><dd>Dożywotnia</dd></div><div><dt>Aktywna od</dt><dd>{datePL(license.grantedAt)}</dd></div></dl>
+     <dl><div><dt>Licencja</dt><dd>{license.licenseType==="ANNUAL"?"Roczna":"Dożywotnia"}</dd></div><div><dt>{license.validUntil?"Ważna do":"Aktywna od"}</dt><dd>{datePL(license.validUntil??license.grantedAt)}</dd></div></dl>
      <Link href={productHref[license.key]}>Otwórz produkt →</Link>
     </article>)}
     {!licenses.length&&<div className="p8-empty">Brak aktywnych licencji produktowych.</div>}

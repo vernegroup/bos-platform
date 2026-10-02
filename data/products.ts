@@ -81,7 +81,7 @@ export const bosProducts: readonly BOSProduct[] = [
       label: "STANDARD OPERACYJNY",
       title: "Kup BOS Wdrożenia",
       description:
-        "Dożywotnia licencja na moduł BOS Wdrożenia w aplikacji webowej wraz z aktualizacjami.",
+        "Roczna licencja na moduł BOS Wdrożenia w aplikacji webowej wraz z aktualizacjami.",
       checkoutEndpoint: "/api/checkout",
       ariaLabel: "Kup BOS Wdrożenia",
     },
@@ -128,7 +128,7 @@ export const bosProducts: readonly BOSProduct[] = [
       label: "STANDARD OPERACYJNY",
       title: "Kup BOS Awanse",
       description:
-        "Dożywotnia licencja na moduł BOS Awanse w aplikacji webowej wraz z aktualizacjami.",
+        "Roczna licencja na moduł BOS Awanse w aplikacji webowej wraz z aktualizacjami.",
       checkoutEndpoint: "/api/checkout-promotions",
       ariaLabel: "Kup BOS Awanse",
     },
