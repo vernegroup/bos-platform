@@ -8,7 +8,7 @@ import type { BOSProductKey } from "@/lib/bos/licenseRepository";
 
 function objectId(v:any){if(!v)return null;return typeof v==="string"?v:v.id}
 function unix(v:any){return typeof v==="number"?new Date(v*1000):null}
-function period(s:any){return {start:unix(s.current_period_start),end:unix(s.current_period_end)}}
+function period(s:any){\n const items=Array.isArray(s?.items?.data)?s.items.data:[];\n const starts=[s?.current_period_start,...items.map((item:any)=>item?.current_period_start)].filter((v:any)=>typeof v==="number");\n const ends=[s?.current_period_end,...items.map((item:any)=>item?.current_period_end)].filter((v:any)=>typeof v==="number");\n return {start:unix(starts.length?Math.min(...starts):null),end:unix(ends.length?Math.max(...ends):null)};\n}
 function slugPart(v:string){return v.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,36)||"firma"}
 
 export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,eventId:string){
