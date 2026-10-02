@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
+import { listBillingSubscriptions } from "@/lib/bos/billingRepository";
 
 export const dynamic="force-dynamic";
 
@@ -11,7 +12,7 @@ const roleLabels={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",U
 
 export default async function OrganizationPage(){
  const access=await requireBOSAccess();
- const [licenses,members]=await Promise.all([listLicensedProducts(access),listOrganizationMembers(access)]);
+ const [licenses,members,subscriptions]=await Promise.all([listLicensedProducts(access),listOrganizationMembers(access),listBillingSubscriptions(access)]);
  const activeMembers=members.filter(member=>member.status==="ACTIVE").length;
  return <>
   <section className="p8-head"><div><h1>Firma</h1><p>Dane organizacji i licencje przypisane do konta BOS.</p></div><span>Aktywna organizacja</span></section>
@@ -36,7 +37,7 @@ export default async function OrganizationPage(){
   </section>
 
   <section className="p8-licenses">
-   <div className="p8-title"><div><h2>Licencje produktowe</h2><p>Produkty dostępne dla tej organizacji.</p></div><span>{licenses.length} aktywnych</span></div>
+   <div className="p8-title"><div><h2>Licencje produktowe</h2><p>Produkty dostępne dla tej organizacji.</p></div><span>{licenses.length} aktywnych</span></div>{subscriptions.some(s=>s.customerId)&&<p><a href="/api/billing/portal">Zarządzaj subskrypcją i metodą płatności →</a></p>}
    <div className="p8-license-grid">
     {licenses.map(license=><article key={license.licenseId}>
      <div className="top"><span>BOS</span><b>Aktywna</b></div>
