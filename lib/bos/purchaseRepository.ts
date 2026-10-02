@@ -22,14 +22,25 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
   const sql = db();
   const fulfillment = await sql.begin(async (tx) => {
     const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
-    if (seen.length) {
-      const retry = await tx.unsafe(
-        "SELECT p.id,p.organization_id,p.buyer_email,u.id AS user_id FROM purchases p LEFT JOIN users u ON lower(u.email)=lower(p.buyer_email) LEFT JOIN memberships m ON m.user_id=u.id AND m.organization_id=p.organization_id AND m.role='OWNER' WHERE p.stripe_checkout_session_id=$1 AND p.status='PAID' AND u.status='INVITED' AND m.status='INVITED' LIMIT 1",
-        [session.id],
-      );
-      return retry.length
-        ? { fulfilled: true, purchaseId: retry[0].id, organizationId: retry[0].organization_id, purchaseNeedsClaim: true, claimUserId: retry[0].user_id as string, buyerEmail: retry[0].buyer_email as string, retry: true }
-        : { fulfilled: false, reason: "duplicate_event" as const };
+    if (seen.length) return { fulfilled: false, reason: "duplicate_event" as const };
+
+    // Session-level idempotency is the primary fulfillment guard. Recovery and a later
+    // Stripe webhook may have different event IDs but must resolve to the same purchase.
+    const existingPurchase = await tx.unsafe(
+      "SELECT p.id,p.organization_id,p.buyer_email,u.id AS user_id,u.status AS user_status,m.status AS membership_status FROM purchases p LEFT JOIN users u ON lower(u.email)=lower(p.buyer_email) LEFT JOIN memberships m ON m.user_id=u.id AND m.organization_id=p.organization_id AND m.role='OWNER' WHERE p.stripe_checkout_session_id=$1 AND p.status='PAID' LIMIT 1",
+      [session.id],
+    );
+    if (existingPurchase.length) {
+      await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2) ON CONFLICT(id) DO NOTHING", [eventId, "checkout.session.paid"]);
+      const row = existingPurchase[0];
+      const needsClaim = row.user_id && row.user_status === "INVITED" && row.membership_status === "INVITED";
+      return {
+        fulfilled: false,
+        reason: "purchase_exists" as const,
+        purchaseId: row.id,
+        organizationId: row.organization_id,
+        purchaseNeedsClaim: Boolean(needsClaim),
+      };
     }
 
     const products = await tx.unsafe("SELECT id FROM products WHERE key=$1 AND status='ACTIVE' LIMIT 1", [productKey]);
@@ -43,16 +54,12 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
     let organizationId = checkoutOrganizationId;
 
     if (checkoutOrganizationId || checkoutUserId) {
-      if (!checkoutOrganizationId || !checkoutUserId) {
-        throw new Error("Authenticated BOS purchase has incomplete organization/user metadata.");
-      }
+      if (!checkoutOrganizationId || !checkoutUserId) throw new Error("Authenticated BOS purchase has incomplete organization/user metadata.");
       const checkoutOwner = await tx.unsafe(
         "SELECT 1 FROM users u JOIN memberships m ON m.user_id=u.id JOIN organizations o ON o.id=m.organization_id WHERE u.id=$1 AND lower(u.email)=$2 AND m.organization_id=$3 AND m.status='ACTIVE' AND o.status='ACTIVE' LIMIT 1",
         [checkoutUserId, buyerEmail, checkoutOrganizationId],
       );
-      if (!checkoutOwner.length) {
-        throw new Error("Authenticated BOS purchase metadata does not match an active organization membership.");
-      }
+      if (!checkoutOwner.length) throw new Error("Authenticated BOS purchase metadata does not match an active organization membership.");
     }
 
     if (!organizationId) {
@@ -111,16 +118,12 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
   return fulfillment;
 }
 
-
 export async function failCheckoutSession(session: Stripe.Checkout.Session, eventId: string) {
   const sql = db();
   return sql.begin(async (tx) => {
     const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
     if (seen.length) return { handled: false, reason: "duplicate_event" as const };
-    await tx.unsafe(
-      "UPDATE purchases SET status='FAILED',updated_at=now() WHERE stripe_checkout_session_id=$1 AND status='PENDING'",
-      [session.id],
-    );
+    await tx.unsafe("UPDATE purchases SET status='FAILED',updated_at=now() WHERE stripe_checkout_session_id=$1 AND status='PENDING'", [session.id]);
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "checkout.session.async_payment_failed"]);
     return { handled: true };
   });
@@ -134,6 +137,14 @@ export async function refundCharge(charge: Stripe.Charge, eventId: string) {
   return sql.begin(async (tx) => {
     const seen = await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1", [eventId]);
     if (seen.length) return { handled: false, reason: "duplicate_event" as const };
+
+    // Stripe emits charge.refunded for partial as well as full refunds.
+    // A perpetual BOS license is revoked only when the charge is fully refunded.
+    const fullyRefunded = charge.refunded === true || charge.amount_refunded >= charge.amount;
+    if (!fullyRefunded) {
+      await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "charge.partially_refunded"]);
+      return { handled: true, partial: true, refundedPurchases: 0 };
+    }
 
     const purchases = await tx.unsafe(
       "UPDATE purchases SET status='REFUNDED',updated_at=now() WHERE stripe_payment_intent_id=$1 AND status='PAID' RETURNING id,organization_id,product_id",
@@ -159,15 +170,12 @@ export async function refundCharge(charge: Stripe.Charge, eventId: string) {
     }
 
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "charge.refunded"]);
-    return { handled: true, refundedPurchases: purchases.length };
+    return { handled: true, partial: false, refundedPurchases: purchases.length };
   });
 }
 
 export async function recoverPaidCheckoutSession(session: Stripe.Checkout.Session) {
   if (session.payment_status !== "paid") return { fulfilled: false, reason: "not_paid" as const };
-  const sql = db();
-  const existing = await sql.unsafe("SELECT id,status FROM purchases WHERE stripe_checkout_session_id=$1 LIMIT 1", [session.id]);
-  if (existing.length) return { fulfilled: false, reason: "purchase_exists" as const, purchaseId: existing[0].id };
-  console.info("[commerce.recovery] recovering paid checkout", { sessionId: session.id });
+  console.info("[commerce.recovery] checking paid checkout", { sessionId: session.id });
   return fulfillCheckoutSession(session, `recovery:${session.id}`);
 }
