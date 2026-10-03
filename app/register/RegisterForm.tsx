@@ -23,7 +23,7 @@ function VerificationResend({ email }: { email: string }) {
       </button>
       {state.message ? (
         <p className={state.status === "error" ? "bos-register-error" : undefined} role="status">
-          {state.message}
+          {state.message}{state.status === "success" ? " Jeśli nie widzisz jej w skrzynce odbiorczej, sprawdź również folder Spam lub Oferty." : ""}
         </p>
       ) : null}
     </form>
@@ -39,6 +39,7 @@ export default function RegisterForm() {
       <div className="bos-register-success" role="status">
         <h2>Konto utworzone</h2>
         <p>{state.message}</p>
+        {state.emailSent ? <p><strong>Nie widzisz wiadomości?</strong> Sprawdź również folder Spam lub Oferty.</p> : null}
         {state.email ? <VerificationResend email={state.email} /> : null}
         <Link href="/login">Wróć do logowania →</Link>
       </div>
