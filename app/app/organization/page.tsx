@@ -37,7 +37,7 @@ export default async function OrganizationPage(){
   </section>
 
   <section className="p8-licenses">
-   <div className="p8-title"><div><h2>Licencje produktowe</h2><p>Produkty dostępne dla tej organizacji.</p></div><span>{licenses.length} aktywnych</span></div>{subscriptions.some(s=>s.customerId)&&<p><a href="/api/billing/portal">Zarządzaj subskrypcją i metodą płatności →</a></p>}
+   <div className="p8-title"><div><h2>Licencje produktowe</h2><p>Produkty dostępne dla tej organizacji.</p></div><span>{licenses.length} aktywnych</span></div>{subscriptions.some(s=>s.customerId)&&<div className="p8-billing-action"><div><strong>Rozliczenia i subskrypcje</strong><span>Zarządzaj odnowieniem produktów i metodą płatności w bezpiecznym panelu Stripe.</span></div><a href="/api/billing/portal">Zarządzaj subskrypcją →</a></div>}
    <div className="p8-license-grid">
     {licenses.map(license=><article key={license.licenseId}>
      <div className="top"><span>BOS</span><b>Aktywna</b></div>
