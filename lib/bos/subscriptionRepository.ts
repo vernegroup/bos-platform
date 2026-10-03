@@ -19,10 +19,10 @@ function period(s:any){
     end: unix(ends.length ? Math.max(...ends) : null),
   };
 }
-function slugPart(v:string){return v.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,36)||"firma"}\nfunction cancelsAtPeriodEnd(s:any,p=period(s)){
+function slugPart(v:string){return v.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,36)||"firma"}\nfunction cancelsAtPeriodEnd(s:any,end:Date|null){
   if(s?.cancel_at_period_end===true)return true;
-  if(typeof s?.cancel_at!=="number"||!p.end)return false;
-  return Math.abs(s.cancel_at*1000-p.end.getTime())<1000;
+  if(typeof s?.cancel_at!=="number"||!end)return false;
+  return Math.abs(s.cancel_at*1000-end.getTime())<1000;
 }
 
 
@@ -86,7 +86,7 @@ export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,even
    await tx.unsafe("INSERT INTO memberships(organization_id,user_id,role,status,invited_at) VALUES($1,$2,'OWNER','INVITED',now()) ON CONFLICT(organization_id,user_id) DO UPDATE SET role='OWNER',status='INVITED',updated_at=now()",[organizationId,claimUserId]);
   }
   const purchase=await tx.unsafe("INSERT INTO purchases(organization_id,product_id,offer_id,buyer_email,stripe_checkout_session_id,stripe_payment_intent_id,stripe_customer_id,stripe_subscription_id,amount_total,currency,status,paid_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'PAID',now()) RETURNING id",[organizationId,products[0].id,offers[0].id,buyerEmail,session.id,objectId(session.payment_intent),objectId(session.customer),subscriptionId,session.amount_total,session.currency]);
-  const sub=await tx.unsafe("INSERT INTO subscriptions(organization_id,product_id,offer_id,stripe_subscription_id,stripe_customer_id,status,current_period_start,current_period_end,cancel_at_period_end,latest_invoice_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(organization_id,product_id) DO UPDATE SET offer_id=EXCLUDED.offer_id,stripe_subscription_id=EXCLUDED.stripe_subscription_id,stripe_customer_id=EXCLUDED.stripe_customer_id,status=EXCLUDED.status,current_period_start=EXCLUDED.current_period_start,current_period_end=EXCLUDED.current_period_end,cancel_at_period_end=EXCLUDED.cancel_at_period_end,latest_invoice_id=EXCLUDED.latest_invoice_id,updated_at=now() RETURNING id",[organizationId,products[0].id,offers[0].id,subscriptionId,objectId(subscription.customer),cancelsAtPeriodEnd(subscription,p)?"CANCEL_AT_PERIOD_END":"ACTIVE",p.start,p.end,cancelsAtPeriodEnd(subscription,p),objectId(subscription.latest_invoice)]);
+  const sub=await tx.unsafe("INSERT INTO subscriptions(organization_id,product_id,offer_id,stripe_subscription_id,stripe_customer_id,status,current_period_start,current_period_end,cancel_at_period_end,latest_invoice_id) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(organization_id,product_id) DO UPDATE SET offer_id=EXCLUDED.offer_id,stripe_subscription_id=EXCLUDED.stripe_subscription_id,stripe_customer_id=EXCLUDED.stripe_customer_id,status=EXCLUDED.status,current_period_start=EXCLUDED.current_period_start,current_period_end=EXCLUDED.current_period_end,cancel_at_period_end=EXCLUDED.cancel_at_period_end,latest_invoice_id=EXCLUDED.latest_invoice_id,updated_at=now() RETURNING id",[organizationId,products[0].id,offers[0].id,subscriptionId,objectId(subscription.customer),cancelsAtPeriodEnd(subscription,p.end)?"CANCEL_AT_PERIOD_END":"ACTIVE",p.start,p.end,cancelsAtPeriodEnd(subscription,p.end),objectId(subscription.latest_invoice)]);
   const old=await tx.unsafe("SELECT license_type FROM licenses WHERE organization_id=$1 AND product_id=$2 LIMIT 1",[organizationId,products[0].id]);
   if(!old.length){
    await tx.unsafe("INSERT INTO licenses(organization_id,product_id,status,license_type,source_purchase_id,source_subscription_id,valid_from,valid_until) VALUES($1,$2,'ACTIVE','ANNUAL',$3,$4,$5,$6)",[organizationId,products[0].id,purchase[0].id,sub[0].id,p.start??new Date(),p.end]);
@@ -128,8 +128,8 @@ export async function recordAnnualInvoice(invoice:Stripe.Invoice,eventId:string,
   const seen=await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1",[eventId]);if(seen.length)return {handled:false,reason:"duplicate_event" as const};
   const rows=await tx.unsafe("SELECT id,organization_id,product_id FROM subscriptions WHERE stripe_subscription_id=$1 LIMIT 1",[stripeSubscriptionId]);
   if(!rows.length){await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)",[eventId,paid?"invoice.paid.unbound":"invoice.payment_failed.unbound"]);return {handled:false,reason:"subscription_not_bound" as const}}
-  const s=rows[0],status=paid?(cancelsAtPeriodEnd(subscription,p)?"CANCEL_AT_PERIOD_END":"ACTIVE"):"PAST_DUE";
-  await tx.unsafe("UPDATE subscriptions SET status=$1,current_period_start=$2,current_period_end=$3,cancel_at_period_end=$4,latest_invoice_id=$5,updated_at=now() WHERE id=$6",[status,p.start,p.end,cancelsAtPeriodEnd(subscription,p),invoice.id,s.id]);
+  const s=rows[0],status=paid?(cancelsAtPeriodEnd(subscription,p.end)?"CANCEL_AT_PERIOD_END":"ACTIVE"):"PAST_DUE";
+  await tx.unsafe("UPDATE subscriptions SET status=$1,current_period_start=$2,current_period_end=$3,cancel_at_period_end=$4,latest_invoice_id=$5,updated_at=now() WHERE id=$6",[status,p.start,p.end,cancelsAtPeriodEnd(subscription,p.end),invoice.id,s.id]);
   await tx.unsafe("INSERT INTO subscription_payments(subscription_id,stripe_invoice_id,stripe_payment_intent_id,amount_paid,currency,status,paid_at) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(stripe_invoice_id) DO UPDATE SET stripe_payment_intent_id=EXCLUDED.stripe_payment_intent_id,amount_paid=EXCLUDED.amount_paid,currency=EXCLUDED.currency,status=EXCLUDED.status,paid_at=EXCLUDED.paid_at,updated_at=now()",[s.id,invoice.id,objectId((invoice as any).payment_intent),(invoice as any).amount_paid??null,invoice.currency,paid?"PAID":"FAILED",paid?new Date():null]);
   if(paid&&p.end)await tx.unsafe("UPDATE licenses SET status='ACTIVE',valid_from=COALESCE($1,valid_from),valid_until=$2,revoked_at=NULL,updated_at=now() WHERE organization_id=$3 AND product_id=$4 AND license_type='ANNUAL'",[p.start,p.end,s.organization_id,s.product_id]);
   await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)",[eventId,paid?"invoice.paid":"invoice.payment_failed"]);
@@ -147,8 +147,8 @@ export async function syncAnnualSubscription(subscription:Stripe.Subscription,ev
   let status:string;
   if(deleted||subscription.status==="canceled")status="CANCELED";
   else if(subscription.status==="past_due"||subscription.status==="unpaid")status="PAST_DUE";
-  else status=cancelsAtPeriodEnd(subscription,p)?"CANCEL_AT_PERIOD_END":"ACTIVE";
-  await tx.unsafe("UPDATE subscriptions SET status=$1,current_period_start=$2,current_period_end=$3,cancel_at_period_end=$4,canceled_at=$5,latest_invoice_id=$6,updated_at=now() WHERE id=$7",[status,p.start,p.end,cancelsAtPeriodEnd(subscription,p),status==="CANCELED"?new Date():null,objectId(subscription.latest_invoice),s.id]);
+  else status=cancelsAtPeriodEnd(subscription,p.end)?"CANCEL_AT_PERIOD_END":"ACTIVE";
+  await tx.unsafe("UPDATE subscriptions SET status=$1,current_period_start=$2,current_period_end=$3,cancel_at_period_end=$4,canceled_at=$5,latest_invoice_id=$6,updated_at=now() WHERE id=$7",[status,p.start,p.end,cancelsAtPeriodEnd(subscription,p.end),status==="CANCELED"?new Date():null,objectId(subscription.latest_invoice),s.id]);
   if(status==="CANCELED"&&(!p.end||p.end<=new Date()))await tx.unsafe("UPDATE licenses SET status='REVOKED',revoked_at=COALESCE(revoked_at,now()),updated_at=now() WHERE organization_id=$1 AND product_id=$2 AND license_type='ANNUAL'",[s.organization_id,s.product_id]);
   await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)",[eventId,deleted?"customer.subscription.deleted":"customer.subscription.updated"]);
   return {handled:true,status};
