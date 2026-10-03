@@ -14,7 +14,7 @@ export default function ResendVerificationForm() {
       <label>Adres e-mail
         <input name="email" type="email" autoComplete="email" required disabled={pending} />
       </label>
-      {state.message ? <p className={state.status === "error" ? "bos-register-error" : undefined} role="status">{state.message}</p> : null}
+      {state.message ? <p className={state.status === "error" ? "bos-register-error" : undefined} role="status">{state.message}{state.status === "success" ? " Jeśli nie widzisz wiadomości w skrzynce odbiorczej, sprawdź również folder Spam lub Oferty." : ""}</p> : null}
       <button className="bos-register-submit" type="submit" disabled={pending}>
         {pending ? "Wysyłanie…" : "Wyślij nowy link weryfikacyjny"} {!pending && <span aria-hidden="true">→</span>}
       </button>
