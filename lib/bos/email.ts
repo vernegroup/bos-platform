@@ -19,9 +19,21 @@ type VerificationEmailInput = {
   token: string;
 };
 
+function bosEmailFrom() {
+  const raw = process.env.BOS_EMAIL_FROM?.trim();
+  if (!raw) return null;
+
+  const unquoted = raw.replace(/^["']|["']$/g, "").trim();
+  if (/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(unquoted)) return unquoted;
+  if (/^.+\s<[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+>$/.test(unquoted)) return unquoted;
+
+  const email = unquoted.match(/[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+/)?.[0];
+  return email ? `BOS <${email}>` : null;
+}
+
 export async function sendPurchaseClaimEmail(input: PurchaseClaimEmailInput) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.BOS_EMAIL_FROM;
+  const from = bosEmailFrom();
   if (!apiKey || !from) {
     console.error("[email.claim] configuration missing", {
       hasApiKey: Boolean(apiKey),
@@ -61,7 +73,7 @@ export async function sendPurchaseClaimEmail(input: PurchaseClaimEmailInput) {
 
 export async function sendVerificationEmail(input: VerificationEmailInput) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.BOS_EMAIL_FROM;
+  const from = bosEmailFrom();
 
   if (!apiKey || !from) {
     console.error("[email.verify] configuration missing", {
@@ -122,7 +134,7 @@ export async function sendVerificationEmail(input: VerificationEmailInput) {
 
 export async function sendPasswordResetEmail(input: PasswordResetEmailInput) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.BOS_EMAIL_FROM;
+  const from = bosEmailFrom();
 
   if (!apiKey || !from) {
     console.error("[email.reset] configuration missing", {
