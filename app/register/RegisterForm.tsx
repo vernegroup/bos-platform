@@ -87,7 +87,7 @@ export default function RegisterForm() {
         {pending ? "Tworzenie konta…" : "Utwórz konto firmowe"} {!pending && <span aria-hidden="true">→</span>}
       </button>
 
-      <p className="bos-register-login">Masz już konto? <Link href="/login">Zaloguj się</Link></p>
+      <p className="bos-register-login">Masz już konto? <Link href="/login">Zaloguj się</Link><br />Konto czeka na aktywację? <Link href="/resend-verification">Wyślij ponownie e-mail</Link></p>
     </form>
   );
 }
