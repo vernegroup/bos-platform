@@ -123,9 +123,17 @@ export async function recordAnnualInvoice(invoice:Stripe.Invoice,eventId:string,
   const seen=await tx.unsafe("SELECT 1 FROM stripe_events WHERE id=$1 LIMIT 1",[eventId]);if(seen.length)return {handled:false,reason:"duplicate_event" as const};
   const rows=await tx.unsafe("SELECT id,organization_id,product_id FROM subscriptions WHERE stripe_subscription_id=$1 LIMIT 1",[stripeSubscriptionId]);
   if(!rows.length){await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)",[eventId,paid?"invoice.paid.unbound":"invoice.payment_failed.unbound"]);return {handled:false,reason:"subscription_not_bound" as const}}
-  const s=rows[0],status=paid?(subscription.cancel_at_period_end?"CANCEL_AT_PERIOD_END":"ACTIVE"):"PAST_DUE";
-  await tx.unsafe("UPDATE subscriptions SET status=$1,current_period_start=$2,current_period_end=$3,cancel_at_period_end=$4,latest_invoice_id=$5,updated_at=now() WHERE id=$6",[status,p.start,p.end,subscription.cancel_at_period_end,invoice.id,s.id]);
-  await tx.unsafe("INSERT INTO subscription_payments(subscription_id,stripe_invoice_id,stripe_payment_intent_id,amount_paid,currency,status,paid_at) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(stripe_invoice_id) DO UPDATE SET stripe_payment_intent_id=EXCLUDED.stripe_payment_intent_id,amount_paid=EXCLUDED.amount_paid,currency=EXCLUDED.currency,status=EXCLUDED.status,paid_at=EXCLUDED.paid_at,updated_at=now()",[s.id,invoice.id,objectId((invoice as any).payment_intent),(invoice as any).amount_paid??null,invoice.currency,paid?"PAID":"FAILED",paid?new Date():null]);
+  const s=rows[0];
+  const stripeCancelAt=(subscription as any).cancel_at;
+  const scheduledAtPeriodEnd=subscription.cancel_at_period_end===true||(
+    typeof stripeCancelAt==="number"&&p.end!==null&&Math.abs(stripeCancelAt*1000-p.end.getTime())<1000
+  );
+  let status:string;
+  if(subscription.status==="canceled")status="CANCELED";
+  else if(subscription.status==="past_due"||subscription.status==="unpaid")status="PAST_DUE";
+  else status=scheduledAtPeriodEnd?"CANCEL_AT_PERIOD_END":"ACTIVE";
+  await tx.unsafe("UPDATE subscriptions SET status=$1,current_period_start=$2,current_period_end=$3,cancel_at_period_end=$4,latest_invoice_id=$5,updated_at=now() WHERE id=$6",[status,p.start,p.end,scheduledAtPeriodEnd,invoice.id,s.id]);
+  await tx.unsafe("INSERT INTO subscription_payments(subscription_id,stripe_invoice_id,stripe_payment_intent_id,amount_paid,currency,status,paid_at) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(stripe_invoice_id) DO UPDATE SET stripe_payment_intent_id=COALESCE(EXCLUDED.stripe_payment_intent_id,subscription_payments.stripe_payment_intent_id),amount_paid=CASE WHEN subscription_payments.status='PAID' THEN subscription_payments.amount_paid ELSE EXCLUDED.amount_paid END,currency=EXCLUDED.currency,status=CASE WHEN subscription_payments.status='PAID' THEN 'PAID' ELSE EXCLUDED.status END,paid_at=CASE WHEN subscription_payments.status='PAID' THEN subscription_payments.paid_at ELSE EXCLUDED.paid_at END,updated_at=now()",[s.id,invoice.id,objectId((invoice as any).payment_intent),(invoice as any).amount_paid??null,invoice.currency,paid?"PAID":"FAILED",paid?new Date():null]);
   if(paid&&p.end)await tx.unsafe("UPDATE licenses SET status='ACTIVE',valid_from=COALESCE($1,valid_from),valid_until=$2,revoked_at=NULL,updated_at=now() WHERE organization_id=$3 AND product_id=$4 AND license_type='ANNUAL'",[p.start,p.end,s.organization_id,s.product_id]);
   await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)",[eventId,paid?"invoice.paid":"invoice.payment_failed"]);
   return {handled:true,status};
