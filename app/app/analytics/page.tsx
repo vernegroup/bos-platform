@@ -5,9 +5,18 @@ import { getVisitCounts } from "@/lib/bos/visitCounterRepository";
 
 export const dynamic = "force-dynamic";
 
+function isPlatformOwner(email: string) {
+  const allowedEmails = (process.env.BOS_PLATFORM_OWNER_EMAILS ?? "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  return allowedEmails.includes(email.trim().toLowerCase());
+}
+
 export default async function AnalyticsPage() {
   const access = await requireBOSAccess();
-  if (access.membership.role !== "OWNER") redirect("/app");
+  if (!isPlatformOwner(access.user.email)) redirect("/app");
 
   const visits = await getVisitCounts();
 
@@ -18,7 +27,7 @@ export default async function AnalyticsPage() {
           <h1>Odwiedziny BOS</h1>
           <p>Prosty licznik unikalnych sesji z istniejącej warstwy Analytics.</p>
         </div>
-        <span>Tylko właściciel</span>
+        <span>Tylko właściciel platformy</span>
       </section>
       <section className="va-grid" aria-label="Licznik odwiedzin">
         <article><span>Dzisiaj</span><strong>{visits.today}</strong></article>
