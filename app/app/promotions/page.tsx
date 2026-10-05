@@ -2,7 +2,9 @@ import Link from "next/link";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listPromotionClosures, listPromotionProcesses } from "@/lib/bos/promotionsRepository";
 
-export const dynamic = "force-dynamic";\n\nconst datePL = (value: string) => new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
+export const dynamic = "force-dynamic";
+
+const datePL = (value: string) => new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
 
 export default async function PromotionsEntryPage() {
   const access = await requireBOSAccess();
