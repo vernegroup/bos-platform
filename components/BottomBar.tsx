@@ -15,12 +15,12 @@ export default function BottomBar() {
           <div className="bos-footer-contact">
             <div className="bos-footer-title">KONTAKT</div>
             <div className="bos-footer-row">sop@vp.pl</div>
-            <div className="bos-footer-row">0048 889 322 470</div>
+            <div className="bos-footer-row">+48 889 322 470</div>
           </div>
         </div>
         <div className="bos-footer-legal">
           <div className="bos-footer-links">
-            <a href="/documents/politykaPrywatnosci.pdf" target="_blank" rel="noopener noreferrer">Polityka prywatności</a>
+            <a href="/documents/polityka-Prywatnosci.pdf" target="_blank" rel="noopener noreferrer">Polityka prywatności</a>
             <span>•</span>
             <a href="/documents/regulamin.pdf" target="_blank" rel="noopener noreferrer">Regulamin</a>
             <span>•</span>
