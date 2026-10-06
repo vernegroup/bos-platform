@@ -22,7 +22,7 @@ export default async function OrganizationStandardsPage(){
    <div className="bos-standard-list-head"><span>STANDARD</span><span>OBSZAR</span><span>WERSJA</span><span>CZYNNOŚCI</span><span>AKTUALIZACJA</span><span>STATUS</span><span /></div>
    {standards.map(s=><Link href={`/app/standards/${s.id}`} className="bos-standard-list-row" key={s.id}>
     <strong>{s.name}</strong><span>{s.area||"—"}</span><b>{s.currentVersion||"ROBOCZA"}</b>
-    <span>{String("taskCount" in s?s.taskCount:0)}</span><span>{s.updatedAt||"—"}</span><em data-status={s.status}>{s.status}</em><i>→</i>
+    <span>{String("taskCount" in s?s.taskCount:0)}</span><span>{s.updatedAt||"—"}</span><em data-status={s.status}>{s.status}</em><i className="bos-standard-open-button">OTWÓRZ →</i>
    </Link>)}
    {!standards.length&&<div className="bos-operational-empty"><strong>Brak Standardów organizacji</strong><p>Utwórz pierwszy Standard. Będzie dostępny dla procesów BOS, które korzystają ze Standardów.</p></div>}
   </section>
