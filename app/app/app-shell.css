@@ -4156,3 +4156,33 @@
   .bos-closure-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .bos-closure-check-head,.bos-closure-check-row{grid-template-columns:28px minmax(0,.85fr) minmax(0,1.15fr) minmax(76px,.5fr)!important;gap:10px!important}
 }
+
+
+/* FINAL-AWANSE — Production UAT closure: responsive workspace + effective date control. */
+.bos-role-transition-hero,.bos-promotion-delta-summary,.bos-promotion-gate-strip,.bos-process-card,.bos-promotions-verify-grid,.bos-promotion-date-ledger,.bos-promotion-next{width:100%;max-width:100%;box-sizing:border-box;min-width:0}
+.bos-promotion-assessment-row,.bos-promotion-deployment-row,.bos-promotion-readiness-row,.bos-promotion-transition-row,.bos-promotion-transition-add{max-width:100%;box-sizing:border-box;min-width:0}
+.bos-promotion-assessment-row>*,
+.bos-promotion-deployment-row>*,
+.bos-promotions-verify-grid>*,
+.bos-promotion-readiness-row>*,
+.bos-promotion-transition-row>*{min-width:0}
+.bos-promotion-assessment-form{grid-template-columns:minmax(120px,150px) minmax(0,1fr) minmax(60px,70px)}
+.bos-promotion-assessment-form input,.bos-promotion-assessment-form select,.bos-promotion-verify-form input,.bos-promotion-transition-add input,.bos-promotion-transition-add select,.bos-promotion-readiness-row input,.bos-promotion-transition-row input{max-width:100%;box-sizing:border-box;min-width:0}
+.bos-promotion-effective-date{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
+.bos-promotion-effective-date input{min-width:130px;min-height:32px;border:1px solid #d7d8d5;background:#fff;padding:0 7px;font:inherit;font-size:8px}
+.bos-promotion-effective-date button{min-height:32px;border:1px solid #c9cdd0;background:#fff;color:var(--app-navy);padding:0 9px;font-size:7px;font-weight:700;cursor:pointer}
+@media(max-width:1000px){
+ .bos-promotion-assessment-row{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+ .bos-promotions-verify-grid{grid-template-columns:1fr;gap:24px}
+ .bos-promotion-deployment-row{grid-template-columns:minmax(140px,.6fr) minmax(0,1.4fr)}
+ .bos-promotion-gate-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .bos-promotion-gate-strip>div:nth-child(4){border-right:0}
+}
+@media(max-width:760px){
+ .bos-promotion-assessment-row,.bos-promotion-deployment-row{grid-template-columns:1fr}
+ .bos-promotion-verify-form{grid-column:1}
+ .bos-promotion-gate-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bos-promotion-assessment-form{grid-template-columns:1fr}
+ .bos-promotion-next{flex-direction:column}
+ .bos-promotion-decision-box{min-width:0!important;width:100%}
+}
