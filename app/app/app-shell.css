@@ -4142,3 +4142,17 @@
   .bos-closure-readiness-row{grid-template-columns:24px 1fr}
   .bos-closure-readiness-row b{grid-column:2}
 }
+
+
+/* FINAL-R2 — closure card responsive fit. */
+.bos-app-main,.bos-app-workspace{max-width:100%;overflow-x:hidden}
+.bos-closure-summary{width:100%;box-sizing:border-box;grid-template-columns:minmax(0,1.35fr) repeat(4,minmax(0,.75fr))!important}
+.bos-closure-summary>div{min-width:0}
+.bos-closure-summary a,.bos-closure-summary strong{display:block;min-width:0;max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
+.bos-closure-result,.bos-closure-checks,.bos-closure-readiness,.bos-closure-recommendation,.bos-closure-record{width:100%;max-width:100%;box-sizing:border-box}
+.bos-closure-check-head,.bos-closure-check-row{width:100%;box-sizing:border-box;grid-template-columns:32px minmax(0,.9fr) minmax(0,1.15fr) minmax(82px,.45fr)!important}
+.bos-closure-check-row strong,.bos-closure-check-row p,.bos-closure-check-row b{min-width:0;max-width:100%;overflow-wrap:anywhere}
+@media(max-width:850px){
+  .bos-closure-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .bos-closure-check-head,.bos-closure-check-row{grid-template-columns:28px minmax(0,.85fr) minmax(0,1.15fr) minmax(76px,.5fr)!important;gap:10px!important}
+}
