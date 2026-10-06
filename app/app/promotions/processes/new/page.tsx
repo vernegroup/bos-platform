@@ -10,12 +10,15 @@ async function startPromotion(fd:FormData){
   "use server";
   const access=await requireBOSAccess();
   const [standardId,standardVersionId]=text(fd,"standardVersion").split(":");
+  const fromRole=text(fd,"fromRole");
+  const toRole=text(fd,"toRole");
+  if(fromRole.localeCompare(toRole,"pl",{sensitivity:"base"})===0){redirect("/app/promotions/processes/new?error=roles");}
   const processId=await createPromotionProcess(access,{
     productId:text(fd,"productId"),
     employeeId:text(fd,"employeeId"),
     standardId,standardVersionId,
-    fromRole:text(fd,"fromRole"),
-    toRole:text(fd,"toRole"),
+    fromRole,
+    toRole,
     changeType:text(fd,"changeType") as "PROMOTION"|"LATERAL_MOVE",
     ownerUserId:text(fd,"ownerUserId"),
     startedOn:text(fd,"startedOn"),
@@ -25,10 +28,10 @@ async function startPromotion(fd:FormData){
   redirect(`/app/promotions/processes/${processId}`);
 }
 
-export default async function NewPromotionProcessPage({searchParams}:{searchParams:Promise<{standardId?:string}>}){
+export default async function NewPromotionProcessPage({searchParams}:{searchParams:Promise<{standardId?:string;error?:string}>}){
   const access=await requireBOSAccess();
   const options=await listPromotionStartOptions(access);
-  const {standardId:selectedStandardId}=await searchParams;
+  const {standardId:selectedStandardId,error}=await searchParams;
   const product=options.products.find(p=>p.key.toLowerCase().includes("promotion"))??options.products.find(p=>p.name.toLowerCase().includes("awans"));
   const today=new Date().toISOString().slice(0,10);
   const selectedStandard=selectedStandardId?options.standards.find(s=>s.standardId===selectedStandardId):undefined;
@@ -48,7 +51,7 @@ export default async function NewPromotionProcessPage({searchParams}:{searchPara
       {!canStart?<div className="bos-operational-empty"><strong>Nie można utworzyć procesu</strong>
         <p>Potrzebujesz aktywnego pracownika, opublikowanego Standardu roli B, aktywnego członka BOS oraz licencji Awanse.</p>
         {!options.standards.length&&<div style={{marginTop:14}}><Link href="/app/standards/new?returnTo=promotions" className="bos-standard-primary-action">+ UTWÓRZ STANDARD ROLI B</Link></div>}</div>:
-      <form action={startPromotion} style={{display:"grid",gap:18}}>
+      <form action={startPromotion} style={{display:"grid",gap:18}}>{error==="roles"&&<div className="bos-onboarding-rule-note"><span>NIE MOŻNA UTWORZYĆ ZMIANY</span><p>Rola A i rola B muszą być różne.</p></div>}
         <input type="hidden" name="productId" value={product!.id}/>
 
         <div className="bos-process-new-field"><span>01 / PRACOWNIK</span><strong>Pracownik</strong>
