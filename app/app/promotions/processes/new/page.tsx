@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { createPromotionProcess, listPromotionStartOptions } from "@/lib/bos/promotionsRepository";
 
