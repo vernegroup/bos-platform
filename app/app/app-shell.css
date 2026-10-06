@@ -3935,7 +3935,7 @@
   padding:0!important;
   border:0!important;
   display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,170px))!important;
+  grid-template-columns:repeat(3,minmax(140px,170px))!important;
   gap:10px!important;
   background:transparent!important;
 }
