@@ -4012,3 +4012,80 @@
   .bos-app-product-rail-item{min-height:36px;padding:0 11px!important;font-size:9px!important}
   .bos-onboarding-commandbar{grid-template-columns:repeat(3,minmax(112px,1fr))!important;overflow-x:auto!important;padding-bottom:3px!important}
 }
+
+
+/* UI-FINAL-02 — product workspaces and Updates use the same app-control language. */
+.bos-onboarding-intro,.bos-promotions-intro,.bos-core-view-head{
+  padding:22px 24px!important;
+  border:1px solid #ded9cf!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  box-shadow:0 6px 20px rgba(13,31,49,.045);
+}
+.bos-onboarding-flow{
+  gap:10px!important;
+}
+.bos-onboarding-flow-step{
+  min-height:62px!important;
+  padding:10px 14px!important;
+  border:1px solid #ddd8ce!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-shadow:0 4px 14px rgba(13,31,49,.04);
+}
+.bos-promotions-commandbar,.bos-core-commandbar{
+  gap:10px!important;
+  border:0!important;
+  background:transparent!important;
+}
+.bos-promotions-commandbar>div,.bos-core-commandbar>div{
+  min-height:64px!important;
+  padding:12px 15px!important;
+  border:1px solid #ddd8ce!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-shadow:0 4px 14px rgba(13,31,49,.045);
+}
+.bos-promotions-identity-path>div,
+.bos-onboarding-stage-row,
+.bos-promotions-preview-list>a,
+.bos-onboarding-table-row,
+.bos-onboarding-process-row{
+  border-radius:10px!important;
+}
+.bos-promotions-preview-list>a,
+.bos-onboarding-table-row,
+.bos-onboarding-process-row{
+  border:1px solid #e0dcd3!important;
+  background:#fff!important;
+  box-shadow:0 3px 12px rgba(13,31,49,.035);
+}
+.bos-platform-release-notes{margin-top:28px}
+.bos-platform-release-list{display:grid;gap:8px;margin-top:14px}
+.bos-platform-release-list>article{
+  min-height:68px;
+  padding:12px 14px;
+  display:grid;
+  grid-template-columns:92px 82px minmax(0,1fr);
+  align-items:center;
+  gap:14px;
+  border:1px solid #e0dcd3;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 3px 12px rgba(13,31,49,.035);
+}
+.bos-platform-release-list time{font-size:9px;color:#697480}
+.bos-platform-release-list b{font-size:8px;letter-spacing:.08em;color:#765725}
+.bos-platform-release-list strong{font-size:12px}
+.bos-platform-release-list p{margin:4px 0 0;font-size:10px;line-height:1.5;color:#697480}
+.bos-core-version-strip>article,.bos-core-update-history>article{
+  border-radius:10px!important;
+  background:#fff!important;
+}
+@media(max-width:600px){
+  .bos-onboarding-intro,.bos-promotions-intro,.bos-core-view-head{padding:18px!important}
+  .bos-platform-release-list>article{grid-template-columns:76px 1fr;gap:8px 10px}
+  .bos-platform-release-list>article>div{grid-column:1 / -1}
+  .bos-promotions-commandbar,.bos-core-commandbar{overflow-x:auto!important}
+  .bos-promotions-commandbar>div,.bos-core-commandbar>div{min-width:118px}
+}
