@@ -27,7 +27,7 @@ export default async function PromotionClosurePage({params}:{params:Promise<{id:
   </div><div><span>REZULTAT</span><strong>{result}</strong></div></section>
   <section className="bos-process-new" style={{display:"grid",gap:12}}>
    <span className="bos-dashboard-section-kicker">BRAMKI DECYZJI / STAN Z CHWILI ZAMKNIĘCIA</span>
-   <div className="bos-promotions-commandbar">
+   <div className="bos-promotions-commandbar bos-promotion-closure-gates">
     {Object.entries({STANDARD:closure.gateSnapshot.standard,PROCES:closure.gateSnapshot.process,"OCENA WEJŚCIOWA":closure.gateSnapshot.entry,WDROŻENIE:closure.gateSnapshot.deployment,K:closure.gateSnapshot.k,GOTOWOŚĆ:closure.gateSnapshot.readiness,PRZEJŚCIE:closure.gateSnapshot.transition}).map(([gate,passed])=><div key={gate}><span>{gate}</span><strong>{passed?"SPEŁNIONA":"—"}</strong></div>)}
    </div>
    <p>To stan siedmiu bramek zapisany w chwili decyzji. Późniejsze zmiany Standardu lub innych procesów nie zmieniają tego rekordu.</p>

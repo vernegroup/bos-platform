@@ -4186,3 +4186,34 @@
  .bos-promotion-next{flex-direction:column}
  .bos-promotion-decision-box{min-width:0!important;width:100%}
 }
+
+
+/* FINAL-R2 AWANSE — closure gate snapshot must fit the available workspace. */
+.bos-promotion-closure-gates{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch;
+  overflow:visible;
+}
+.bos-promotion-closure-gates>div{
+  min-width:0;
+  width:auto;
+  padding:12px 10px;
+  box-sizing:border-box;
+  overflow-wrap:anywhere;
+}
+.bos-promotion-closure-gates>div+div{padding-left:10px}
+.bos-promotion-closure-gates span,
+.bos-promotion-closure-gates strong{min-width:0;max-width:100%;overflow-wrap:anywhere}
+@media(max-width:850px){
+ .bos-promotion-closure-gates{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bos-promotion-closure-gates>div{border-bottom:1px solid var(--bos-border)}
+ .bos-promotion-closure-gates>div:nth-child(2n){border-right:0}
+}
+@media(max-width:480px){
+ .bos-promotion-closure-gates{grid-template-columns:1fr}
+ .bos-promotion-closure-gates>div{border-right:0}
+}
