@@ -208,6 +208,17 @@ export async function createPromotionProcess(access:BOSAccess,input:{
 }
 
 
+export async function updatePromotionEffectiveOn(access:BOSAccess,input:{processId:string;effectiveOn:string}){
+ const org=access.organization.id;
+ if(!input.effectiveOn) throw new Error("Data wejścia w rolę B jest wymagana.");
+ const rows=await db().unsafe(
+  "UPDATE promotion_processes SET effective_on=$1,updated_at=now() WHERE id=$2 AND organization_id=$3 AND bos_promotion_lifecycle_state(id) NOT IN ('CLOSED','STOPPED') RETURNING id",
+  [input.effectiveOn,input.processId,org]
+ );
+ if(!rows[0]) throw new Error("Nie znaleziono aktywnego procesu w tej organizacji.");
+ return rows[0].id as string;
+}
+
 export async function savePromotionAssessment(access:BOSAccess,input:{
  processId:string;processTaskId:string;assessment:"CONFIRMED"|"TO_VERIFY"|"TO_DEPLOY";evidenceNote?:string;
 }){
