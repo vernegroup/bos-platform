@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireBOSAccess } from "@/lib/bos/access";
-import { addPromotionTransitionItem, advancePromotionDeployment, confirmPromotionTransitionItem, finalizePromotionDecision, getPromotionProcess, savePromotionAssessment, savePromotionReadiness, verifyPromotionAssessment } from "@/lib/bos/promotionsRepository";
+import { addPromotionTransitionItem, advancePromotionDeployment, confirmPromotionTransitionItem, finalizePromotionDecision, getPromotionProcess, savePromotionAssessment, savePromotionReadiness, updatePromotionEffectiveOn, verifyPromotionAssessment } from "@/lib/bos/promotionsRepository";
 
 export const dynamic="force-dynamic";
 const text=(fd:FormData,key:string)=>String(fd.get(key)??"").trim();
@@ -44,6 +44,7 @@ async function saveReadiness(fd:FormData){"use server";const access=await requir
 async function addTransition(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");await addPromotionTransitionItem(access,{processId,item:text(fd,"item"),disposition:text(fd,"disposition") as "TRANSFER"|"RETAIN"|"CHANGE"|"NOT_APPLICABLE"});revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
 async function confirmTransition(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");await confirmPromotionTransitionItem(access,{processId,itemId:text(fd,"itemId"),confirmation:text(fd,"confirmation") as "DONE"|"NOT_DONE",note:text(fd,"note")||undefined});revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
 async function decide(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");const decision=text(fd,"decision") as "READY"|"NOT_YET"|"STOP";const result=await finalizePromotionDecision(access,{processId,decision,note:text(fd,"note")||undefined});if(result.closureId){redirect(`/app/promotions/closed/${result.closureId}`);}revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
+async function saveEffectiveOn(fd:FormData){"use server";const access=await requireBOSAccess();const processId=text(fd,"processId");await updatePromotionEffectiveOn(access,{processId,effectiveOn:text(fd,"effectiveOn")});revalidatePath(`/app/promotions/processes/${processId}`);redirect(`/app/promotions/processes/${processId}`);}
 
 
 export default async function PromotionProcessPage({params}:{params:Promise<{id:string}>}){
@@ -97,7 +98,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
       <input name="evidenceNote" defaultValue={t.evidenceNote??""} placeholder="Dowód / kontekst: proces, obserwacja, dokument…" disabled={Boolean(t.verificationResult)}/>
       {!t.verificationResult&&<button type="submit">ZAPISZ</button>}
      </form>
-     {(t.evidenceNote||t.verificationResult)&&<div className="bos-promotion-evidence-record"><span>EVIDENCE / CONTEXT</span>{t.evidenceNote&&<p>{t.evidenceNote}</p>}{t.verificationResult&&<small>SPRAWDŹ: <b>{t.verificationResult}</b>{t.verificationNote?` · ${t.verificationNote}`:""}{t.verificationAt?` · ${t.verificationAt}`:""}</small>}</div>}
+     {(t.evidenceNote||t.verificationResult)&&<div className="bos-promotion-evidence-record"><span>DOWÓD / KONTEKST</span>{t.evidenceNote&&<p>{t.evidenceNote}</p>}{t.verificationResult&&<small>WERYFIKACJA: <b>{t.verificationResult==="PASS"?"SPEŁNIONE":"NIESPEŁNIONE"}</b>{t.verificationNote?` · ${t.verificationNote}`:""}{t.verificationAt?` · ${t.verificationAt}`:""}</small>}</div>}
     </div>
     {t.initialAssessment==="TO_VERIFY"&&!t.verificationResult&&<form action={verifyAssessment} className="bos-promotion-verify-form"><input type="hidden" name="processId" value={p.id}/><input type="hidden" name="assessmentId" value={t.assessmentId}/><input name="verificationNote" placeholder="Co sprawdzono i na jakiej podstawie?"/><button name="result" value="PASS">SPEŁNIONE</button><button name="result" value="FAIL">NIESPEŁNIONE</button></form>}
    </article>)}
@@ -131,7 +132,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   <section className="bos-promotion-date-ledger" aria-label="Daty procesu">
    <div><span>START PROCESU</span><strong>{p.startedOn||"—"}</strong><small>początek pracy nad zmianą</small></div>
    <div><span>DECYZJA</span><strong>{p.latestDecisionAt||"—"}</strong><small>data ostatniej decyzji</small></div>
-   <div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong><small>rzeczywista data objęcia roli</small></div>
+   <div><span>WEJŚCIE W ROLĘ B</span><strong>{p.effectiveOn||"—"}</strong><small>rzeczywista data objęcia roli</small><form action={saveEffectiveOn} className="bos-promotion-effective-date"><input type="hidden" name="processId" value={p.id}/><input type="date" name="effectiveOn" required/><button type="submit">{p.effectiveOn?"ZMIEN DATĘ":"UZUPEŁNIJ DATĘ"}</button></form></div>
   </section>
 
   <section className="bos-process-next bos-promotion-next" id="decision">
