@@ -6,9 +6,13 @@ const datePL = (value: string) => new Intl.DateTimeFormat("pl-PL", { year: "nume
 const productLabel = (key: string) => ({ onboarding: "WDROŻENIA", promotions: "AWANSE" }[key.toLowerCase()] ?? key);
 
 const platformUpdates = [
-  { date: "06.10.2026", version: "RELEASE", title: "Commerce 2", description: "Uruchomiono produkcyjną warstwę zakupu, licencji i obsługi subskrypcji BOS." },
-  { date: "06.10.2026", version: "SECURITY", title: "Płatności i webhook", description: "Domknięto produkcyjną konfigurację Stripe oraz weryfikację zdarzeń webhook." },
-  { date: "06.10.2026", version: "ACCESS", title: "Logowanie", description: "Zweryfikowano produkcyjne logowanie kontem Google oraz obsługę dostępu do aplikacji." },
+  { date: "06.10.2026", version: "AWANSE 1.0", title: "Proces zmiany roli", description: "Domknięto pełną ścieżkę prowadzenia zmiany roli od rozpoczęcia procesu do decyzji i historii." },
+  { date: "06.10.2026", version: "AWANSE 1.0", title: "Data rozpoczęcia nowej roli", description: "Usprawniono obsługę i zachowanie daty wejścia pracownika w nową rolę." },
+  { date: "06.10.2026", version: "AWANSE 1.0", title: "Kontrola wyboru ról", description: "Doprecyzowano komunikat przy próbie wskazania tej samej roli jako obecnej i docelowej." },
+  { date: "06.10.2026", version: "AWANSE 1.0", title: "Karta zamknięcia", description: "Poprawiono prezentację podsumowania zakończonego procesu i stanu jego bramek." },
+  { date: "06.10.2026", version: "AWANSE 1.0", title: "Komunikaty procesu", description: "Ujednolicono polskie nazwy dowodów, kontekstu i wyników weryfikacji." },
+  { date: "06.10.2026", version: "PLATFORMA", title: "Zakup i dostęp", description: "Dopracowano produkcyjną obsługę zakupu, licencji i dostępu do produktów BOS." },
+  { date: "06.10.2026", version: "PLATFORMA", title: "Dostęp do konta", description: "Zweryfikowano produkcyjną obsługę logowania i dostępu do aplikacji." },
 ] as const;
 
 export default async function UpdatesPage() {
