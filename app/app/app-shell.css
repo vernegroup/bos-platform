@@ -3749,3 +3749,138 @@
 .bos-product-status.is-unlicensed{background:#f2efe8;color:#88734e}
 .bos-product-card>.bos-product-more{width:100%;height:36px;margin:0;border:1px solid #b78a3e;border-radius:3px;background:transparent;color:#8b682e;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-size:9px;font-weight:700;letter-spacing:.025em;cursor:pointer}
 .bos-product-card>.bos-product-more:hover{background:#b78a3e;color:#fff}
+
+
+/* ===========================================================
+   UI APP POLISH — presentation only, mechanics frozen
+   Mobile-container friendly visual layer.
+   =========================================================== */
+.bos-app-shell{
+  --app-radius:12px;
+  --app-radius-sm:9px;
+  --app-shadow:0 10px 28px rgba(13,31,49,.07);
+  --app-shadow-hover:0 14px 34px rgba(13,31,49,.11);
+}
+.bos-app-main{background:linear-gradient(145deg,#fbfaf7 0%,#f3f1eb 58%,#f7f5f0 100%)}
+.bos-app-sidebar{box-shadow:10px 0 32px rgba(8,22,34,.12)}
+.bos-app-nav-link{min-height:44px;border-radius:10px;padding:0 12px}
+.bos-app-nav-link.is-active{background:rgba(255,255,255,.10);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.bos-app-topbar{height:64px;box-shadow:0 5px 20px rgba(13,31,49,.045)}
+.bos-app-menu-button,.bos-app-notifications,.bos-app-account-trigger{min-width:44px;min-height:44px}
+.bos-app-menu-button{border-radius:10px}
+.bos-app-menu-button:hover,.bos-app-menu-button:focus-visible{background:#f3f1eb}
+.bos-app-search{height:40px;border-radius:10px;background:#f2f3f2}
+.bos-app-account-mark{width:38px;height:38px;box-shadow:0 4px 12px rgba(13,31,49,.12)}
+.bos-app-account-dropdown{border-radius:12px;box-shadow:0 18px 48px rgba(13,31,49,.16)}
+.bos-app-account-dropdown>a{min-height:42px;display:flex;align-items:center;border-radius:8px}
+.bos-app-workspace{padding-top:34px}
+
+/* Make existing text actions read as touch-friendly application controls. */
+.bos-app-workspace :where(a[class*="open"],a[class*="action"],a[class*="link"],button):not(.bos-app-account-trigger):not(.bos-app-menu-button):not(.bos-app-sidebar-close):not(.bos-app-scrim){
+  border-radius:9px;
+}
+.bos-dashboard-open,.bos-onboarding-stage-open{
+  min-height:40px;
+  border-color:#d9d6ce;
+  background:#fff;
+  box-shadow:0 4px 12px rgba(13,31,49,.045);
+}
+.bos-dashboard-open:hover,.bos-dashboard-open:focus-visible,
+.bos-onboarding-stage-open:hover,.bos-onboarding-stage-open:focus-visible{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(13,31,49,.08);
+}
+
+/* Dashboard: cards instead of flat web rows. */
+.bos-home-kpis article,.bos-product-card,.p8-summary article,.p8-license-grid>article,
+.bos-help-grid,.bos-home-product{
+  border-radius:var(--app-radius)!important;
+  box-shadow:var(--app-shadow);
+}
+.bos-home-kpis article,.p8-summary article,.p8-license-grid>article,.bos-product-card{
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+}
+.bos-home-kpis article:hover,.p8-summary article:hover,.p8-license-grid>article:hover,.bos-product-card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--app-shadow-hover);
+}
+.bos-home-product{overflow:hidden}
+.bos-home-product>a,
+.bos-product-card>a,
+.p8-license-grid a,
+.p8-billing-action>a,
+.bos-help-grid a{
+  min-height:42px;
+  padding:0 14px;
+  border:1px solid #d8d2c7;
+  border-radius:9px!important;
+  background:#fff;
+  color:#765725;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  text-decoration:none;
+  font-weight:700;
+  box-sizing:border-box;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+}
+.bos-home-product>a:hover,.bos-home-product>a:focus-visible,
+.bos-product-card>a:hover,.bos-product-card>a:focus-visible,
+.p8-license-grid a:hover,.p8-license-grid a:focus-visible,
+.p8-billing-action>a:hover,.p8-billing-action>a:focus-visible,
+.bos-help-grid a:hover,.bos-help-grid a:focus-visible{
+  background:#faf7f0;
+  box-shadow:0 6px 16px rgba(13,31,49,.08);
+  transform:translateY(-1px);
+}
+.p8-license-grid a{background:#b78a3e;color:#fff;border-color:#b78a3e}
+.p8-license-grid a:hover,.p8-license-grid a:focus-visible{background:#a77b31;color:#fff}
+
+/* Secondary navigation actions become compact buttons without changing hrefs. */
+.bos-home-section-head>a,.bos-onboarding-text-link,.bos-help-back a{
+  min-height:38px;
+  padding:0 12px;
+  border:1px solid #ddd8ce;
+  border-radius:9px;
+  background:rgba(255,255,255,.72);
+  display:inline-flex;
+  align-items:center;
+  text-decoration:none;
+  box-shadow:0 3px 10px rgba(13,31,49,.035);
+}
+
+/* App-like surfaces. */
+.bos-dashboard-side,.bos-route-placeholder,.bos-route-products,
+.bos-onboarding-stage-list,.bos-onboarding-table,.bos-onboarding-process-list{
+  border-radius:var(--app-radius);
+}
+.p8-company>dl,.p8-billing-action,.p8-note,.bos-help-contact{
+  border-radius:var(--app-radius)!important;
+  box-shadow:0 7px 22px rgba(13,31,49,.05);
+}
+.bos-product-status,.p8-head>span,.p8-license-grid .top>b{
+  box-shadow:inset 0 0 0 1px rgba(63,118,80,.08);
+}
+
+/* Touch and future mobile-container ergonomics. */
+@media (max-width:800px){
+  .bos-app-topbar{height:60px;padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+  .bos-app-sidebar{padding-left:max(13px,env(safe-area-inset-left));padding-bottom:max(16px,env(safe-area-inset-bottom))}
+  .bos-app-workspace{padding-bottom:max(72px,calc(48px + env(safe-area-inset-bottom)))}
+  .bos-app-nav-link{min-height:48px}
+  .bos-app-search{height:44px}
+}
+@media (max-width:520px){
+  .bos-app-workspace{width:calc(100% - 20px);padding-top:18px}
+  .bos-home-kpis,.p8-summary{gap:10px}
+  .bos-home-kpis article,.p8-summary article{min-height:84px;padding:15px}
+  .bos-home-section-head{align-items:center;gap:10px}
+  .bos-home-section-head>a{min-height:40px}
+  .bos-home-product,.bos-product-card,.p8-license-grid>article{border-radius:14px!important}
+}
+
+/* Motion remains cosmetic and respects OS accessibility preferences. */
+@media (prefers-reduced-motion:reduce){
+  .bos-app-shell *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}
+}

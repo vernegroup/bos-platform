@@ -4,6 +4,8 @@ import { listPromotionClosures, listPromotionProcesses } from "@/lib/bos/promoti
 
 export const dynamic = "force-dynamic";
 
+const datePL = (value: string) => new Intl.DateTimeFormat("pl-PL", { day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(value));
+
 export default async function PromotionsEntryPage() {
   const access = await requireBOSAccess();
   const [active, closed] = await Promise.all([
@@ -74,7 +76,7 @@ export default async function PromotionsEntryPage() {
           <div className="bos-promotions-preview-list bos-promotions-preview-history">
             {closed.slice(0, 5).map((closure) => (
               <Link href={`/app/promotions/closed/${closure.id}`} key={closure.id}>
-                <time>{closure.closedAt}</time>
+                <time dateTime={closure.closedAt}>{datePL(closure.closedAt)}</time>
                 <div><strong>{closure.employee}</strong><span>{closure.fromRole} → {closure.toRole}</span></div>
                 <b>{closure.result === "READY" ? "GOTOWY" : "STOP"}</b>
               </Link>

@@ -28,12 +28,12 @@ export default async function ProductsPage(){
           <div className="bos-product-card-top"><div className="bos-product-brand">BOS</div><span className={"bos-product-status"+(license?"":" is-unlicensed")}><i aria-hidden="true"/>{license?"Aktywny":"Bez licencji"}</span></div>
           <div className="bos-product-card-body"><h2>{product.displayName}</h2><strong>{meta.description}</strong><p>{meta.detail}</p></div>
           <dl className="bos-product-meta">
-            <div><dt>Licencja</dt><dd>{license?"Dożywotnia":"Nieaktywna"}</dd></div>
+            <div><dt>Licencja</dt><dd>{license?(license.licenseType==="ANNUAL"?"Roczna":"Dożywotnia"):"Nieaktywna"}</dd></div>
             <div><dt>Wersja</dt><dd>{license?.currentVersion??"—"}</dd></div>
           </dl>
           {license
             ? <Link href={meta.href}>Otwórz produkt <span aria-hidden="true">→</span></Link>
-            : <ProductDetailsModal product={product.id}/>}
+            : <ProductDetailsModal product={product.id} requireAccess/>}
         </article>;
       })}
     </section>

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
 import AppShell from "@/components/app-shell/AppShell";
+import SessionIdleGuard from "@/components/app-shell/SessionIdleGuard";
 import { requireBOSAccess } from "@/lib/bos/access";
 import "./app-shell.css";
+import "./product-modal.css";
 import "../public-products.css";
 import { listProductEntitlements } from "@/lib/bos/licenseRepository";
 
@@ -22,8 +24,11 @@ export default async function BOSAppLayout({ children }: { children: React.React
   };
 
   return (
-    <AppShell account={account} organizationName={access.organization.name} productEntitlements={productEntitlements}>
+    <>
+      <SessionIdleGuard />
+      <AppShell account={account} organizationName={access.organization.name} productEntitlements={productEntitlements}>
       {children}
-    </AppShell>
+      </AppShell>
+    </>
   );
 }

@@ -42,7 +42,7 @@ export const bosProducts: readonly BOSProduct[] = [
     id: "onboarding",
     index: "01",
     displayName: "WDROŻENIA",
-    name: "BOS Onboarding",
+    name: "BOS Wdrożenia",
     eyebrow: "SYSTEM WDRAŻANIA NOWYCH PRACOWNIKÓW",
     title: "Gotowe rozwiązanie",
     subtitle: "konkretne, praktyczne i pozostające w organizacji na stałe.",
@@ -55,7 +55,7 @@ export const bosProducts: readonly BOSProduct[] = [
     },
     video: {
       src: "/videos/onboarding-test.mp4",
-      label: "BOS Onboarding",
+      label: "BOS Wdrożenia",
     },
     sales: {
       kicker: "BOS WDROŻENIA",
@@ -81,7 +81,7 @@ export const bosProducts: readonly BOSProduct[] = [
       label: "STANDARD OPERACYJNY",
       title: "Kup BOS Wdrożenia",
       description:
-        "Dożywotnia licencja na moduł BOS Wdrożenia w aplikacji webowej wraz z aktualizacjami.",
+        "Roczna licencja na moduł BOS Wdrożenia w aplikacji webowej wraz z aktualizacjami.",
       checkoutEndpoint: "/api/checkout",
       ariaLabel: "Kup BOS Wdrożenia",
     },
@@ -90,19 +90,19 @@ export const bosProducts: readonly BOSProduct[] = [
     id: "promotions",
     index: "02",
     displayName: "AWANSE",
-    name: "BOS Promotions",
+    name: "BOS Awanse",
     eyebrow: "SYSTEM AWANSÓW WEWNĘTRZNYCH",
     title: "Rozwijaj ludzi. Zachowuj standard.",
     description:
-      "BOS Promotions porządkuje proces awansów wewnętrznych, przekazywania nowych obowiązków oraz przygotowania pracowników do kolejnych ról w organizacji.",
+      "BOS Awanse porządkuje proces awansów wewnętrznych, przekazywania nowych obowiązków oraz przygotowania pracowników do kolejnych ról w organizacji.",
     reference: "STRUKTURA · ROZWÓJ · POWTARZALNOŚĆ",
     image: {
       src: "/images/promotions-hero.png",
-      alt: "BOS Promotions",
+      alt: "BOS Awanse",
     },
     video: {
       src: "/videos/onboarding-02.mp4",
-      label: "BOS Promotions",
+      label: "BOS Awanse",
     },
     sales: {
       kicker: "BOS AWANSE",
@@ -128,7 +128,7 @@ export const bosProducts: readonly BOSProduct[] = [
       label: "STANDARD OPERACYJNY",
       title: "Kup BOS Awanse",
       description:
-        "Dożywotnia licencja na moduł BOS Awanse w aplikacji webowej wraz z aktualizacjami.",
+        "Roczna licencja na moduł BOS Awanse w aplikacji webowej wraz z aktualizacjami.",
       checkoutEndpoint: "/api/checkout-promotions",
       ariaLabel: "Kup BOS Awanse",
     },
@@ -136,7 +136,7 @@ export const bosProducts: readonly BOSProduct[] = [
 ];
 
 export const plannedBosProducts = [
-  { id: "pricing", displayName: "WYCENA" },
+  { id: "pricing", displayName: "CENY" },
 ] as const;
 
 export function getBOSProduct(productId: BOSProductKey): BOSProduct {

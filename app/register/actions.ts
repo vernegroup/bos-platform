@@ -1,7 +1,7 @@
 "use server";
 
 import { registerCompanyAccount } from "@/lib/bos/registrationRepository";
-import { sendVerificationEmail } from "@/lib/bos/email";
+import { sendNewRegistrationNotification, sendVerificationEmail } from "@/lib/bos/email";
 import { findUserForEmailVerification, issueAuthToken } from "@/lib/bos/authRepository";
 
 export type RegisterState = {
@@ -58,6 +58,17 @@ export async function registerCompanyAction(
       };
     }
     return { status: "error", message: "Nie udało się utworzyć konta." };
+  }
+
+  try {
+    await sendNewRegistrationNotification({
+      userEmail: email,
+      companyName,
+    });
+  } catch (error) {
+    console.error("[register] owner notification failed", {
+      error: error instanceof Error ? error.message : "UNKNOWN_EMAIL_ERROR",
+    });
   }
 
   try {
