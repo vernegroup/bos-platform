@@ -4089,3 +4089,27 @@
   .bos-promotions-commandbar,.bos-core-commandbar{overflow-x:auto!important}
   .bos-promotions-commandbar>div,.bos-core-commandbar>div{min-width:118px}
 }
+
+
+/* UI-FINAL-03 — screenshot pass: consistent control breathing room and one navy shell.
+   Presentation only. */
+.bos-app-sidebar{background:#111920!important}
+.bos-onboarding-text-link,
+.bos-onboarding-stage-open,
+.bos-standard-open-button{
+  padding-left:16px!important;
+  padding-right:16px!important;
+}
+.bos-onboarding-table-row,
+.bos-onboarding-process-row{
+  padding-left:16px!important;
+  padding-right:16px!important;
+}
+.bos-onboarding-table-row>*,.bos-onboarding-process-row>*{min-width:0}
+@media(max-width:680px){
+  .bos-onboarding-table-row,
+  .bos-onboarding-process-row{
+    padding-left:14px!important;
+    padding-right:14px!important;
+  }
+}
