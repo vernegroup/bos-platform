@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getClosure, getStandard, reopenProcess } from "@/lib/bos/onboardingRepository";
+import { getClosure, getClosureOutcome, getStandard, reopenProcess } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
 async function reopen(formData:FormData) {
@@ -13,7 +13,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
   const { closureId } = await params;
   const closure = await getClosure(closureId, access.organization.id);
   if (!closure) notFound();
-  const standard = await getStandard(closure.standardId, access.organization.id);
+  const [standard, outcome] = await Promise.all([getStandard(closure.standardId, access.organization.id), getClosureOutcome(closureId, access.organization.id)]);
   const version = standard?.versions.find((item) => item.version === closure.standardVersion);
   if (!standard || !version) notFound();
   const progress = closure.totalTasks ? Math.round((closure.completedTasks / closure.totalTasks) * 100) : 0;
@@ -31,7 +31,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-closure-summary">
-        <div><span>STANDARD</span><Link href={`/app/standards/${standard.id}?version=${encodeURIComponent(closure.standardVersion)}&returnTo=onboarding`}>{standard.name} {closure.standardVersion} ↗</Link></div>
+        <div><span>STANDARD</span><Link href={`/app/standards/${standard.id}?version=${encodeURIComponent(closure.standardVersion)}`}>{standard.name} {closure.standardVersion} ↗</Link></div>
         <div><span>START</span><strong>{closure.startedAt}</strong></div>
         <div><span>ZAMKNIĘCIE</span><strong>{closure.closedAt}</strong></div>
         <div><span>PROWADZĄCY</span><strong>{closure.owner}</strong></div>
@@ -49,7 +49,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
       </section>
 
       <section className="bos-closure-checks">
-        <div className="bos-closure-check-head"><span>LP.</span><span>CZYNNOŚĆ</span><span>KRYTERIUM GOTOWOŚCI</span><span>WERYFIKACJA</span></div>
+        <div className="bos-closure-check-head"><span>LP.</span><span>CZYNNOŚĆ</span><span>CO SPRAWDZIĆ PRZY SPRAWDŹ</span><span>WERYFIKACJA</span></div>
         {version.tasks.map((task) => (
           <div className="bos-closure-check-row" key={task.id}>
             <span>{String(task.order).padStart(2, "0")}</span>
@@ -58,6 +58,14 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
             <b>POTWIERDZONE</b>
           </div>
         ))}
+      </section>
+
+      <section className="bos-closure-readiness">
+        <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">BRAMKA GOTOWOŚCI</span><h2>Końcowe kryteria roli</h2></div><span className="bos-dashboard-count">{version.readinessCriteria.length} kryteria</span></div>
+        {version.readinessCriteria.map((criterion,index) => {
+          const check=outcome?.readinessChecks.find((item)=>item.criterionId===criterion.id);
+          return <div className="bos-closure-readiness-row" key={criterion.id}><span>{String(index+1).padStart(2,"0")}</span><div><strong>{criterion.criterion}</strong><p>{criterion.verificationMethodOther||criterion.verificationMethod}</p></div><b>{check?.isPassed?"POTWIERDZONE":"NIEPOTWIERDZONE"}</b></div>;
+        })}
       </section>
 
       {closure.recommendations && (

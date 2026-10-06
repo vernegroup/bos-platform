@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { closeProcess, getProcess, getProcessProgress, getStandard } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
+import CloseDecisionForm, { type CloseDecisionState } from "./CloseDecisionForm";
 
-async function decide(formData:FormData) {
+async function decide(_state:CloseDecisionState,formData:FormData):Promise<CloseDecisionState> {
   "use server";
   const access=await requireBOSAccess();
   const processId=String(formData.get("processId")??"");
@@ -13,18 +14,14 @@ async function decide(formData:FormData) {
   const recommendations=String(formData.get("recommendations")??"");
   const formalitiesConfirmed=formData.get("formalitiesConfirmed")==="on";
   if(!["READY","NOT_YET","STOP"].includes(decision)) throw new Error("Nieprawidłowa decyzja.");
-  if(decision==="READY"&&!formalitiesConfirmed){
-    const query=new URLSearchParams({formalitiesError:"1",summary,recommendations});
-    redirect(`/app/onboarding/processes/${processId}/close?${query.toString()}#formalities`);
-  }
+  if(decision==="READY"&&!formalitiesConfirmed) return {formalitiesError:true,summary,recommendations};
   const closureId=await closeProcess({organizationId:access.organization.id,processId,verifiedByUserId:access.user.id,decision,summary,recommendations,formalitiesConfirmed});
   redirect(`/app/onboarding/closed/${closureId}`);
 }
 
-export default async function CloseProcessPage({params,searchParams}:{params:Promise<{processId:string}>,searchParams:Promise<{formalitiesError?:string;summary?:string;recommendations?:string}>}) {
+export default async function CloseProcessPage({params}:{params:Promise<{processId:string}>}) {
  const access=await requireBOSAccess();
  const {processId}=await params;
- const {formalitiesError,summary="",recommendations=""}=await searchParams;
  const process=await getProcess(processId,access.organization.id); if(!process) notFound();
  const standard=await getStandard(process.standardId,access.organization.id); const version=standard?.versions.find(v=>v.version===process.standardVersion); if(!standard||!version) notFound();
  const progress=getProcessProgress(process); const critical=version.tasks.filter(t=>t.isCritical); const criticalDone=critical.filter(t=>{const x=process.tasks.find(p=>p.standardTaskId===t.id);return x?.soloAt&&x?.checkedAt}).length;
@@ -46,13 +43,5 @@ export default async function CloseProcessPage({params,searchParams}:{params:Pro
  </section>
  <aside className="bos-guidance"><div><span className="bos-guidance-eyebrow">DECYZJA</span><strong>Decyzja należy do człowieka</strong><p><b>GOTOWY</b> potwierdza zakończenie wdrożenia. <b>JESZCZE NIE</b> oznacza potrzebę dalszej pracy przy zachowaniu dotychczasowego postępu. <b>STOP</b> kończy proces bez potwierdzenia gotowości.</p></div><details><summary>? Czego system nie ocenia</summary><p>BOS nie ocenia „czy ktoś jest dobrym pracownikiem”. Porządkuje wykonanie czynności, dowody dla K i Kryteria Gotowości względem konkretnej wersji Standardu.</p></details></aside>
  <section className="bos-process-card"><div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">KARTA ZAKOŃCZENIA</span><h2>Wynik weryfikacji</h2></div></div>
- <form action={decide} className="bos-close-decision-form"><input type="hidden" name="processId" value={process.id}/>
- <aside className="bos-guidance bos-guidance-formalities"><div><span className="bos-guidance-eyebrow">PRZED ZAPISEM DECYZJI</span><strong>Formalności pozostają poza BOS</strong><p>Potwierdź tylko, że wymagane szkolenia BHP, badania, uprawnienia, instruktaże lub inne obowiązki zostały zweryfikowane w odpowiednim systemie albo dokumentacji.</p></div><details><summary>? Dlaczego osobne potwierdzenie</summary><p>BOS dokumentuje gotowość operacyjną według Standardu. Nie zastępuje prawnych ani branżowych procedur dopuszczenia do pracy.</p></details></aside>
- <label id="formalities"><span>POTWIERDZENIE FORMALNOŚCI</span><span><input type="checkbox" name="formalitiesConfirmed"/> Potwierdzam, że wymagane formalności dotyczące dopuszczenia do pracy zostały zweryfikowane poza BOS.</span><small>Wymagane wyłącznie dla decyzji GOTOWY.</small></label>
- {formalitiesError&&<div className="bos-publish-error" role="alert"><strong>Potwierdź formalności przed decyzją GOTOWY</strong><p>Zaznacz potwierdzenie powyżej. Wpisane podsumowanie i dalsze działania zostały zachowane.</p></div>}
- <label className="bos-close-guided-field"><span>PODSUMOWANIE FAKTÓW</span><small>Zapisz obserwowalne fakty będące podstawą decyzji. Nie opisuj cech osoby.</small><textarea name="summary" required maxLength={1200} defaultValue={summary} placeholder="Np. Wszystkie czynności wykonane i sprawdzone; 2/2 K zaliczone; kryterium kompletacji bez braków potwierdzone w realnej pracy."/></label>
- <label className="bos-close-guided-field"><span>POWÓD / DALSZE DZIAŁANIE</span><small>Wymagane znaczeniowo dla JESZCZE NIE i STOP; przy GOTOWY możesz zapisać dalsze zalecenia operacyjne.</small><textarea name="recommendations" maxLength={1200} defaultValue={recommendations} placeholder="Np. Powtórzyć czynność 04 na kolejnej zmianie i ponownie sprawdzić rezultat."/></label>
- <div className="bos-close-decision-guide"><strong>Wybierz decyzję</strong><p>{ready?"Bramka Gotowości jest kompletna. GOTOWY jest dostępne, ale decyzję nadal podejmuje człowiek.":"Bramka Gotowości jest niepełna. GOTOWY pozostaje zablokowane; możesz wybrać JESZCZE NIE, aby zachować postęp i wrócić do pracy, albo STOP, aby zakończyć proces bez potwierdzenia gotowości."}</p></div>
- <div className="bos-close-decisions bos-guided-decisions"><button name="decision" value="READY" disabled={!ready}><strong>GOTOWY</strong><span>{ready?"zakończ wdrożenie pozytywnie":"wymaga kompletnej Bramki Gotowości"}</span></button><button name="decision" value="NOT_YET"><strong>JESZCZE NIE</strong><span>zachowaj postęp i wróć do pracy</span></button><button name="decision" value="STOP"><strong>STOP</strong><span>zakończ bez potwierdzenia gotowości</span></button></div>
- </form></section></>;
+ <CloseDecisionForm action={decide} processId={process.id} ready={ready}/></section></>;
 }

@@ -4113,3 +4113,32 @@
     padding-right:14px!important;
   }
 }
+
+
+/* FINAL-FIX — production user-test readability on closure and status surfaces. */
+.bos-app-build-state{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:flex-start!important;
+  gap:6px!important;
+  min-width:0;
+}
+.bos-app-build-state span,.bos-app-build-state strong{display:block;max-width:100%;overflow-wrap:anywhere}
+.bos-closure-summary{max-width:100%;overflow:hidden}
+.bos-closure-summary>div,.bos-closure-check-head>*,.bos-closure-check-row>*{min-width:0;overflow-wrap:anywhere}
+.bos-closure-checks{max-width:100%;overflow:hidden}
+.bos-closure-readiness{margin-top:30px;border-top:1px solid var(--app-line);border-bottom:1px solid var(--app-line)}
+.bos-closure-readiness .bos-dashboard-section-head{padding:14px 0}
+.bos-closure-readiness-row{min-height:62px;padding:12px 0;border-top:1px solid var(--app-line);display:grid;grid-template-columns:38px minmax(0,1fr) 120px;gap:16px;align-items:start}
+.bos-closure-readiness-row>span{color:#9ba1a7;font-size:8px;font-weight:700}
+.bos-closure-readiness-row strong{font-size:9px}
+.bos-closure-readiness-row p{margin:5px 0 0;font-size:8px;line-height:1.5;color:var(--app-muted);overflow-wrap:anywhere}
+.bos-closure-readiness-row b{color:#536a54;font-size:7px;letter-spacing:.5px}
+@media(max-width:850px){
+  .bos-closure-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .bos-closure-check-head,.bos-closure-check-row{grid-template-columns:32px minmax(120px,.8fr) minmax(160px,1fr) 92px;gap:12px}
+}
+@media(max-width:600px){
+  .bos-closure-readiness-row{grid-template-columns:24px 1fr}
+  .bos-closure-readiness-row b{grid-column:2}
+}
