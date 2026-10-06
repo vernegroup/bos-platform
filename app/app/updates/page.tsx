@@ -5,6 +5,12 @@ export const dynamic = "force-dynamic";
 const datePL = (value: string) => new Intl.DateTimeFormat("pl-PL", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(value));
 const productLabel = (key: string) => ({ onboarding: "WDROŻENIA", promotions: "AWANSE" }[key.toLowerCase()] ?? key);
 
+const platformUpdates = [
+  { date: "06.10.2026", version: "RELEASE", title: "Commerce 2", description: "Uruchomiono produkcyjną warstwę zakupu, licencji i obsługi subskrypcji BOS." },
+  { date: "06.10.2026", version: "SECURITY", title: "Płatności i webhook", description: "Domknięto produkcyjną konfigurację Stripe oraz weryfikację zdarzeń webhook." },
+  { date: "06.10.2026", version: "ACCESS", title: "Logowanie", description: "Zweryfikowano produkcyjne logowanie kontem Google oraz obsługę dostępu do aplikacji." },
+] as const;
+
 export default async function UpdatesPage() {
   const access = await requireBOSAccess();
   const [updates, versions] = await Promise.all([listProductUpdates(access), getCurrentProductVersions(access)]);
@@ -29,6 +35,21 @@ export default async function UpdatesPage() {
             <small>{version.latestUpdateAt ? `OSTATNIA PUBLIKACJA ${datePL(version.latestUpdateAt)}` : "BRAK OPUBLIKOWANEJ HISTORII"}</small>
           </article>
         ))}
+      </section>
+      <section className="bos-platform-release-notes" aria-labelledby="platform-release-notes">
+        <div className="bos-dashboard-section-head">
+          <div><span className="bos-dashboard-section-kicker">PLATFORMA BOS</span><h2 id="platform-release-notes">Ostatnie zmiany platformy</h2></div>
+          <span className="bos-dashboard-count">stan produkcyjny</span>
+        </div>
+        <div className="bos-platform-release-list">
+          {platformUpdates.map((item) => (
+            <article key={`${item.date}-${item.version}`}>
+              <time>{item.date}</time>
+              <b>{item.version}</b>
+              <div><strong>{item.title}</strong><p>{item.description}</p></div>
+            </article>
+          ))}
+        </div>
       </section>
       <section className="bos-core-update-history">
         <header><span>DATA</span><span>PRODUKT</span><span>AKTUALIZACJA</span><span>STATUS</span></header>
