@@ -3884,3 +3884,131 @@
 @media (prefers-reduced-motion:reduce){
   .bos-app-shell *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
+
+
+/* UI-FINAL-01 — app-like controls, readable standards repository and stronger product rail.
+   Presentation only: no routing, auth, commerce or data mechanics changed. */
+.bos-app-product-rail{
+  min-height:64px!important;
+}
+.bos-app-product-rail-label{
+  font-size:18px!important;
+  padding-right:4px;
+}
+.bos-app-product-rail-track{
+  gap:14px!important;
+  align-items:center!important;
+}
+.bos-app-product-rail-item{
+  min-height:38px;
+  padding:0 14px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  border-radius:9px!important;
+  background:rgba(255,255,255,.045)!important;
+  font-size:10px!important;
+  letter-spacing:.10em!important;
+  box-sizing:border-box;
+}
+.bos-app-product-rail-item:hover,.bos-app-product-rail-item:focus-visible{
+  background:rgba(255,255,255,.09)!important;
+  border-color:rgba(255,255,255,.22)!important;
+}
+.bos-app-product-rail-item.is-active{
+  color:#fff!important;
+  background:rgba(185,135,50,.18)!important;
+  border-color:rgba(201,154,80,.62)!important;
+  box-shadow:inset 0 -2px #c79a50;
+}
+.bos-app-product-rail-item.is-active i{display:none}
+.bos-app-product-rail-item.is-planned{
+  color:#7d878f!important;
+  background:rgba(255,255,255,.018)!important;
+  border-color:rgba(255,255,255,.07)!important;
+  opacity:.62!important;
+}
+.bos-app-product-rail-sale{align-items:center!important}
+.bos-app-product-rail-item--sale{min-height:38px!important}
+
+/* Repository summary reads as three application controls rather than a spreadsheet header. */
+.bos-onboarding-commandbar{
+  margin-top:22px!important;
+  padding:0!important;
+  border:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,170px))!important;
+  gap:10px!important;
+  background:transparent!important;
+}
+.bos-onboarding-commandbar>div{
+  min-height:64px!important;
+  padding:12px 15px!important;
+  border:1px solid #ddd8ce!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-shadow:0 4px 14px rgba(13,31,49,.045);
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+}
+.bos-onboarding-commandbar>div span{font-size:7px!important;letter-spacing:.11em!important}
+.bos-onboarding-commandbar>div strong{margin-top:5px!important;font-size:15px!important}
+
+/* Standards repository becomes a stack of clear, touch-friendly application rows. */
+.bos-standard-list{
+  margin-top:18px!important;
+  border:0!important;
+  display:grid!important;
+  gap:8px!important;
+}
+.bos-standard-list-head{
+  min-height:30px!important;
+  padding:0 14px!important;
+  border:0!important;
+}
+.bos-standard-list-row{
+  min-height:64px!important;
+  padding:10px 14px!important;
+  border:1px solid #e0dcd3!important;
+  border-radius:10px!important;
+  background:#fff!important;
+  box-shadow:0 3px 12px rgba(13,31,49,.035);
+  transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease!important;
+}
+.bos-standard-list-row:hover,.bos-standard-list-row:focus-visible{
+  transform:translateY(-1px);
+  border-color:#cfc6b7!important;
+  box-shadow:0 8px 20px rgba(13,31,49,.075);
+}
+.bos-standard-open-button{
+  min-width:72px;
+  min-height:32px;
+  padding:0 9px;
+  border:1px solid #d5d0c6;
+  border-radius:8px;
+  background:#f8f6f1;
+  color:#765725;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-style:normal!important;
+  font-size:7px!important;
+  font-weight:800;
+  letter-spacing:.07em;
+  white-space:nowrap;
+}
+.bos-standard-list-row:hover .bos-standard-open-button,
+.bos-standard-list-row:focus-visible .bos-standard-open-button{
+  border-color:#b98732;
+  background:#fbf7ef;
+}
+@media(max-width:820px){
+  .bos-standard-list{gap:7px!important}
+  .bos-standard-list-row{padding:13px!important}
+  .bos-standard-open-button{grid-column:2!important;grid-row:1 / span 2!important;align-self:center}
+}
+@media(max-width:600px){
+  .bos-app-product-rail{min-height:60px!important}
+  .bos-app-product-rail-track{gap:8px!important}
+  .bos-app-product-rail-item{min-height:36px;padding:0 11px!important;font-size:9px!important}
+  .bos-onboarding-commandbar{grid-template-columns:repeat(3,minmax(112px,1fr))!important;overflow-x:auto!important;padding-bottom:3px!important}
+}
