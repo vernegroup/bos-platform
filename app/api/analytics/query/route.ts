@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { parseAnalyticsQuery, queryAnalytics } from "@/analytics/query/query-api";
+import { requirePlatformOwner } from "@/lib/bos/platformOwner";
 
 export async function GET(request: Request) {
+  const access = await requirePlatformOwner();
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
   try {
     const query = parseAnalyticsQuery(new URL(request.url).searchParams);
     return NextResponse.json(await queryAnalytics(query));
