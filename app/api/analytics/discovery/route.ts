@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { discoverAnalytics, parseDiscoveryQuery } from "@/analytics/discovery/dynamic-discovery";
+import { requirePlatformOwner } from "@/lib/bos/platformOwner";
 
 export async function GET(request: Request) {
+  const access = await requirePlatformOwner();
+  if (!access.ok) {
+    return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
   try {
     const query = parseDiscoveryQuery(new URL(request.url).searchParams);
     return NextResponse.json(await discoverAnalytics(query));
