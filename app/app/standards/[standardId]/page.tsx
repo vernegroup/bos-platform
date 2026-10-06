@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   createDraftReadinessCriterion, createDraftStartRequirement, createDraftTask, deleteDraftReadinessCriterion,
   deleteDraftStartRequirement, deleteDraftTask, getStandard, moveDraftReadinessCriterion, moveDraftStartRequirement,
@@ -10,6 +11,8 @@ import {
 import { requireBOSAccess } from "@/lib/bos/access";
 
 const text = (formData: FormData, key: string) => String(formData.get(key) ?? "");
+const startCategoryLabel:Record<string,string>={TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"};
+const verificationMethodLabel:Record<string,string>={OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"};
 const editorPath=(standardId:string,returnTo:string,anchor="")=>{
   const query=returnTo==="promotions"?"?returnTo=promotions":returnTo==="onboarding"?"?returnTo=onboarding":"";
   return `/app/standards/${standardId}${query}${anchor}`;
@@ -20,27 +23,27 @@ async function updateDraft(formData: FormData) {
   const access = await requireBOSAccess();
   const standardId=text(formData,"standardId");
   await updateDraftStandard({organizationId:access.organization.id,standardId,name:text(formData,"name"),area:text(formData,"area"),roleDescription:text(formData,"roleDescription")});
-  redirect(editorPath(standardId,text(formData,"returnTo")));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo")));
 }
 async function addTask(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await createDraftTask({organizationId:access.organization.id,standardId,name:text(formData,"name"),execution:text(formData,"execution"),
     readyWhen:text(formData,"readyWhen"),hint:text(formData,"hint"),isCritical:formData.get("isCritical")==="on"});
-  redirect(editorPath(standardId,text(formData,"returnTo")));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo")));
 }
 async function editTask(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await updateDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId"),name:text(formData,"name"),
     execution:text(formData,"execution"),readyWhen:text(formData,"readyWhen"),hint:text(formData,"hint"),isCritical:formData.get("isCritical")==="on"});
-  redirect(editorPath(standardId,text(formData,"returnTo")));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo")));
 }
 async function removeTask(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await deleteDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId")});
-  redirect(editorPath(standardId,text(formData,"returnTo")));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo")));
 }
 async function reorderTask(formData: FormData) {
   "use server";
@@ -48,7 +51,7 @@ async function reorderTask(formData: FormData) {
   const direction=text(formData,"direction");
   if(direction!=="UP" && direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftTask({organizationId:access.organization.id,standardId,taskId:text(formData,"taskId"),direction});
-  redirect(editorPath(standardId,text(formData,"returnTo")));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo")));
 }
 
 
@@ -57,27 +60,27 @@ async function addStartRequirement(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const category=text(formData,"category") as "TOOLS"|"ACCESS"|"MATERIALS"|"INSTRUCTIONS"|"WORKPLACE"|"OTHER";
   await createDraftStartRequirement({organizationId:access.organization.id,standardId,category,requirement:text(formData,"requirement")});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
 }
 async function editStartRequirement(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const category=text(formData,"category") as "TOOLS"|"ACCESS"|"MATERIALS"|"INSTRUCTIONS"|"WORKPLACE"|"OTHER";
   await updateDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId"),category,requirement:text(formData,"requirement")});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
 }
 async function removeStartRequirement(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await deleteDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId")});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
 }
 async function reorderStartRequirement(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId"); const direction=text(formData,"direction");
   if(direction!=="UP"&&direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftStartRequirement({organizationId:access.organization.id,standardId,requirementId:text(formData,"requirementId"),direction});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#warunki-startu"));
 }
 
 
@@ -86,27 +89,27 @@ async function addReadinessCriterion(formData: FormData) {
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const verificationMethod=text(formData,"verificationMethod") as "OBSERVATION"|"INDEPENDENT_TASK"|"WORK_SAMPLE"|"CONTROL_QUESTIONS"|"KNOWLEDGE_TEST"|"OTHER";
   await createDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterion:text(formData,"criterion"),verificationMethod,verificationMethodOther:text(formData,"verificationMethodOther")});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
 }
 async function editReadinessCriterion(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   const verificationMethod=text(formData,"verificationMethod") as "OBSERVATION"|"INDEPENDENT_TASK"|"WORK_SAMPLE"|"CONTROL_QUESTIONS"|"KNOWLEDGE_TEST"|"OTHER";
   await updateDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId"),criterion:text(formData,"criterion"),verificationMethod,verificationMethodOther:text(formData,"verificationMethodOther")});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
 }
 async function removeReadinessCriterion(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId");
   await deleteDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId")});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
 }
 async function reorderReadinessCriterion(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const standardId=text(formData,"standardId"); const direction=text(formData,"direction");
   if(direction!=="UP"&&direction!=="DOWN") throw new Error("Nieprawidłowy kierunek zmiany kolejności.");
   await moveDraftReadinessCriterion({organizationId:access.organization.id,standardId,criterionId:text(formData,"criterionId"),direction});
-  redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
+  revalidatePath(`/app/standards/${standardId}`); redirect(editorPath(standardId,text(formData,"returnTo"),"#kryteria-gotowosci"));
 }
 
 
@@ -194,7 +197,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
       current.startRequirements.map((requirement,index)=><div className="bos-standard-detail-head" key={requirement.id}>
-        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {requirement.category}</span>
+        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {startCategoryLabel[requirement.category]??requirement.category}</span>
           {!isDraft&&<p>{requirement.requirement}</p>}</div>
         {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="requirementId" value={requirement.id}/>
@@ -230,7 +233,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
       current.readinessCriteria.map((criterion,index)=><div className="bos-standard-detail-head" key={criterion.id}>
-        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {criterion.verificationMethod}</span>
+        <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {verificationMethodLabel[criterion.verificationMethod]??criterion.verificationMethod}</span>
           {!isDraft&&<><p>{criterion.criterion}</p>{criterion.verificationMethodOther&&<p>{criterion.verificationMethodOther}</p>}</>}</div>
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
           <input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="criterionId" value={criterion.id}/>
