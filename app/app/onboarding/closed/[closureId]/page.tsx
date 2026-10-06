@@ -4,6 +4,8 @@ import { notFound, redirect } from "next/navigation";
 import { getClosure, getClosureOutcome, getStandard, reopenProcess } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
+const verificationMethodLabel:Record<string,string>={OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"};
+
 async function reopen(formData:FormData) {
   "use server"; const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const closureId=String(formData.get("closureId")??"");
   await reopenProcess({organizationId:access.organization.id,processId,closureId,userId:access.user.id,reason:String(formData.get("reason")??"")}); redirect(`/app/onboarding/processes/${processId}`);
@@ -64,7 +66,7 @@ export default async function ClosureDetailPage({ params }: { params: Promise<{ 
         <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">BRAMKA GOTOWOŚCI</span><h2>Końcowe kryteria roli</h2></div><span className="bos-dashboard-count">{version.readinessCriteria.length} kryteria</span></div>
         {version.readinessCriteria.map((criterion,index) => {
           const check=outcome?.readinessChecks.find((item)=>item.criterionId===criterion.id);
-          return <div className="bos-closure-readiness-row" key={criterion.id}><span>{String(index+1).padStart(2,"0")}</span><div><strong>{criterion.criterion}</strong><p>{criterion.verificationMethodOther||criterion.verificationMethod}</p></div><b>{check?.isPassed?"POTWIERDZONE":"NIEPOTWIERDZONE"}</b></div>;
+          return <div className="bos-closure-readiness-row" key={criterion.id}><span>{String(index+1).padStart(2,"0")}</span><div><strong>{criterion.criterion}</strong><p>{criterion.verificationMethodOther||verificationMethodLabel[criterion.verificationMethod]||criterion.verificationMethod}</p></div><b>{check?.isPassed?"POTWIERDZONE":"NIEPOTWIERDZONE"}</b></div>;
         })}
       </section>
 
