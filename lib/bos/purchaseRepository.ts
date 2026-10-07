@@ -4,7 +4,7 @@ import type Stripe from "stripe";
 import { db } from "@/lib/db";
 import type { BOSProductKey } from "@/lib/bos/licenseRepository";
 import { issueAuthToken } from "@/lib/bos/authRepository";
-import { sendPurchaseClaimEmail } from "@/lib/bos/email";
+import { sendPurchaseClaimEmail, sendPurchaseConfirmationEmail } from "@/lib/bos/email";
 
 function objectId(value: string | { id: string } | null | undefined) {
   if (!value) return null;
@@ -121,17 +121,46 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
         [purchases[0].id, purchases[0].organization_id, products[0].id],
       );
     }
+    const annualLicense = await tx.unsafe(
+      "SELECT valid_from,valid_until FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' AND license_type='ANNUAL' LIMIT 1",
+      [purchases[0].organization_id, products[0].id],
+    );
+    if (!annualLicense.length || !annualLicense[0].valid_until) throw new Error("Paid annual BOS purchase has no active annual license.");
+
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "checkout.session.paid"]);
-    return { fulfilled: true, purchaseId: purchases[0].id, organizationId: purchases[0].organization_id, purchaseNeedsClaim, claimUserId, buyerEmail };
+    return {
+      fulfilled: true,
+      purchaseId: purchases[0].id,
+      organizationId: purchases[0].organization_id,
+      purchaseNeedsClaim,
+      claimUserId,
+      buyerEmail,
+      validFrom: annualLicense[0].valid_from,
+      validUntil: annualLicense[0].valid_until,
+    };
   });
 
-  if (fulfillment.fulfilled && fulfillment.purchaseNeedsClaim && fulfillment.claimUserId && fulfillment.buyerEmail) {
-    const token = await issueAuthToken(fulfillment.claimUserId, "CLAIM_PURCHASE", 60 * 24);
-    await sendPurchaseClaimEmail({
-      to: fulfillment.buyerEmail,
-      displayName: fulfillment.buyerEmail.split("@")[0] || "Kliencie",
-      token,
-    });
+  if (fulfillment.fulfilled && fulfillment.buyerEmail && fulfillment.validUntil) {
+    const productName = productKey === "onboarding" ? "BOS Wdrożenia" : "BOS Awanse";
+    const displayName = fulfillment.buyerEmail.split("@")[0] || "Kliencie";
+
+    if (fulfillment.purchaseNeedsClaim && fulfillment.claimUserId) {
+      const token = await issueAuthToken(fulfillment.claimUserId, "CLAIM_PURCHASE", 60 * 24);
+      await sendPurchaseClaimEmail({
+        to: fulfillment.buyerEmail,
+        displayName,
+        token,
+        productName,
+        validUntil: fulfillment.validUntil,
+      });
+    } else {
+      await sendPurchaseConfirmationEmail({
+        to: fulfillment.buyerEmail,
+        displayName,
+        productName,
+        validUntil: fulfillment.validUntil,
+      });
+    }
   }
 
   return fulfillment;

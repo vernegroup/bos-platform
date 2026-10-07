@@ -11,6 +11,15 @@ type PurchaseClaimEmailInput = {
   to: string;
   displayName: string;
   token: string;
+  productName: string;
+  validUntil: Date | string;
+};
+
+type PurchaseConfirmationEmailInput = {
+  to: string;
+  displayName: string;
+  productName: string;
+  validUntil: Date | string;
 };
 
 type VerificationEmailInput = {
@@ -103,32 +112,54 @@ export async function sendPurchaseClaimEmail(input: PurchaseClaimEmailInput) {
     throw new Error("EMAIL_NOT_CONFIGURED");
   }
   const claimUrl = `${bosAppUrl()}/claim-purchase?token=${encodeURIComponent(input.token)}`;
+  const validUntil = formatLicenseDate(input.validUntil);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from,
       to: [input.to],
-      subject: "Aktywuj dostęp do zakupionego produktu — BOS",
-      html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Aktywuj dostęp do BOS</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>płatność została potwierdzona. Ustaw hasło, aby przejąć konto organizacji i korzystać z zakupionego produktu.</p><p style="margin:28px 0"><a href="${claimUrl}" style="background:#b98b46;color:#fff;text-decoration:none;padding:14px 22px;display:inline-block">Aktywuj dostęp →</a></p><p style="font-size:13px;color:#69747d">Link jest jednorazowy i wygasa po 24 godzinach.</p></div></body></html>`,
+      subject: `Potwierdzenie zakupu — ${input.productName} — BOS`,
+      html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Płatność potwierdzona</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>przyznaliśmy Twojej organizacji licencję na <strong>${escapeHtml(input.productName)}</strong> na 12 miesięcy.</p><p><strong>Licencja jest ważna do: ${escapeHtml(validUntil)}.</strong></p><p>Licencja nie odnawia się automatycznie. Po zakończeniu okresu ważności możesz odnowić ją na kolejny rok.</p><p>Ustaw hasło, aby przejąć konto organizacji i korzystać z zakupionego produktu.</p><p style="margin:28px 0"><a href="${claimUrl}" style="background:#b98b46;color:#fff;text-decoration:none;padding:14px 22px;display:inline-block">Aktywuj dostęp →</a></p><p style="font-size:13px;color:#69747d">Link aktywacyjny jest jednorazowy i wygasa po 24 godzinach.</p></div></body></html>`,
     }),
   });
   const responseBody = await response.text();
   if (!response.ok) {
-    console.error("[email.claim] Resend rejected message", {
-      status: response.status,
-      response: responseBody.slice(0, 1000),
-    });
+    console.error("[email.claim] Resend rejected message", { status: response.status, response: responseBody.slice(0, 1000) });
     throw new Error(`EMAIL_SEND_FAILED:${response.status}`);
   }
-
   let messageId: string | null = null;
-  try {
-    messageId = (JSON.parse(responseBody) as { id?: string }).id ?? null;
-  } catch {
-    // A successful response without JSON is still a successful delivery request.
-  }
+  try { messageId = (JSON.parse(responseBody) as { id?: string }).id ?? null; } catch {}
   console.info("[email.claim] accepted by Resend", { status: response.status, messageId });
+  return { messageId };
+}
+
+export async function sendPurchaseConfirmationEmail(input: PurchaseConfirmationEmailInput) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = bosEmailFrom();
+  if (!apiKey || !from) {
+    console.error("[email.purchase] configuration missing", { hasApiKey: Boolean(apiKey), hasFrom: Boolean(from) });
+    throw new Error("EMAIL_NOT_CONFIGURED");
+  }
+  const validUntil = formatLicenseDate(input.validUntil);
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [input.to],
+      subject: `Potwierdzenie zakupu — ${input.productName} — BOS`,
+      html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Płatność potwierdzona</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>przyznaliśmy Twojej organizacji licencję na <strong>${escapeHtml(input.productName)}</strong> na 12 miesięcy.</p><p><strong>Licencja jest ważna do: ${escapeHtml(validUntil)}.</strong></p><p>Licencja nie odnawia się automatycznie. Po zakończeniu okresu ważności możesz odnowić ją na kolejny rok.</p><p>Produkt jest dostępny po zalogowaniu do BOS.</p></div></body></html>`,
+    }),
+  });
+  const responseBody = await response.text();
+  if (!response.ok) {
+    console.error("[email.purchase] Resend rejected message", { status: response.status, response: responseBody.slice(0, 1000) });
+    throw new Error(`EMAIL_SEND_FAILED:${response.status}`);
+  }
+  let messageId: string | null = null;
+  try { messageId = (JSON.parse(responseBody) as { id?: string }).id ?? null; } catch {}
+  console.info("[email.purchase] accepted by Resend", { status: response.status, messageId });
   return { messageId };
 }
 
@@ -247,6 +278,12 @@ export async function sendPasswordResetEmail(input: PasswordResetEmailInput) {
 
   console.info("[email.reset] accepted by Resend", { status: response.status, messageId });
   return { messageId };
+}
+
+function formatLicenseDate(value: Date | string) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) throw new Error("INVALID_LICENSE_DATE");
+  return new Intl.DateTimeFormat("pl-PL", { dateStyle: "long", timeZone: "Europe/Warsaw" }).format(date);
 }
 
 function escapeHtml(value: string) {
