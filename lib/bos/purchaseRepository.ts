@@ -176,10 +176,36 @@ export async function refundCharge(charge: Stripe.Charge, eventId: string) {
         [purchase.organization_id, purchase.product_id, purchase.id],
       );
       if (replacement.length) {
-        await tx.unsafe(
-          "UPDATE licenses SET source_purchase_id=$1,updated_at=now() WHERE organization_id=$2 AND product_id=$3 AND status='ACTIVE' AND source_purchase_id=$4",
-          [replacement[0].id, purchase.organization_id, purchase.product_id, purchase.id],
+        const licenses = await tx.unsafe(
+          "SELECT license_type FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' LIMIT 1 FOR UPDATE",
+          [purchase.organization_id, purchase.product_id],
         );
+        if (licenses[0]?.license_type === "ANNUAL") {
+          const remaining = await tx.unsafe(
+            "SELECT id,paid_at FROM purchases WHERE organization_id=$1 AND product_id=$2 AND status='PAID' AND offer_id IS NOT NULL ORDER BY paid_at ASC NULLS LAST,created_at ASC",
+            [purchase.organization_id, purchase.product_id],
+          );
+          if (remaining.length) {
+            let validFrom = remaining[0].paid_at ?? new Date();
+            let validUntil = validFrom;
+            for (const item of remaining) {
+              const rows = await tx.unsafe(
+                "SELECT GREATEST($1::timestamptz,$2::timestamptz)+interval '1 year' AS valid_until",
+                [validUntil, item.paid_at ?? validFrom],
+              );
+              validUntil = rows[0].valid_until;
+            }
+            await tx.unsafe(
+              "UPDATE licenses SET source_purchase_id=$1,valid_from=$2,valid_until=$3,updated_at=now() WHERE organization_id=$4 AND product_id=$5 AND status='ACTIVE'",
+              [remaining[remaining.length - 1].id, validFrom, validUntil, purchase.organization_id, purchase.product_id],
+            );
+          }
+        } else {
+          await tx.unsafe(
+            "UPDATE licenses SET source_purchase_id=$1,updated_at=now() WHERE organization_id=$2 AND product_id=$3 AND status='ACTIVE' AND source_purchase_id=$4",
+            [replacement[0].id, purchase.organization_id, purchase.product_id, purchase.id],
+          );
+        }
       } else {
         await tx.unsafe(
           "UPDATE licenses SET status='REVOKED',revoked_at=COALESCE(revoked_at,now()),updated_at=now() WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE'",
