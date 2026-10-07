@@ -84,8 +84,8 @@ export const bosProducts: readonly BOSProduct[] = [
       title: "Kup BOS Wdrożenia",
       description:
         "Roczna licencja na moduł BOS Wdrożenia w aplikacji webowej wraz z aktualizacjami.",
-      price: "690 zł",
-      priceNote: "licencja roczna",
+      price: "82,50 zł / mies.",
+      priceNote: "990 zł brutto / rok · płatność roczna",
       checkoutEndpoint: "/api/checkout",
       ariaLabel: "Kup BOS Wdrożenia",
     },
@@ -133,8 +133,8 @@ export const bosProducts: readonly BOSProduct[] = [
       title: "Kup BOS Awanse",
       description:
         "Roczna licencja na moduł BOS Awanse w aplikacji webowej wraz z aktualizacjami.",
-      price: "690 zł",
-      priceNote: "licencja roczna",
+      price: "57,50 zł / mies.",
+      priceNote: "690 zł brutto / rok · płatność roczna",
       checkoutEndpoint: "/api/checkout-promotions",
       ariaLabel: "Kup BOS Awanse",
     },
