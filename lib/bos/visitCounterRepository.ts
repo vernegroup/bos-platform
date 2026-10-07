@@ -19,7 +19,8 @@ export type AnalyticsSummary = {
   eventMix: { event: string; count: number }[];
 };
 
-const browserSession = `source = 'browser' AND environment = 'production' AND session_id IS NOT NULL AND btrim(session_id) <> '' AND COALESCE(data->>'internal', 'false') <> 'true'`;\nconst externalTraffic = `source = 'browser' AND environment = 'production' AND COALESCE(data->>'internal', 'false') <> 'true'`;
+const browserSession = `source = 'browser' AND environment = 'production' AND session_id IS NOT NULL AND btrim(session_id) <> '' AND COALESCE(data->>'internal', 'false') <> 'true'`;
+const externalTraffic = `source = 'browser' AND environment = 'production' AND COALESCE(data->>'internal', 'false') <> 'true'`;
 
 export async function getVisitCounts(): Promise<VisitCounts> {
   const rows = await db().unsafe(`
