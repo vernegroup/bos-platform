@@ -817,6 +817,8 @@
   gap:12px;align-items:center;
 }
 .bos-standard-list-head{
+  padding-left:14px;
+  padding-right:18px;
   min-height:34px;border-bottom:1px solid var(--app-line);color:#969da4;
   font-size:7px;font-weight:700;letter-spacing:.8px;
 }
@@ -1837,8 +1839,8 @@
 .bos-operational-list .bos-standard-list-row,
 .bos-operational-list .bos-process-list-row,
 .bos-operational-list .bos-closure-list-row{
-  padding-left:10px;
-  padding-right:10px;
+  padding-left:14px;
+  padding-right:18px;
   transition:background-color .12s ease;
 }
 .bos-operational-list .bos-standard-list-row:hover,
@@ -3980,7 +3982,9 @@
   box-shadow:0 8px 20px rgba(13,31,49,.075);
 }
 .bos-standard-open-button{
+  width:72px;
   min-width:72px;
+  justify-self:end;
   min-height:32px;
   padding:0 9px;
   border:1px solid #d5d0c6;
