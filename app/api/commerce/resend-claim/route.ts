@@ -18,8 +18,10 @@ export async function POST(request: Request) {
     const sql = db();
     const rows = await sql.unsafe(
       `SELECT p.id AS purchase_id,p.buyer_email,u.id AS user_id,u.display_name,u.status AS user_status,
-              m.status AS membership_status
+              m.status AS membership_status,pr.key AS product_key,l.valid_until
        FROM purchases p
+       JOIN products pr ON pr.id=p.product_id
+       JOIN licenses l ON l.organization_id=p.organization_id AND l.product_id=p.product_id AND l.status='ACTIVE' AND l.license_type='ANNUAL'
        JOIN users u ON lower(u.email)=lower(p.buyer_email)
        JOIN memberships m ON m.user_id=u.id AND m.organization_id=p.organization_id AND m.role='OWNER'
        WHERE p.stripe_checkout_session_id=$1 AND p.status='PAID'
@@ -40,6 +42,8 @@ export async function POST(request: Request) {
       to: row.buyer_email as string,
       displayName: (row.display_name as string | null) || (row.buyer_email as string).split("@")[0] || "Kliencie",
       token,
+      productName: row.product_key === "onboarding" ? "BOS Wdrożenia" : "BOS Awanse",
+      validUntil: row.valid_until,
     });
 
     console.info("[commerce.claim.resend] sent", { purchaseId: row.purchase_id, sessionId: session.id });
