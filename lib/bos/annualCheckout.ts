@@ -15,12 +15,11 @@ export async function createAnnualCheckout(product:BOSProductKey,options?:{requi
  const metadata={product,offer:offer.key,...(access?{organization_id:access.organization.id,bos_user_id:access.user.id}:{})};
  const customerId=access?await resolveBillingCustomerId(access):null;
  const session=await stripe.checkout.sessions.create({
-  mode:"subscription",
+  mode:"payment",
   line_items:[{price:offer.priceId,quantity:1}],
   ...(customerId?{customer:customerId}:{customer_email:access?.user.email??undefined}),
   client_reference_id:access?.organization.id??undefined,
   metadata,
-  subscription_data:{metadata},
   success_url:`${origin}/success/${product}?session_id={CHECKOUT_SESSION_ID}`,
   cancel_url:origin+"/",
  });
