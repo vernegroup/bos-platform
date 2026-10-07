@@ -109,7 +109,13 @@ export async function fulfillAnnualCheckout(session:Stripe.Checkout.Session,even
  }
  if(result.fulfilled&&result.purchaseNeedsClaim&&result.claimUserId&&result.buyerEmail){
   const token=await issueAuthToken(result.claimUserId,"CLAIM_PURCHASE",60*24);
-  await sendPurchaseClaimEmail({to:result.buyerEmail,displayName:result.buyerEmail.split("@")[0]||"Kliencie",token});
+  await sendPurchaseClaimEmail({
+   to:result.buyerEmail,
+   displayName:result.buyerEmail.split("@")[0]||"Kliencie",
+   token,
+   productName:productKey==="onboarding"?"BOS Wdrożenia":"BOS Awanse",
+   validUntil:p.end,
+  });
  }
  return result;
 }
