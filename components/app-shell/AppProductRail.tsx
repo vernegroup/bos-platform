@@ -5,11 +5,6 @@ import { usePathname } from "next/navigation";
 import ProductDetailsModal from "@/components/home/ProductDetailsModal";
 import { bosProducts, type BOSProductKey } from "@/data/products";
 
-const appPlannedProducts = [
-  { id: "pricing", displayName: "CENY" },
-  { id: "complaints", displayName: "REKLAMACJE" },
-  { id: "display", displayName: "EKSPOZYCJA" },
-] as const;
 
 const productHrefs: Record<BOSProductKey,string> = {
   onboarding: "/app/onboarding",
@@ -29,7 +24,6 @@ export default function AppProductRail({productEntitlements}:{productEntitlement
           ? <Link key={product.id} href={href} className={"bos-app-product-rail-item"+(active?" is-active":"")} aria-current={active?"page":undefined}>{product.displayName}<i aria-hidden="true"/></Link>
           : <div key={product.id} className="bos-app-product-rail-sale"><ProductDetailsModal product={product.id} variant="appRail"/></div>;
       })}
-      {appPlannedProducts.map(product=><span key={product.id} className="bos-app-product-rail-item is-planned" aria-disabled="true">{product.displayName}</span>)}
     </div>
   </nav>;
 }

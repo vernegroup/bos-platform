@@ -1,6 +1,6 @@
 "use client";
 
-import { bosProducts, plannedBosProducts } from "@/data/products";
+import { bosProducts } from "@/data/products";
 import ProductDetailsModal from "./ProductDetailsModal";
 
 export default function ProductRail(){
@@ -16,11 +16,6 @@ export default function ProductRail(){
             <article className="bos-product-rail__item" key={product.id}>
               <div className="bos-product-rail__name">{product.displayName}</div>
               <ProductDetailsModal product={product.id} variant="rail" />
-            </article>
-          ))}
-          {plannedBosProducts.map(product=>(
-            <article className="bos-product-rail__item is-planned" key={product.id}>
-              <div className="bos-product-rail__name">{product.displayName}</div>
             </article>
           ))}
         </div>
