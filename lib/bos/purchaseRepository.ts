@@ -46,6 +46,14 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
     const products = await tx.unsafe("SELECT id FROM products WHERE key=$1 AND status='ACTIVE' LIMIT 1", [productKey]);
     if (!products.length) throw new Error("BOS product not found.");
 
+    const offerKey = session.metadata?.offer || null;
+    if (!offerKey) throw new Error("Paid BOS purchase has no offer metadata.");
+    const offers = await tx.unsafe(
+      "SELECT id FROM commerce_offers WHERE key=$1 AND product_id=$2 AND status='ACTIVE' LIMIT 1",
+      [offerKey, products[0].id],
+    );
+    if (!offers.length) throw new Error("Paid BOS purchase has no active annual offer.");
+
     const buyerEmail = session.customer_details?.email?.trim().toLowerCase() || session.customer_email?.trim().toLowerCase() || null;
     if (!buyerEmail) throw new Error("Paid BOS purchase has no buyer email.");
 
@@ -94,14 +102,25 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
     }
 
     const purchases = await tx.unsafe(
-      "INSERT INTO purchases(organization_id,product_id,buyer_email,stripe_checkout_session_id,stripe_payment_intent_id,stripe_customer_id,amount_total,currency,status,paid_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,'PAID',now()) ON CONFLICT(stripe_checkout_session_id) DO UPDATE SET organization_id=COALESCE(purchases.organization_id,EXCLUDED.organization_id),buyer_email=EXCLUDED.buyer_email,stripe_payment_intent_id=EXCLUDED.stripe_payment_intent_id,stripe_customer_id=EXCLUDED.stripe_customer_id,amount_total=EXCLUDED.amount_total,currency=EXCLUDED.currency,status='PAID',paid_at=COALESCE(purchases.paid_at,now()),updated_at=now() RETURNING id,organization_id",
-      [organizationId, products[0].id, buyerEmail, session.id, objectId(session.payment_intent), objectId(session.customer), session.amount_total, session.currency],
+      "INSERT INTO purchases(organization_id,product_id,offer_id,buyer_email,stripe_checkout_session_id,stripe_payment_intent_id,stripe_customer_id,amount_total,currency,status,paid_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,'PAID',now()) ON CONFLICT(stripe_checkout_session_id) DO UPDATE SET organization_id=COALESCE(purchases.organization_id,EXCLUDED.organization_id),offer_id=EXCLUDED.offer_id,buyer_email=EXCLUDED.buyer_email,stripe_payment_intent_id=EXCLUDED.stripe_payment_intent_id,stripe_customer_id=EXCLUDED.stripe_customer_id,amount_total=EXCLUDED.amount_total,currency=EXCLUDED.currency,status='PAID',paid_at=COALESCE(purchases.paid_at,now()),updated_at=now() RETURNING id,organization_id",
+      [organizationId, products[0].id, offers[0].id, buyerEmail, session.id, objectId(session.payment_intent), objectId(session.customer), session.amount_total, session.currency],
     );
 
-    await tx.unsafe(
-      "INSERT INTO licenses(organization_id,product_id,status,license_type,source_purchase_id) VALUES($1,$2,'ACTIVE','PERPETUAL',$3) ON CONFLICT DO NOTHING",
-      [purchases[0].organization_id, products[0].id, purchases[0].id],
+    const existingLicense = await tx.unsafe(
+      "SELECT license_type,valid_until FROM licenses WHERE organization_id=$1 AND product_id=$2 LIMIT 1 FOR UPDATE",
+      [purchases[0].organization_id, products[0].id],
     );
+    if (!existingLicense.length) {
+      await tx.unsafe(
+        "INSERT INTO licenses(organization_id,product_id,status,license_type,source_purchase_id,valid_from,valid_until) VALUES($1,$2,'ACTIVE','ANNUAL',$3,now(),now()+interval '1 year')",
+        [purchases[0].organization_id, products[0].id, purchases[0].id],
+      );
+    } else if (existingLicense[0].license_type !== "PERPETUAL") {
+      await tx.unsafe(
+        "UPDATE licenses SET status='ACTIVE',license_type='ANNUAL',source_purchase_id=$1,source_subscription_id=NULL,valid_from=COALESCE(valid_from,now()),valid_until=(CASE WHEN valid_until>now() THEN valid_until ELSE now() END)+interval '1 year',revoked_at=NULL,updated_at=now() WHERE organization_id=$2 AND product_id=$3",
+        [purchases[0].id, purchases[0].organization_id, products[0].id],
+      );
+    }
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "checkout.session.paid"]);
     return { fulfilled: true, purchaseId: purchases[0].id, organizationId: purchases[0].organization_id, purchaseNeedsClaim, claimUserId, buyerEmail };
   });
@@ -157,10 +176,36 @@ export async function refundCharge(charge: Stripe.Charge, eventId: string) {
         [purchase.organization_id, purchase.product_id, purchase.id],
       );
       if (replacement.length) {
-        await tx.unsafe(
-          "UPDATE licenses SET source_purchase_id=$1,updated_at=now() WHERE organization_id=$2 AND product_id=$3 AND status='ACTIVE' AND source_purchase_id=$4",
-          [replacement[0].id, purchase.organization_id, purchase.product_id, purchase.id],
+        const licenses = await tx.unsafe(
+          "SELECT license_type FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' LIMIT 1 FOR UPDATE",
+          [purchase.organization_id, purchase.product_id],
         );
+        if (licenses[0]?.license_type === "ANNUAL") {
+          const remaining = await tx.unsafe(
+            "SELECT id,paid_at FROM purchases WHERE organization_id=$1 AND product_id=$2 AND status='PAID' AND offer_id IS NOT NULL ORDER BY paid_at ASC NULLS LAST,created_at ASC",
+            [purchase.organization_id, purchase.product_id],
+          );
+          if (remaining.length) {
+            let validFrom = remaining[0].paid_at ?? new Date();
+            let validUntil = validFrom;
+            for (const item of remaining) {
+              const rows = await tx.unsafe(
+                "SELECT GREATEST($1::timestamptz,$2::timestamptz)+interval '1 year' AS valid_until",
+                [validUntil, item.paid_at ?? validFrom],
+              );
+              validUntil = rows[0].valid_until;
+            }
+            await tx.unsafe(
+              "UPDATE licenses SET source_purchase_id=$1,valid_from=$2,valid_until=$3,updated_at=now() WHERE organization_id=$4 AND product_id=$5 AND status='ACTIVE'",
+              [remaining[remaining.length - 1].id, validFrom, validUntil, purchase.organization_id, purchase.product_id],
+            );
+          }
+        } else {
+          await tx.unsafe(
+            "UPDATE licenses SET source_purchase_id=$1,updated_at=now() WHERE organization_id=$2 AND product_id=$3 AND status='ACTIVE' AND source_purchase_id=$4",
+            [replacement[0].id, purchase.organization_id, purchase.product_id, purchase.id],
+          );
+        }
       } else {
         await tx.unsafe(
           "UPDATE licenses SET status='REVOKED',revoked_at=COALESCE(revoked_at,now()),updated_at=now() WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE'",
