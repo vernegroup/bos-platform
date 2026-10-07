@@ -1,5 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { canManageMembers,requireBOSAccess,type BOSRole } from "@/lib/bos/access";
 import { inviteOrganizationMember,updateMemberRole } from "@/lib/bos/organizationRepository";
 import { sendOrganizationInviteEmail } from "@/lib/bos/email";
@@ -19,6 +20,7 @@ export async function inviteMemberAction(formData:FormData){
     token:invitation.token,
   });
   revalidatePath("/app/users");
+  redirect("/app/users?invite=sent");
 }
 export async function updateMemberRoleAction(formData:FormData){
   const access=await requireBOSAccess();
