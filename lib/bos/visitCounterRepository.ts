@@ -19,7 +19,7 @@ export type AnalyticsSummary = {
   eventMix: { event: string; count: number }[];
 };
 
-const browserSession = `source = 'browser' AND session_id IS NOT NULL AND btrim(session_id) <> ''`;
+const browserSession = `source = 'browser' AND session_id IS NOT NULL AND btrim(session_id) <> '' AND COALESCE(data->>'internal', 'false') <> 'true'`;\nconst externalTraffic = `source = 'browser' AND COALESCE(data->>'internal', 'false') <> 'true'`;
 
 export async function getVisitCounts(): Promise<VisitCounts> {
   const rows = await db().unsafe(`
@@ -85,18 +85,18 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
         COUNT(DISTINCT path) FILTER (WHERE event='page_view')::int AS active_paths,
         COALESCE(MAX(CASE WHEN event='scroll' THEN (data->>'depth')::numeric END),0)::float AS max_scroll
       FROM analytics_raw_events
-      WHERE source='browser' AND occurred_at >= now() - interval '30 days'
+      WHERE ${externalTraffic} AND occurred_at >= now() - interval '30 days'
     `),
     sql.unsafe(`
       SELECT path, COUNT(*)::int AS views, COUNT(DISTINCT session_id)::int AS sessions
       FROM analytics_raw_events
-      WHERE source='browser' AND event='page_view' AND occurred_at >= now() - interval '30 days'
+      WHERE ${externalTraffic} AND event='page_view' AND occurred_at >= now() - interval '30 days'
       GROUP BY path ORDER BY views DESC, path ASC LIMIT 8
     `),
     sql.unsafe(`
       SELECT event, COUNT(*)::int AS count
       FROM analytics_raw_events
-      WHERE source='browser' AND occurred_at >= now() - interval '30 days'
+      WHERE ${externalTraffic} AND occurred_at >= now() - interval '30 days'
       GROUP BY event ORDER BY count DESC, event ASC
     `),
   ]);
