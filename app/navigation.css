@@ -323,3 +323,26 @@
 .bos-product-modal-checkout-error{margin:10px 0 0;color:#b42318;font-size:12px}
 @media(max-width:700px){.bos-public-root .bos-topbar-buy-trigger{min-height:38px;padding:0 12px;font-size:9px}.bos-public-root .bos-topbar-buy-menu{left:auto;right:0}}
 @media(max-width:460px){.bos-public-root .bos-topbar-buy-trigger{padding:0 9px;font-size:8px}.bos-public-root .bos-topbar-buy-menu{min-width:190px}}
+
+/* COMMERCE UI — KUP opens a full pricing dialog aligned with the product modal footprint. */
+.bos-public-root .bos-topbar-buy-backdrop{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:clamp(20px,4vw,56px);background:rgba(0,3,7,.84);backdrop-filter:blur(14px)}
+.bos-public-root .bos-topbar-buy-catalog{position:relative;width:min(1320px,calc(100vw - 80px));max-height:calc(100vh - 110px);overflow:auto;border:1px solid rgba(123,139,153,.34);background:#101820;color:#eef1f4;box-shadow:0 28px 90px rgba(0,0,0,.52)}
+.bos-public-root .bos-topbar-buy-close{position:absolute;top:16px;right:16px;z-index:2;width:44px;height:44px;border:1px solid rgba(217,222,225,.18);background:rgba(255,255,255,.06);color:#fff;font-size:28px;line-height:1;cursor:pointer}
+.bos-public-root .bos-topbar-buy-catalog>header{padding:44px 54px 30px;border-bottom:1px solid rgba(217,222,225,.16)}
+.bos-public-root .bos-topbar-buy-catalog>header>span,.bos-public-root .bos-topbar-buy-product-copy>span{color:#d2a45b;font-size:9px;font-weight:800;letter-spacing:.18em}
+.bos-public-root .bos-topbar-buy-catalog h2{margin:10px 0 8px;color:#f4f2ed;font-size:clamp(34px,4vw,58px);line-height:1;font-weight:700;letter-spacing:-.035em}
+.bos-public-root .bos-topbar-buy-catalog>header p{max-width:700px;margin:0;color:rgba(225,231,238,.58);font-size:13px;line-height:1.6}
+.bos-public-root .bos-topbar-buy-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.bos-public-root .bos-topbar-buy-products article{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:1fr auto;gap:24px 34px;min-height:250px;padding:38px 54px;border-right:1px solid rgba(217,222,225,.16)}
+.bos-public-root .bos-topbar-buy-products article:last-child{border-right:0}
+.bos-public-root .bos-topbar-buy-product-copy h3{margin:10px 0 12px;color:#f4f2ed;font-size:25px;letter-spacing:-.02em}
+.bos-public-root .bos-topbar-buy-product-copy p{max-width:430px;margin:0;color:rgba(225,231,238,.58);font-size:12px;line-height:1.6}
+.bos-public-root .bos-topbar-buy-price{align-self:start;text-align:right}
+.bos-public-root .bos-topbar-buy-price strong{display:block;color:#f4f2ed;font-family:Georgia,"Times New Roman",serif;font-size:38px;font-weight:400;white-space:nowrap}
+.bos-public-root .bos-topbar-buy-price small{display:block;margin-top:4px;color:#d2a45b;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.bos-public-root .bos-topbar-buy-products article>button{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;width:100%;min-height:50px;padding:0 18px;border:0;background:#c38d31;color:#fff;font-size:10px;font-weight:800;letter-spacing:.14em;cursor:pointer}
+.bos-public-root .bos-topbar-buy-products article>button:disabled{opacity:.65;cursor:wait}
+.bos-public-root .bos-topbar-buy-catalog>footer{display:flex;justify-content:space-between;gap:20px;padding:18px 54px;border-top:1px solid rgba(217,222,225,.16);color:rgba(225,231,238,.48);font-size:9px;letter-spacing:.08em}
+.bos-public-root .bos-topbar-buy-catalog>footer p{margin:0;color:#e7a6a1}
+@media(max-width:800px){.bos-public-root .bos-topbar-buy-catalog{width:calc(100vw - 32px);max-height:calc(100vh - 32px)}.bos-public-root .bos-topbar-buy-products{grid-template-columns:1fr}.bos-public-root .bos-topbar-buy-products article{border-right:0;border-bottom:1px solid rgba(217,222,225,.16)}.bos-public-root .bos-topbar-buy-catalog>header,.bos-public-root .bos-topbar-buy-products article{padding-left:28px;padding-right:28px}.bos-public-root .bos-topbar-buy-catalog>footer{padding-left:28px;padding-right:28px}}
+@media(max-width:520px){.bos-public-root .bos-topbar-buy-backdrop{padding:8px}.bos-public-root .bos-topbar-buy-catalog{width:100%;max-height:calc(100vh - 16px)}.bos-public-root .bos-topbar-buy-products article{grid-template-columns:1fr}.bos-public-root .bos-topbar-buy-price{text-align:left}.bos-public-root .bos-topbar-buy-products article>button{grid-column:1}}
