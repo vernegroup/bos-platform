@@ -28,6 +28,14 @@ type VerificationEmailInput = {
   token: string;
 };
 
+type OrganizationInviteEmailInput = {
+  to: string;
+  displayName: string;
+  organizationName: string;
+  roleLabel: string;
+  token: string;
+};
+
 function bosEmailFrom() {
   const raw = process.env.BOS_EMAIL_FROM?.trim();
   if (!raw) return null;
@@ -161,6 +169,33 @@ export async function sendPurchaseConfirmationEmail(input: PurchaseConfirmationE
   try { messageId = (JSON.parse(responseBody) as { id?: string }).id ?? null; } catch {}
   console.info("[email.purchase] accepted by Resend", { status: response.status, messageId });
   return { messageId };
+}
+
+export async function sendOrganizationInviteEmail(input: OrganizationInviteEmailInput) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = bosEmailFrom();
+  if (!apiKey || !from) throw new Error("EMAIL_NOT_CONFIGURED");
+
+  const inviteUrl = `${bosAppUrl()}/accept-invite?token=${encodeURIComponent(input.token)}`;
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [input.to],
+      subject: `Zaproszenie do ${input.organizationName} — BOS`,
+      html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Zaproszenie do organizacji</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>otrzymujesz zaproszenie do organizacji <strong>${escapeHtml(input.organizationName)}</strong> w BOS.</p><p>Przypisana rola: <strong>${escapeHtml(input.roleLabel)}</strong>.</p><p>Ustaw hasło, aby aktywować konto i dołączyć do organizacji.</p><p style="margin:28px 0"><a href="${inviteUrl}" style="background:#b98b46;color:#fff;text-decoration:none;padding:14px 22px;display:inline-block">Przyjmij zaproszenie →</a></p><p style="font-size:13px;color:#69747d">Link jest jednorazowy i wygasa po 24 godzinach. Jeśli nie oczekujesz tego zaproszenia, zignoruj wiadomość.</p></div></body></html>`,
+    }),
+  });
+  const responseBody = await response.text();
+  if (!response.ok) {
+    console.error("[email.organization-invite] Resend rejected message", { status: response.status, response: responseBody.slice(0, 1000) });
+    throw new Error(`EMAIL_SEND_FAILED:${response.status}`);
+  }
+  let messageId:string|null=null;
+  try { messageId=(JSON.parse(responseBody) as {id?:string}).id??null; } catch {}
+  console.info("[email.organization-invite] accepted by Resend",{status:response.status,messageId});
+  return {messageId};
 }
 
 export async function sendVerificationEmail(input: VerificationEmailInput) {
