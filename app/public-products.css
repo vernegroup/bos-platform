@@ -175,3 +175,14 @@
 @media(max-width:800px){
  .bos-public-root .bos-topbar-buy-products article{border-bottom-color:#dedbd4}
 }
+
+
+/* PRICING POPUP — keep product access description horizontal and emphatic */
+.bos-public-root .bos-topbar-buy-product-copy p{
+  max-width:none;
+  color:#10253c;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.55;
+  letter-spacing:.06em;
+}
