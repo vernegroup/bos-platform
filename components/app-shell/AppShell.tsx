@@ -7,6 +7,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { signOut } from "next-auth/react";
 import AppProductRail from "./AppProductRail";
+import AppHelpRegion from "./AppHelpRegion";
+import AppAgentSlot from "./AppAgentSlot";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -59,13 +61,50 @@ export default function AppShell({children,account,organizationName,productEntit
   const [signoutOpen,setSignoutOpen]=useState(false);
   const closeButtonRef=useRef<HTMLButtonElement>(null);
   const menuButtonRef=useRef<HTMLButtonElement>(null);
+  const navHandleRef=useRef<HTMLButtonElement>(null);
+  const navOpenerRef=useRef<HTMLButtonElement|null>(null);
+  const topbarRef=useRef<HTMLElement>(null);
+  const [topbarVisible,setTopbarVisible]=useState(true);
   const accountRef=useRef<HTMLDivElement>(null);
 
   useEffect(()=>{
     if(!mobileOpen)return;
     const previous=document.body.style.overflow; document.body.style.overflow="hidden"; closeButtonRef.current?.focus();
-    const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape"){setMobileOpen(false);requestAnimationFrame(()=>menuButtonRef.current?.focus());}};
+    const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape"){setMobileOpen(false);requestAnimationFrame(()=>navOpenerRef.current?.focus());}};
     document.addEventListener("keydown",onKey); return()=>{document.body.style.overflow=previous;document.removeEventListener("keydown",onKey);};
+  },[mobileOpen]);
+
+  useEffect(()=>{
+    const node=topbarRef.current;
+    if(!node || typeof IntersectionObserver==="undefined")return;
+    const observer=new IntersectionObserver(([entry])=>setTopbarVisible(entry.isIntersecting),{threshold:0});
+    observer.observe(node);
+    return()=>observer.disconnect();
+  },[]);
+
+  function openMobileNav(opener:HTMLButtonElement|null){
+    navOpenerRef.current=opener;
+    setMobileOpen(true);
+  }
+  function closeMobileNav(){
+    setMobileOpen(false);
+    requestAnimationFrame(()=>navOpenerRef.current?.focus());
+  }
+
+  useEffect(()=>{
+    if(!mobileOpen)return;
+    const sidebar=document.getElementById("bos-app-navigation");
+    if(!sidebar)return;
+    const onTab=(event:KeyboardEvent)=>{
+      if(event.key!=="Tab")return;
+      const items=Array.from(sidebar.querySelectorAll<HTMLElement>('a[href],button:not([disabled])')).filter(el=>el.getClientRects().length>0);
+      if(!items.length)return;
+      const first=items[0],last=items[items.length-1];
+      if(event.shiftKey && document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey && document.activeElement===last){event.preventDefault();first.focus();}
+    };
+    sidebar.addEventListener("keydown",onTab);
+    return()=>sidebar.removeEventListener("keydown",onTab);
   },[mobileOpen]);
 
   useEffect(()=>{
@@ -81,7 +120,7 @@ export default function AppShell({children,account,organizationName,productEntit
     <a className="bos-skip-link" href="#bos-main-content">Przejdź do treści</a>
     <aside id="bos-app-navigation" className={"bos-app-sidebar"+(mobileOpen?" is-open":"")} aria-label="Menu aplikacji">
       <div className="bos-app-sidebar-head">
-        <Link href="/app" className="bos-app-brand" aria-label="BOS — panel główny" onClick={()=>setMobileOpen(false)}><span>BOS</span></Link>
+        <Link href="/app" className="bos-app-brand" aria-label="BOS — panel główny" onClick={closeMobileNav}><span>BOS</span></Link>
         <button ref={closeButtonRef} className="bos-app-sidebar-close" type="button" aria-label="Zamknij menu" onClick={()=>setMobileOpen(false)}>×</button>
       </div>
       <nav className="bos-app-nav" aria-label="Nawigacja aplikacji BOS">
@@ -94,8 +133,8 @@ export default function AppShell({children,account,organizationName,productEntit
     </aside>
     {mobileOpen&&<button className="bos-app-scrim" aria-label="Zamknij menu" onClick={()=>setMobileOpen(false)}/>}
     <div className="bos-app-main">
-      <header className="bos-app-topbar">
-        <button ref={menuButtonRef} className="bos-app-menu-button" type="button" aria-label="Otwórz menu" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(true)}><span/><span/><span/></button>
+      <header ref={topbarRef} className="bos-app-topbar">
+        <button ref={menuButtonRef} className="bos-app-menu-button" type="button" aria-label="Otwórz menu" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={()=>openMobileNav(menuButtonRef.current)}><span/><span/><span/></button>
         <form className="bos-app-search" role="search" onSubmit={submitSearch}>
           <Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} aria-label="Szukaj w BOS" placeholder="Szukaj w BOS..." />
         </form>
@@ -119,8 +158,13 @@ export default function AppShell({children,account,organizationName,productEntit
         </div>
       </header>
       <AppProductRail productEntitlements={productEntitlements} />
-      <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
+      <div className="bos-app-content">
+        <AppHelpRegion />
+        <main id="bos-main-content" className="bos-app-workspace" tabIndex={-1}>{children}</main>
+      </div>
+      <AppAgentSlot />
       {signoutOpen&&<div className="bos-signout-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSignoutOpen(false)}}><section className="bos-signout-dialog" role="dialog" aria-modal="true" aria-labelledby="bos-signout-title"><h2 id="bos-signout-title">Wylogowanie</h2><p>Czy na pewno chcesz się wylogować?</p><div><button type="button" onClick={()=>setSignoutOpen(false)}>Anuluj</button><button type="button" onClick={()=>signOut({callbackUrl:"/"})}>Wyloguj się</button></div></section></div>}
+      {!topbarVisible && <button ref={navHandleRef} className="bos-app-nav-handle" type="button" aria-label="Otwórz menu nawigacji" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={()=>openMobileNav(navHandleRef.current)}><span aria-hidden="true">☰</span></button>}
       <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>
     </div>
   </div>;
