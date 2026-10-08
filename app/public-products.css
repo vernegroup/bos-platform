@@ -127,3 +127,51 @@
 .bos-public-root .bos-product-modal-steps{border-color:rgba(207,213,216,.22)}
 .bos-public-root .bos-product-modal-steps article{display:block;padding-left:14px;border-left:1px solid rgba(217,222,225,.16)}
 .bos-public-root .bos-product-modal-steps article:first-child{border-left:0}
+
+
+/* LANDING MODALS — shared light application surface */
+.bos-public-root .bos-intro{background:linear-gradient(135deg,#faf9f6,#f3f1ec);color:#10253c}
+.bos-public-root .bos-intro p{color:#66717a}
+.bos-public-root .bos-intro strong{color:#10253c}
+.bos-public-root .bos-intro small{color:#7a838a}
+.bos-public-root .bos-intro button{color:#fff}
+
+.bos-public-root .bos-product-modal{border-color:#d9d6cf;background:#faf9f6;color:#10253c;box-shadow:0 28px 90px rgba(10,24,36,.2)}
+.bos-public-root .bos-product-modal-copy{background:#faf9f6;border-right-color:#dedbd4}
+.bos-public-root .bos-product-modal-close{border-color:#d6d2ca;background:#f3f1ec;color:#10253c}
+.bos-public-root .bos-product-modal-copy>h2,
+.bos-public-root .bos-product-modal-benefits h3,
+.bos-public-root .bos-product-modal-steps h3{color:#10253c}
+.bos-public-root .bos-product-modal-lead,
+.bos-public-root .bos-product-modal-benefits p,
+.bos-public-root .bos-product-modal-steps p,
+.bos-public-root .bos-product-modal-audience p{color:#66717a}
+.bos-public-root .bos-product-modal-benefits,
+.bos-public-root .bos-product-modal-benefits article,
+.bos-public-root .bos-product-modal-steps,
+.bos-public-root .bos-product-modal-steps article{border-color:#dedbd4}
+.bos-public-root .bos-product-modal-audience{border-color:#dedbd4;background:#f3f1ec}
+.bos-public-root .bos-product-modal-demo{background:#f3f1ec}
+
+.bos-public-root .bos-topbar-buy-catalog{border-color:#d9d6cf;background:#faf9f6;color:#10253c;box-shadow:0 28px 90px rgba(10,24,36,.2)}
+.bos-public-root .bos-topbar-buy-close{border-color:#d6d2ca;background:#f3f1ec;color:#10253c}
+.bos-public-root .bos-topbar-buy-catalog>header{border-bottom-color:#dedbd4}
+.bos-public-root .bos-topbar-buy-catalog h2,
+.bos-public-root .bos-topbar-buy-product-copy h3,
+.bos-public-root .bos-topbar-buy-price strong{color:#10253c}
+.bos-public-root .bos-topbar-buy-catalog>header p,
+.bos-public-root .bos-topbar-buy-product-copy p{color:#66717a}
+.bos-public-root .bos-topbar-buy-products article{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-content:space-between;gap:22px 32px;min-width:0;border-right-color:#dedbd4}
+.bos-public-root .bos-topbar-buy-product-copy{min-width:0}
+.bos-public-root .bos-topbar-buy-product-copy p{max-width:420px;font-size:11px;line-height:1.65}
+.bos-public-root .bos-topbar-buy-price{min-width:245px}
+.bos-public-root .bos-topbar-buy-price strong{font-size:36px}
+.bos-public-root .bos-topbar-buy-catalog>footer{border-top-color:#dedbd4;color:#7a838a}
+@media(max-width:1100px){
+ .bos-public-root .bos-topbar-buy-products article{grid-template-columns:1fr}
+ .bos-public-root .bos-topbar-buy-price{min-width:0;text-align:left}
+ .bos-public-root .bos-topbar-buy-price small{margin-left:0}
+}
+@media(max-width:800px){
+ .bos-public-root .bos-topbar-buy-products article{border-bottom-color:#dedbd4}
+}
