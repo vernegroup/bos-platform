@@ -63,7 +63,7 @@ export default function AppShell({children,account,organizationName,productEntit
   const menuButtonRef=useRef<HTMLButtonElement>(null);
   const navHandleRef=useRef<HTMLButtonElement>(null);
   const navOpenerRef=useRef<HTMLButtonElement|null>(null);
-  const topbarRef=useRef<HTMLElement>(null);
+  const topbarSentinelRef=useRef<HTMLDivElement>(null);
   const [topbarVisible,setTopbarVisible]=useState(true);
   const accountRef=useRef<HTMLDivElement>(null);
 
@@ -75,7 +75,7 @@ export default function AppShell({children,account,organizationName,productEntit
   },[mobileOpen]);
 
   useEffect(()=>{
-    const node=topbarRef.current;
+    const node=topbarSentinelRef.current;
     if(!node || typeof IntersectionObserver==="undefined")return;
     const observer=new IntersectionObserver(([entry])=>setTopbarVisible(entry.isIntersecting),{threshold:0});
     observer.observe(node);
@@ -121,19 +121,20 @@ export default function AppShell({children,account,organizationName,productEntit
     <aside id="bos-app-navigation" className={"bos-app-sidebar"+(mobileOpen?" is-open":"")} aria-label="Menu aplikacji">
       <div className="bos-app-sidebar-head">
         <Link href="/app" className="bos-app-brand" aria-label="BOS — panel główny" onClick={closeMobileNav}><span>BOS</span></Link>
-        <button ref={closeButtonRef} className="bos-app-sidebar-close" type="button" aria-label="Zamknij menu" onClick={()=>setMobileOpen(false)}>×</button>
+        <button ref={closeButtonRef} className="bos-app-sidebar-close" type="button" aria-label="Zamknij menu" onClick={closeMobileNav}>×</button>
       </div>
       <nav className="bos-app-nav" aria-label="Nawigacja aplikacji BOS">
-        {navigation.map(item=><Link key={item.href} href={item.href} className={"bos-app-nav-link"+(isCurrentPath(pathname,item.href)?" is-active":"")} aria-current={isCurrentPath(pathname,item.href)?"page":undefined} onClick={()=>setMobileOpen(false)}><Icon name={item.icon}/><span>{item.label}</span></Link>)}
+        {navigation.map(item=><Link key={item.href} href={item.href} className={"bos-app-nav-link"+(isCurrentPath(pathname,item.href)?" is-active":"")} aria-current={isCurrentPath(pathname,item.href)?"page":undefined} onClick={closeMobileNav}><Icon name={item.icon}/><span>{item.label}</span></Link>)}
       </nav>
       <div className="bos-app-sidebar-bottom">
-        <Link href="/app/help" className={"bos-app-nav-link"+(isCurrentPath(pathname,"/app/help")?" is-active":"")} aria-current={isCurrentPath(pathname,"/app/help")?"page":undefined} onClick={()=>setMobileOpen(false)}><Icon name="help"/><span>Pomoc</span></Link>
-        <button type="button" className="bos-app-nav-link bos-app-nav-button" onClick={()=>setSignoutOpen(true)}><Icon name="logout"/><span>Wyloguj</span></button>
+        <Link href="/app/help" className={"bos-app-nav-link"+(isCurrentPath(pathname,"/app/help")?" is-active":"")} aria-current={isCurrentPath(pathname,"/app/help")?"page":undefined} onClick={closeMobileNav}><Icon name="help"/><span>Pomoc</span></Link>
+        <button type="button" className="bos-app-nav-link bos-app-nav-button" onClick={()=>{closeMobileNav();setSignoutOpen(true)}}><Icon name="logout"/><span>Wyloguj</span></button>
       </div>
     </aside>
-    {mobileOpen&&<button className="bos-app-scrim" aria-label="Zamknij menu" onClick={()=>setMobileOpen(false)}/>}
+    {mobileOpen&&<button className="bos-app-scrim" aria-label="Zamknij menu" onClick={closeMobileNav}/>}
     <div className="bos-app-main">
-      <header ref={topbarRef} className="bos-app-topbar">
+      <div ref={topbarSentinelRef} className="bos-app-topbar-sentinel" aria-hidden="true" />
+      <header className="bos-app-topbar">
         <button ref={menuButtonRef} className="bos-app-menu-button" type="button" aria-label="Otwórz menu" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={()=>openMobileNav(menuButtonRef.current)}><span/><span/><span/></button>
         <form className="bos-app-search" role="search" onSubmit={submitSearch}>
           <Icon name="search"/><input value={search} onChange={e=>setSearch(e.target.value)} aria-label="Szukaj w BOS" placeholder="Szukaj w BOS..." />
