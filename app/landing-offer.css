@@ -15,3 +15,15 @@
 .bos-public-root .bos-offer-comparison tbody td{color:#415367}
 @media(max-width:800px){.bos-public-root .bos-offer-comparison{padding:26px 28px 30px}.bos-public-root .bos-offer-comparison__heading{display:block}.bos-public-root .bos-offer-comparison__heading h3{margin-top:8px}}
 @media(max-width:520px){.bos-public-root .bos-offer-comparison{padding:24px 16px}.bos-public-root .bos-offer-comparison table{min-width:620px}.bos-public-root .bos-offer-comparison th,.bos-public-root .bos-offer-comparison td{padding:12px}}
+
+/* LAND-03: show access terms as horizontal text rather than a narrow vertical column. */
+@media(min-width:1101px){
+ .bos-public-root .bos-topbar-buy-products article{grid-template-columns:1fr;grid-template-rows:auto auto auto;align-content:start}
+ .bos-public-root .bos-topbar-buy-product-copy p{max-width:none;white-space:normal;letter-spacing:0;font-size:12px;line-height:1.6;font-weight:600}
+ .bos-public-root .bos-topbar-buy-price{min-width:0;text-align:left}
+ .bos-public-root .bos-topbar-buy-price small{max-width:none;margin-left:0}
+ .bos-public-root .bos-topbar-buy-products article>button{grid-column:1}
+}
+@media(min-width:801px) and (max-width:1100px){
+ .bos-public-root .bos-topbar-buy-product-copy p{max-width:none;letter-spacing:0}
+}
