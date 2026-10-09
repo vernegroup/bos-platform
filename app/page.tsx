@@ -9,6 +9,7 @@ import "./public-scene.css";
 import "./public-hero.css";
 import "./public-products.css";
 import "./landing-explainer.css";
+import "./landing-offer.css";
 
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
