@@ -50,7 +50,7 @@ WITH usage AS (
   FROM standard_capacity_grants WHERE status='ACTIVE' GROUP BY organization_id,product_id
 )
 INSERT INTO standard_capacity_grants(organization_id,product_id,quantity,source)
-SELECT u.organization_id,u.product_id,10*CEIL((u.used-b.capacity)::numeric/10)::int,'LEGACY'
+SELECT u.organization_id,u.product_id,(10*CEIL((u.used-b.capacity)::numeric/10))::int,'LEGACY'
 FROM usage u JOIN base b USING(organization_id,product_id)
 WHERE u.used>b.capacity
   AND NOT EXISTS(SELECT 1 FROM standard_capacity_grants g
