@@ -1,5 +1,5 @@
 /* LAND-02 preview — isolated public landing explainer, no product or AppShell overrides. */
-.bos-land-explainer{position:relative;z-index:2;padding:76px clamp(28px,4.2vw,78px) 96px;color:#f5f3ee;background:linear-gradient(180deg,rgba(2,5,10,0),rgba(2,5,10,.68) 18%,rgba(2,5,10,.78) 78%,rgba(2,5,10,0))}
+.bos-land-explainer{position:relative;z-index:2;margin:36px clamp(24px,4.2vw,78px) 64px;padding:64px clamp(28px,4.2vw,78px) 72px;color:#f5f3ee;background:rgba(2,5,10,.68);border:1px solid rgba(225,232,241,.13);border-radius:22px}
 .bos-land-explainer__inner{max-width:1420px;margin:0 auto}
 .bos-land-explainer__heading{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);column-gap:clamp(32px,7vw,120px);align-items:end}
 .bos-land-explainer__eyebrow{grid-column:1/-1;margin-bottom:24px;color:#d1a568;font-size:10px;font-weight:700;letter-spacing:.26em}
@@ -15,5 +15,5 @@
 .bos-land-explainer__footer strong{font-size:15px;font-weight:600;letter-spacing:.015em}
 .bos-land-explainer__footer a{display:inline-flex;align-items:center;gap:14px;color:#e4b576;font-size:11px;font-weight:700;letter-spacing:.15em;text-decoration:none;white-space:nowrap}
 .bos-land-explainer__footer a:hover,.bos-land-explainer__footer a:focus-visible{color:#fff;text-decoration:underline;text-underline-offset:5px}
-@media(max-width:900px){.bos-land-explainer{padding-top:52px;padding-bottom:70px}.bos-land-explainer__heading{grid-template-columns:1fr;gap:22px}.bos-land-explainer__eyebrow{margin-bottom:0}.bos-land-explainer__heading p{max-width:650px}.bos-land-explainer__steps{gap:18px;margin-top:48px}.bos-land-explainer__steps li{gap:12px}}
-@media(max-width:650px){.bos-land-explainer{padding:46px 24px 58px}.bos-land-explainer__steps{grid-template-columns:1fr;gap:12px;margin-top:38px}.bos-land-explainer__steps li{padding-top:18px}.bos-land-explainer__steps p{max-width:none}.bos-land-explainer__footer{align-items:flex-start;flex-direction:column;gap:22px;margin-top:32px}.bos-land-explainer__footer a{white-space:normal}}
+@media(max-width:900px){.bos-land-explainer{padding-top:52px;padding-bottom:60px}.bos-land-explainer__heading{grid-template-columns:1fr;gap:22px}.bos-land-explainer__eyebrow{margin-bottom:0}.bos-land-explainer__heading p{max-width:650px}.bos-land-explainer__steps{gap:18px;margin-top:48px}.bos-land-explainer__steps li{gap:12px}}
+@media(max-width:650px){.bos-land-explainer{margin:24px 16px 48px;padding:38px 24px 46px;border-radius:16px}.bos-land-explainer__steps{grid-template-columns:1fr;gap:12px;margin-top:38px}.bos-land-explainer__steps li{padding-top:18px}.bos-land-explainer__steps p{max-width:none}.bos-land-explainer__footer{align-items:flex-start;flex-direction:column;gap:22px;margin-top:32px}.bos-land-explainer__footer a{white-space:normal}}
