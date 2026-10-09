@@ -326,3 +326,46 @@ function escapeHtml(value: string) {
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;",
   })[character] ?? character);
 }
+
+
+export async function sendCapacityAddonConfirmationEmail(input: {
+  to: string;
+  productName: string;
+  totalCapacity: number;
+  checkoutSessionId: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = bosEmailFrom();
+  if (!apiKey || !from) throw new Error("EMAIL_NOT_CONFIGURED");
+  // Stable idempotency key protects against a crash after Resend accepts the email.
+  const idempotencyKey = `bos-capacity-email-${input.checkoutSessionId}`;
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": idempotencyKey,
+    },
+    body: JSON.stringify({
+      from,
+      to: [input.to],
+      template: {
+        id: "7a736b1b-b326-4a83-934c-caf6789ef266",
+        variables: {
+          PRODUCT_NAME: input.productName,
+          TOTAL_CAPACITY: String(input.totalCapacity),
+          ORDER_ID: input.checkoutSessionId,
+        },
+      },
+    }),
+  });
+  const body = await response.text();
+  if (!response.ok) {
+    console.error("[email.capacity] Resend rejected message", { status: response.status, response: body.slice(0, 1000) });
+    throw new Error(`EMAIL_SEND_FAILED:${response.status}`);
+  }
+  let messageId: string | null = null;
+  try { messageId = (JSON.parse(body) as { id?: string }).id ?? null; } catch {}
+  console.info("[email.capacity] accepted by Resend", { messageId, checkoutSessionId: input.checkoutSessionId });
+  return { messageId };
+}
