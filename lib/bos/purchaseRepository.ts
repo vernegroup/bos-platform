@@ -121,6 +121,12 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
         [purchases[0].id, purchases[0].organization_id, products[0].id],
       );
     }
+    // One BASE capacity grant per organization/product, regardless of purchase retries.
+    // The grant is issued in the same transaction as the product license.
+    await tx.unsafe(
+      "INSERT INTO standard_capacity_grants(organization_id,product_id,quantity,source) VALUES($1,$2,10,'BASE') ON CONFLICT DO NOTHING",
+      [purchases[0].organization_id,products[0].id],
+    );
     const annualLicense = await tx.unsafe(
       "SELECT valid_from,valid_until FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' AND license_type='ANNUAL' LIMIT 1",
       [purchases[0].organization_id, products[0].id],
