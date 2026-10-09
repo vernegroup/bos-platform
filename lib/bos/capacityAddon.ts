@@ -37,10 +37,12 @@ export async function createCapacityAddonCheckout(productKey: "onboarding"|"prom
 export async function fulfillCapacityAddon(session:Stripe.Checkout.Session,eventId:string) {
   if(session.metadata?.bos_kind!==ADDON_KIND)throw new Error("Unexpected checkout kind");
   if(session.mode!=="payment"||session.payment_status!=="paid")return {fulfilled:false,reason:"not_paid" as const};
-  const organizationId=session.metadata.organization_id;
-  const productId=session.metadata.product_id;
-  const userId=session.metadata.bos_user_id;
-  if(!organizationId||!productId||!userId||!["onboarding","promotions"].includes(session.metadata.product??"")||session.metadata.standards_added!=="10"||session.client_reference_id!==organizationId)
+  const metadata=session.metadata;
+  if(!metadata)throw new Error("Missing capacity checkout metadata");
+  const organizationId=metadata.organization_id;
+  const productId=metadata.product_id;
+  const userId=metadata.bos_user_id;
+  if(!organizationId||!productId||!userId||!["onboarding","promotions"].includes(metadata.product??"")||metadata.standards_added!=="10"||session.client_reference_id!==organizationId)
     throw new Error("Invalid capacity checkout metadata");
   // Validate the actual paid line item, not only customer-controlled session metadata.
   const lines=await stripe.checkout.sessions.listLineItems(session.id,{limit:10});
@@ -56,7 +58,7 @@ export async function fulfillCapacityAddon(session:Stripe.Checkout.Session,event
     }
     const eligible=await tx.unsafe(
       "SELECT 1 FROM licenses l JOIN products p ON p.id=l.product_id JOIN organizations o ON o.id=l.organization_id JOIN memberships m ON m.organization_id=o.id AND m.user_id=$3 JOIN users u ON u.id=m.user_id WHERE l.organization_id=$1 AND l.product_id=$2 AND l.status='ACTIVE' AND (l.license_type='PERPETUAL' OR (l.license_type='ANNUAL' AND l.valid_until>now())) AND p.status='ACTIVE' AND p.key=$4 AND o.status='ACTIVE' AND m.status='ACTIVE' AND m.role IN ('OWNER','ADMIN') AND u.status='ACTIVE' LIMIT 1",
-      [organizationId,productId,userId,session.metadata.product]
+      [organizationId,productId,userId,metadata.product]
     );
     if(!eligible.length)throw new Error("No active product license or authorized purchaser for capacity addon");
     await tx.unsafe(
