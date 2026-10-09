@@ -25,6 +25,8 @@ function harness({access=null,licensed=false,eligible=licensed,paid=true,price="
   if(q.includes("SELECT id FROM standard_capacity_grants"))return existing?[{id:"grant-test"}]:[];
   if(q.includes("SELECT 1 FROM licenses"))return eligible?[{ok:1}]:[];
   if(q.includes("INSERT INTO standard_capacity_grants"))calls.grants++;
+  if(q.includes("SELECT email FROM users"))return [{email:"test@example.invalid"}];
+  if(q.includes("SELECT COALESCE(SUM(quantity)"))return [{total:20}];
   return [];
  }})};
  const modules={
@@ -33,6 +35,7 @@ function harness({access=null,licensed=false,eligible=licensed,paid=true,price="
   "@/lib/bos/app-url":{bosAppUrl:()=>"https://bos.test"},
   "@/lib/bos/access":{resolveBOSAccess:async()=>access},
   "@/lib/bos/billingRepository":{resolveBillingCustomerId:async()=>null},
+  "@/lib/bos/capacityAddonEmail":{deliverCapacityAddonConfirmation:async()=>({delivered:true})},
   "server-only":{}
  };
  const filename=path.resolve(__dirname,"../lib/bos/capacityAddon.ts");
