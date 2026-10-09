@@ -525,6 +525,8 @@ export async function publishDraftStandard(input:{organizationId:string;standard
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
+    const [member]=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
+    if(!member) throw new Error("Brak aktywnego członkostwa w organizacji.");
     const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id) VALUES(${organizationId},${input.productId},${input.name},${input.area??null},'ACTIVE',${input.createdByUserId}) RETURNING id`;
     await consumeStandardCapacity(tx,{organizationId,standardId:standard.id,productId:input.productId});
     const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,published_at,created_by_user_id) VALUES(${organizationId},${standard.id},1,${input.versionLabel},'PUBLISHED',${input.changeNote??null},now(),${input.createdByUserId}) RETURNING id`;
