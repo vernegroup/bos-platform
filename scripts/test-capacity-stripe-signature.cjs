@@ -20,7 +20,7 @@ function loadRoute(){
   "@/lib/bos/purchaseRepository":{failCheckoutSession:async()=>({}),fulfillCheckoutSession:async()=>{calls.license++;return {};},refundCharge:async()=>({})},
   "@/lib/bos/subscriptionRepository":{fulfillAnnualCheckout:async()=>({}),recordAnnualInvoice:async()=>({}),syncAnnualSubscription:async()=>({})}
  };
- vm.runInNewContext(js,{exports,require:(name)=>{if(!(name in modules))throw Error("Unexpected dependency "+name);return modules[name];},process:{env:{STRIPE_WEBHOOK_SECRET:secret}},console:{error:()=>{}}},{filename});
+ vm.runInNewContext(js,{exports,require:(name)=>{if(!(name in modules))throw Error("Unexpected dependency "+name);return modules[name];},process:{env:{STRIPE_WEBHOOK_SECRET:secret}},console:{error:()=>{},info:()=>{}}},{filename});
  return {POST:exports.POST,calls};
 }
 function eventRequest({tamper=false,invalidSignature=false,kind="standard_capacity_addon",type="checkout.session.completed"}={}){
