@@ -4359,3 +4359,22 @@
 .bos-app-help-region .bos-help-instruction-list li{font-size:12px;line-height:1.55;overflow-wrap:anywhere}
 .bos-app-help-region .bos-help-instruction-list li::marker{font-weight:700;color:#a77428}
 .bos-app-help-region .bos-help-instruction-link{display:inline-block;margin-top:14px;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+
+/* HELP-03 polish — dock the global Help shortcut below the HELP column. */
+@media(min-width:1440px){
+  .bos-app-shell .bos-app-chat-fab{
+    left:calc(var(--bos-nav-width) + (var(--bos-help-width) - 156px)/2);
+    right:auto;
+    bottom:20px;
+    width:156px;
+    height:42px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    font-size:12px;
+    font-weight:700;
+  }
+  .bos-app-shell .bos-app-chat-fab svg{width:18px;height:18px}
+}
