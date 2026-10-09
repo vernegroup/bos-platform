@@ -1,3 +1,4 @@
+import HelpProcessContext from "@/components/app-shell/HelpProcessContext";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -66,8 +67,9 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   {name:"PRZEJŚCIE",ok:p.gates.transition,detail:p.transition.length===0?"Dodaj co najmniej jeden element przejścia A → B i potwierdź jego wykonanie. 0/0 nie spełnia bramki PRZEJŚCIE.":"Potwierdź jako WYKONANE wszystkie elementy przejścia A → B.",href:"#verification"}
  ] as const;
  const pendingGates=gateGuidance.filter(g=>!g.ok);
+ const helpState=p.gates.readyAllowed?"ready-for-decision":`gate-${pendingGates[0]?.name==="OCENA WEJŚCIOWA"?"entry":pendingGates[0]?.name==="WDROŻENIE"?"deployment":pendingGates[0]?.name==="GOTOWOŚĆ"?"readiness":pendingGates[0]?.name==="PRZEJŚCIE"?"transition":pendingGates[0]?.name==="STANDARD"?"standard":pendingGates[0]?.name==="PROCES"?"process":"critical"}`;
  const lifecyclePL=p.lifecycleState==="PLANNED"?(assessed>0?"W TOKU":"PLANOWANE"):p.lifecycleState==="IN_PROGRESS"?"W TOKU":p.lifecycleState==="READY_TO_DECIDE"?"GOTOWY DO DECYZJI":p.lifecycleState==="CLOSED"?"ZAMKNIĘTY":p.lifecycleState==="STOPPED"?"ZATRZYMANY":p.lifecycleState;
- return <>
+ return <><HelpProcessContext context={{product:"promotions",screen:"process-detail",stage:"conduct",state:helpState}} />
   <div className="bos-standard-back"><Link href="/app/promotions/processes">← ZMIANY W TOKU</Link></div>
   <section className="bos-app-intro bos-promotions-view-head"><div>
    <div className="bos-app-kicker">BOS / AWANSE / MAPA ZMIANY</div>
