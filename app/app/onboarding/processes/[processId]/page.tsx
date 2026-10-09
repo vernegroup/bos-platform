@@ -1,3 +1,4 @@
+import HelpProcessContext from "@/components/app-shell/HelpProcessContext";
 export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -47,9 +48,11 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
   const readinessPassed=version.readinessCriteria.filter(c=>process.readinessChecks.find(x=>x.criterionId===c.id)?.isPassed).length;
   const readinessGate=version.readinessCriteria.length>0&&readinessPassed===version.readinessCriteria.length;
   const readyForDecision=tasksGate&&criticalGate&&readinessGate;
+  const helpState=!startComplete?"start-blocked":!tasksGate?"tasks-pending":!criticalGate?"critical-pending":!readinessGate?"readiness-pending":"ready-for-decision";
 
   return (
     <>
+      <HelpProcessContext context={{product:"onboarding",screen:"process-detail",stage:"conduct",state:helpState}} />
       <div className="bos-standard-back"><Link href="/app/onboarding/processes">← WDROŻENIA W TOKU</Link></div>
       <nav className="bos-guided-flow" aria-label="Etapy BOS Onboarding">
         <Link href="/app/standards"><span>01</span><strong>PRZYGOTUJ</strong><small>Standard Stanowiska</small></Link>
