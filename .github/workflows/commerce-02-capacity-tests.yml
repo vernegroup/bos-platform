@@ -1,0 +1,23 @@
+name: COMMERCE-02 Capacity Tests
+on:
+  push:
+    branches:
+      - feature/commerce-02-standard-capacity
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capacity-addon-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Simulated session integration tests
+        run: npm run test:capacity-addon
+      - name: TypeScript
+        run: npx tsc --noEmit
