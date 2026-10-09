@@ -4346,3 +4346,10 @@
   .bos-app-shell .bos-app-nav-handle:focus-visible{outline:2px solid #b98732;outline-offset:2px}
 }
 @media(max-width:520px){.bos-app-shell .bos-app-workspace{padding-inline:12px}}
+
+/* BOS UI 2.1 — Promotions compact-copy readability (no workflow changes) */
+.bos-promotions-shell .bos-promotions-rule-note span{font-size:10px;line-height:1.4}
+.bos-promotions-shell .bos-promotions-rule-note p{font-size:11px;line-height:1.55}
+.bos-promotions-shell .bos-standard-toolbar>div span{font-size:10px;line-height:1.4}
+.bos-promotions-shell .bos-standard-toolbar>div strong{font-size:12px;line-height:1.4}
+.bos-promotions-shell .bos-standard-primary-action{min-height:38px!important;padding:0 14px!important;font-size:10px!important;line-height:1.3!important}
