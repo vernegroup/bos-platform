@@ -5,6 +5,7 @@ import { stripe } from "@/lib/stripe";
 import { bosAppUrl } from "@/lib/bos/app-url";
 import { resolveBOSAccess } from "@/lib/bos/access";
 import { resolveBillingCustomerId } from "@/lib/bos/billingRepository";
+import { deliverCapacityAddonConfirmation } from "@/lib/bos/capacityAddonEmail";
 
 export const CAPACITY_ADDON_PRICE_ID = "price_1UOb8W1ETGwirCfz2kz71m3W";
 const ADDON_KIND = "standard_capacity_addon";
@@ -49,7 +50,7 @@ export async function fulfillCapacityAddon(session:Stripe.Checkout.Session,event
   if(lines.data.length!==1||lines.data[0].price?.id!==CAPACITY_ADDON_PRICE_ID||lines.data[0].quantity!==1)
     throw new Error("Capacity addon price mismatch");
   const sql=db();
-  return sql.begin(async tx=>{
+  const fulfillment = await sql.begin(async tx=>{
     await tx.unsafe("SELECT pg_advisory_xact_lock(hashtextextended($1,0))",[`bos-capacity:${organizationId}:${productId}`]);
     const prior=await tx.unsafe("SELECT id FROM standard_capacity_grants WHERE stripe_checkout_session_id=$1 LIMIT 1",[session.id]);
     if(prior.length){
@@ -65,7 +66,22 @@ export async function fulfillCapacityAddon(session:Stripe.Checkout.Session,event
       "INSERT INTO standard_capacity_grants(organization_id,product_id,quantity,source,stripe_checkout_session_id) VALUES($1,$2,10,'STRIPE',$3) ON CONFLICT(stripe_checkout_session_id) DO NOTHING",
       [organizationId,productId,session.id]
     );
+    // Outbox row is committed atomically with the capacity grant.
+    const buyer=await tx.unsafe("SELECT email FROM users WHERE id=$1 AND status='ACTIVE' LIMIT 1",[userId]);
+    if(!buyer.length||!buyer[0].email)throw new Error("Capacity purchaser email unavailable");
+    const capacity=await tx.unsafe(
+      "SELECT COALESCE(SUM(quantity),0)::int AS total FROM standard_capacity_grants WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE'",
+      [organizationId,productId]
+    );
+    await tx.unsafe(
+      "INSERT INTO standard_capacity_email_outbox(stripe_checkout_session_id,organization_id,product_id,recipient_email,product_name,total_capacity) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT(stripe_checkout_session_id) DO NOTHING",
+      [session.id,organizationId,productId,buyer[0].email,metadata.product==="onboarding"?"BOS Wdrożenia":"BOS Awanse",Number(capacity[0].total)]
+    );
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2) ON CONFLICT DO NOTHING",[eventId,"capacity.addon.paid"]);
     return {fulfilled:true,organizationId,productId,quantity:10};
   });
+  // On repeated events retry an unsent confirmation without regranting capacity.
+  // A delivery failure returns 500 to Stripe; the committed grant is not rolled back.
+  await deliverCapacityAddonConfirmation(session.id);
+  return fulfillment;
 }
