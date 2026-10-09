@@ -1,0 +1,17 @@
+/* LAND-03: offer comparison inspired by feature matrices, without subscription tiers. */
+.bos-public-root .bos-topbar-buy-catalog{width:min(1360px,calc(100vw - 80px))}
+.bos-public-root .bos-topbar-buy-catalog>header h2{max-width:1050px}
+.bos-public-root .bos-offer-comparison{padding:28px 54px 38px;border-top:1px solid #dedbd4;background:#f6f4ef;color:#10253c}
+.bos-public-root .bos-offer-comparison__heading{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:22px}
+.bos-public-root .bos-offer-comparison__heading>span{color:#b8873e;font-size:9px;font-weight:800;letter-spacing:.18em}
+.bos-public-root .bos-offer-comparison__heading h3{margin:0;color:#10253c;font-size:clamp(18px,2vw,26px);font-weight:600}
+.bos-public-root .bos-offer-comparison__scroll{overflow-x:auto}
+.bos-public-root .bos-offer-comparison table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px;line-height:1.55}
+.bos-public-root .bos-offer-comparison thead{background:#10253c;color:#fff}
+.bos-public-root .bos-offer-comparison th,.bos-public-root .bos-offer-comparison td{padding:15px 18px;border:1px solid #dedbd4;text-align:left;vertical-align:top}
+.bos-public-root .bos-offer-comparison thead th{border-color:#344759;font-size:10px;font-weight:800;letter-spacing:.12em}
+.bos-public-root .bos-offer-comparison tbody th{width:30%;color:#10253c;font-weight:700}
+.bos-public-root .bos-offer-comparison tbody tr:nth-child(even){background:#ebe8e2}
+.bos-public-root .bos-offer-comparison tbody td{color:#415367}
+@media(max-width:800px){.bos-public-root .bos-offer-comparison{padding:26px 28px 30px}.bos-public-root .bos-offer-comparison__heading{display:block}.bos-public-root .bos-offer-comparison__heading h3{margin-top:8px}}
+@media(max-width:520px){.bos-public-root .bos-offer-comparison{padding:24px 16px}.bos-public-root .bos-offer-comparison table{min-width:620px}.bos-public-root .bos-offer-comparison th,.bos-public-root .bos-offer-comparison td{padding:12px}}
