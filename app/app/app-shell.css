@@ -4378,3 +4378,5 @@
   }
   .bos-app-shell .bos-app-chat-fab svg{width:18px;height:18px}
 }
+
+@media(max-width:1439px){.bos-app-shell .bos-app-chat-label{display:none}}
