@@ -29,3 +29,9 @@ C02-03C = PARTIAL; database smoke PASS, full integration and concurrency NOT PAS
 - These latest source changes were **not** built or deployed. Migration revision not reapplied to test branch; verification checked data equivalence only.
 - Remaining pre-merge risks: no real two-session concurrency test, no Next.js build/typecheck, no full authenticated app integration; product suitability of existing onboarding templates for Promotions not assessed.
 - Merge to main explicitly deferred by owner until after maximal isolated testing. Production unchanged.
+
+## Collision fix — perpetual vs annual fulfillment
+- Commit `7d28dc99`: fulfillment checks the actual active entitlement (PERPETUAL or valid ANNUAL) instead of requiring ANNUAL unconditionally.
+- Existing PERPETUAL is preserved; a paid session no longer fails only because it did not produce an ANNUAL license.
+- Annual-only confirmation/claim email templates are intentionally not sent for PERPETUAL. **Open**: implement correct perpetual confirmation and claim activation communication before enabling that purchase path for customers.
+- This is source inspection only: no executed Stripe webhook integration test or TypeScript build. Annual/perpetual offer policy still requires product decision.
