@@ -127,11 +127,13 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
       "INSERT INTO standard_capacity_grants(organization_id,product_id,quantity,source) VALUES($1,$2,10,'BASE') ON CONFLICT DO NOTHING",
       [purchases[0].organization_id,products[0].id],
     );
-    const annualLicense = await tx.unsafe(
-      "SELECT valid_from,valid_until FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' AND license_type='ANNUAL' LIMIT 1",
+    const activeLicense = await tx.unsafe(
+      "SELECT license_type,valid_from,valid_until FROM licenses WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE' AND (license_type='PERPETUAL' OR (license_type='ANNUAL' AND valid_until>now())) LIMIT 1",
       [purchases[0].organization_id, products[0].id],
     );
-    if (!annualLicense.length || !annualLicense[0].valid_until) throw new Error("Paid annual BOS purchase has no active annual license.");
+    if (!activeLicense.length) throw new Error("Paid BOS purchase has no active license.");
+    // Preserve existing perpetual licenses rather than treating them as failed annual purchases.
+    // Annual-specific email templates must not be sent for a perpetual entitlement.
 
     await tx.unsafe("INSERT INTO stripe_events(id,type) VALUES($1,$2)", [eventId, "checkout.session.paid"]);
     return {
@@ -141,12 +143,13 @@ export async function fulfillCheckoutSession(session: Stripe.Checkout.Session, e
       purchaseNeedsClaim,
       claimUserId,
       buyerEmail,
-      validFrom: annualLicense[0].valid_from,
-      validUntil: annualLicense[0].valid_until,
+      validFrom: activeLicense[0].valid_from,
+      licenseType: activeLicense[0].license_type,
+      validUntil: activeLicense[0].valid_until,
     };
   });
 
-  if (fulfillment.fulfilled && fulfillment.buyerEmail && fulfillment.validUntil) {
+  if (fulfillment.fulfilled && fulfillment.buyerEmail && fulfillment.validUntil && fulfillment.licenseType === "ANNUAL") {
     const productName = productKey === "onboarding" ? "BOS Wdrożenia" : "BOS Awanse";
     const displayName = fulfillment.buyerEmail.split("@")[0] || "Kliencie";
 
