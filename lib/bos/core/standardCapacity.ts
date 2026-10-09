@@ -13,6 +13,16 @@ export async function consumeStandardCapacity(tx:any, input:{
   await tx.unsafe("SELECT pg_advisory_xact_lock(hashtextextended($1,0))",[
     `bos-capacity:${input.organizationId}:${input.productId}`
   ]);
+  const license=await tx.unsafe(
+    "SELECT 1 FROM licenses l JOIN products p ON p.id=l.product_id WHERE l.organization_id=$1 AND l.product_id=$2 AND l.status='ACTIVE' AND p.status='ACTIVE' AND p.key IN ('onboarding','promotions') AND (l.license_type='PERPETUAL' OR (l.license_type='ANNUAL' AND l.valid_until>now())) LIMIT 1",
+    [input.organizationId,input.productId]
+  );
+  if(!license.length) throw new Error("Brak aktywnej licencji produktu BOS.");
+  const ownership=await tx.unsafe(
+    "SELECT 1 FROM standards WHERE id=$1 AND organization_id=$2 AND product_id=$3 LIMIT 1",
+    [input.standardId,input.organizationId,input.productId]
+  );
+  if(!ownership.length) throw new Error("Standard nie należy do wskazanego produktu i organizacji.");
   const existing=await tx.unsafe(
     "SELECT 1 FROM standard_capacity_consumptions WHERE standard_id=$1 AND organization_id=$2 AND product_id=$3",
     [input.standardId,input.organizationId,input.productId]
