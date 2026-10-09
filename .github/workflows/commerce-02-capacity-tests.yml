@@ -27,5 +27,7 @@ jobs:
         run: node --test scripts/test-capacity-stripe-signature.cjs
       - name: Capacity confirmation email outbox tests
         run: node --test scripts/test-capacity-addon-email.cjs
-      - name: Stateful end-to-end sandbox (mock Stripe/Neon/Resend)\n        run: node --test scripts/test-capacity-addon-sandbox.cjs\n      - name: TypeScript
+      - name: Stateful end-to-end sandbox (mock Stripe/Neon/Resend)
+        run: node --test scripts/test-capacity-addon-sandbox.cjs
+      - name: TypeScript
         run: npx tsc --noEmit
