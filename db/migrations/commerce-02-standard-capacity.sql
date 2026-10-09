@@ -24,21 +24,21 @@ CREATE TABLE IF NOT EXISTS standard_capacity_grants (
 CREATE UNIQUE INDEX IF NOT EXISTS standard_capacity_grants_base_unique
   ON standard_capacity_grants(organization_id,product_id) WHERE source='BASE';
 
--- Backfill ONLY unambiguously attributed historical publications.
+-- Backfill ONLY unambiguously attributed historical publications, including archived versions with published_at.
 INSERT INTO standard_capacity_consumptions
   (standard_id,organization_id,product_id,first_published_at)
 SELECT s.id,s.organization_id,s.product_id,MIN(COALESCE(v.published_at,v.created_at))
 FROM standards s JOIN standard_versions v
   ON v.standard_id=s.id AND v.organization_id=s.organization_id
-WHERE s.product_id IS NOT NULL AND v.status='PUBLISHED'
+WHERE s.product_id IS NOT NULL AND v.published_at IS NOT NULL
 GROUP BY s.id,s.organization_id,s.product_id
 ON CONFLICT (standard_id) DO NOTHING;
 
--- Base entitlements: exactly one BASE grant per organization/product with ACTIVE PERPETUAL license.
+-- Base entitlements: exactly one BASE grant per organization/product with currently valid license.
 INSERT INTO standard_capacity_grants(organization_id,product_id,quantity,source)
 SELECT l.organization_id,l.product_id,10,'BASE'
 FROM licenses l
-WHERE l.status='ACTIVE' AND l.license_type='PERPETUAL'
+WHERE l.status='ACTIVE' AND (l.license_type='PERPETUAL' OR (l.license_type='ANNUAL' AND l.valid_until>now()))
 ON CONFLICT DO NOTHING;
 
 -- Legacy overage: preserve already-published Standards without retroactive payment.
