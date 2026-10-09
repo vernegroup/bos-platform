@@ -4149,7 +4149,7 @@
 
 
 /* FINAL-R2 — closure card responsive fit. */
-.bos-app-main,.bos-app-workspace{max-width:100%;overflow-x:hidden}
+.bos-app-main,.bos-app-workspace{max-width:100%;overflow-x:clip}
 .bos-closure-summary{width:100%;box-sizing:border-box;grid-template-columns:minmax(0,1.35fr) repeat(4,minmax(0,.75fr))!important}
 .bos-closure-summary>div{min-width:0}
 .bos-closure-summary a,.bos-closure-summary strong{display:block;min-width:0;max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
