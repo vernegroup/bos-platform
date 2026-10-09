@@ -20,3 +20,12 @@ GitHub: `feature/commerce-02-standard-capacity`.
 
 ## Status
 C02-03C = PARTIAL; database smoke PASS, full integration and concurrency NOT PASS. Do not merge/deploy yet.
+
+## Pre-merge hardening follow-up
+- Commit bb68b9a9: publication now checks active license and exact tenant/product ownership inside transaction.
+- Commit ad8a0755: direct published Standard creation now requires active membership.
+- Commit b10b2282: migration backfills historical published_at even for archived versions; grants BASE for active valid ANNUAL or PERPETUAL licenses.
+- Read-only verification on isolated Neon branch: 7 historical published, 7 ledger consumptions; 3 valid licenses, 3 BASE grants. PASS.
+- These latest source changes were **not** built or deployed. Migration revision not reapplied to test branch; verification checked data equivalence only.
+- Remaining pre-merge risks: no real two-session concurrency test, no Next.js build/typecheck, no full authenticated app integration; product suitability of existing onboarding templates for Promotions not assessed.
+- Merge to main explicitly deferred by owner until after maximal isolated testing. Production unchanged.
