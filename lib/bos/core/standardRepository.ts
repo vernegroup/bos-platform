@@ -1,6 +1,7 @@
 import "server-only";
 import { db, hasDatabase } from "@/lib/db";
 import { onboardingStandards } from "@/data/onboardingStandards";
+import { consumeStandardCapacity } from "@/lib/bos/core/standardCapacity";
 
 function tenantId(organizationId?: string) {
   if (!organizationId) throw new Error("organizationId is required for onboarding data.");
@@ -486,7 +487,7 @@ export async function publishDraftStandard(input:{organizationId:string;standard
   if(!input.qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
-    const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status,COALESCE(to_jsonb(sv)->>\'role_description\',\'\') role_description
+    const [standard]=await tx`SELECT s.id,s.name,s.product_id,s.current_version_id,sv.id version_id,sv.status,COALESCE(to_jsonb(sv)->>\'role_description\',\'\') role_description
       FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
       ORDER BY sv.version_number DESC LIMIT 1 FOR UPDATE OF s,sv`;
@@ -511,6 +512,7 @@ export async function publishDraftStandard(input:{organizationId:string;standard
     });
     if(!completeness.complete) throw new Error(`Standard nie jest gotowy do publikacji: ${completeness.reasons.join(" ")}`);
 
+    await consumeStandardCapacity(tx,{organizationId,standardId:standard.id,productId:standard.product_id});
     await tx`UPDATE standard_versions SET status='PUBLISHED',published_at=now(),published_by_user_id=${input.publishedByUserId},updated_at=now()
       WHERE id=${standard.version_id} AND standard_id=${standard.id} AND organization_id=${organizationId} AND status='DRAFT'`;
     await tx`UPDATE standards SET current_version_id=${standard.version_id},status='ACTIVE',updated_at=now()
@@ -524,6 +526,7 @@ export async function createStandard(input:{organizationId?:string;productId:str
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
     const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id) VALUES(${organizationId},${input.productId},${input.name},${input.area??null},'ACTIVE',${input.createdByUserId}) RETURNING id`;
+    await consumeStandardCapacity(tx,{organizationId,standardId:standard.id,productId:input.productId});
     const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,published_at,created_by_user_id) VALUES(${organizationId},${standard.id},1,${input.versionLabel},'PUBLISHED',${input.changeNote??null},now(),${input.createdByUserId}) RETURNING id`;
     for(let i=0;i<input.tasks.length;i++){const t=input.tasks[i];await tx`INSERT INTO standard_tasks(organization_id,standard_version_id,position,name,execution,ready_when) VALUES(${organizationId},${version.id},${i+1},${t.name},${t.execution},${t.readyWhen})`;}
     await tx`UPDATE standards SET current_version_id=${version.id},updated_at=now() WHERE id=${standard.id} AND organization_id=${organizationId}`;
