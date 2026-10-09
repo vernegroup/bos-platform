@@ -3,7 +3,7 @@
 .bos-land-explainer__inner{max-width:1420px;margin:0 auto}
 .bos-land-explainer__heading{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);column-gap:clamp(32px,7vw,120px);align-items:end}
 .bos-land-explainer__eyebrow{grid-column:1/-1;margin-bottom:24px;color:#d1a568;font-size:10px;font-weight:700;letter-spacing:.26em}
-.bos-land-explainer__heading h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,5.5vw,82px);font-weight:400;letter-spacing:-.045em;line-height:1.03}
+.bos-land-explainer__heading h2{color:#dda85c;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(40px,5.5vw,82px);font-weight:400;letter-spacing:-.045em;line-height:1.03}
 .bos-land-explainer__heading h2 em{font-style:normal;color:#fff}
 .bos-land-explainer__heading p{max-width:460px;margin:0 0 6px;color:#fff;font-size:clamp(14px,1.15vw,17px);line-height:1.75}
 .bos-land-explainer__steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin:66px 0 0;padding:0;list-style:none}
