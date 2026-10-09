@@ -538,6 +538,7 @@ export async function createStandard(input:{organizationId?:string;productId:str
 // Shared BOS Core entry point used by product-neutral Standard creation.
 export async function createOrganizationDraftStandard(input:{
   organizationId:string;
+  productId:string;
   name:string;
   area?:string;
   createdByUserId:string;
@@ -552,8 +553,12 @@ export async function createOrganizationDraftStandard(input:{
     const [member]=await tx`SELECT 1 ok FROM memberships
       WHERE organization_id=${organizationId} AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
     if(!member) throw new Error("Osoba tworząca Standard nie należy aktywnie do organizacji.");
+    const [product]=await tx`SELECT p.id FROM products p JOIN licenses l ON l.product_id=p.id AND l.organization_id=${organizationId}
+      WHERE p.id=${input.productId} AND p.key IN ('onboarding','promotions') AND p.status='ACTIVE'
+      AND l.status='ACTIVE' AND (l.license_type='PERPETUAL' OR (l.license_type='ANNUAL' AND l.valid_until>now())) LIMIT 1`;
+    if(!product) throw new Error("Wybierz produkt BOS z aktywną licencją.");
     const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id)
-      VALUES(${organizationId},NULL,${name},${input.area?.trim()||null},'DRAFT',${input.createdByUserId})
+      VALUES(${organizationId},${input.productId},${name},${input.area?.trim()||null},'DRAFT',${input.createdByUserId})
       RETURNING id`;
     const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,created_by_user_id)
       VALUES(${organizationId},${standard.id},1,'v1','DRAFT','Wersja robocza',${input.createdByUserId})
