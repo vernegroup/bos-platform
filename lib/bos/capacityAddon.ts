@@ -40,7 +40,7 @@ export async function fulfillCapacityAddon(session:Stripe.Checkout.Session,event
   const organizationId=session.metadata.organization_id;
   const productId=session.metadata.product_id;
   const userId=session.metadata.bos_user_id;
-  if(!organizationId||!productId||!userId||session.metadata.standards_added!=="10"||session.client_reference_id!==organizationId)
+  if(!organizationId||!productId||!userId||!["onboarding","promotions"].includes(session.metadata.product??"")||session.metadata.standards_added!=="10"||session.client_reference_id!==organizationId)
     throw new Error("Invalid capacity checkout metadata");
   // Validate the actual paid line item, not only customer-controlled session metadata.
   const lines=await stripe.checkout.sessions.listLineItems(session.id,{limit:10});
