@@ -18,7 +18,7 @@ export async function listStandardTemplates():Promise<StandardTemplateSummary[]>
 }
 
 export async function createStandardFromTemplate(input:{
-  organizationId:string;templateId:string;createdByUserId:string;
+  organizationId:string;productId:string;templateId:string;createdByUserId:string;
 }){
   const sql=db();
   return sql.begin(async tx=>{
@@ -26,6 +26,10 @@ export async function createStandardFromTemplate(input:{
       AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
     if(!member)throw new Error("Osoba tworząca Standard nie należy aktywnie do organizacji.");
 
+    const [product]=await tx`SELECT p.id FROM products p JOIN licenses l ON l.product_id=p.id AND l.organization_id=${input.organizationId}
+      WHERE p.id=${input.productId} AND p.key IN ('onboarding','promotions') AND p.status='ACTIVE'
+      AND l.status='ACTIVE' AND (l.license_type='PERPETUAL' OR (l.license_type='ANNUAL' AND l.valid_until>now())) LIMIT 1`;
+    if(!product) throw new Error("Wybierz produkt BOS z aktywną licencją.");
     const [template]=await tx`SELECT id,name,area,role_description,version,tasks_json,start_requirements_json,readiness_criteria_json
       FROM standard_templates WHERE id=${input.templateId} AND status='ACTIVE' FOR SHARE`;
     if(!template)throw new Error("Wybrany wzór BOS nie jest dostępny.");
@@ -33,7 +37,7 @@ export async function createStandardFromTemplate(input:{
     const [standard]=await tx`INSERT INTO standards(
       organization_id,product_id,name,area,status,created_by_user_id,source_template_id,source_template_version
     ) VALUES(
-      ${input.organizationId},NULL,${template.name},${template.area},'DRAFT',${input.createdByUserId},${template.id},${template.version}
+      ${input.organizationId},${input.productId},${template.name},${template.area},'DRAFT',${input.createdByUserId},${template.id},${template.version}
     ) RETURNING id`;
     const [version]=await tx`INSERT INTO standard_versions(
       organization_id,standard_id,version_number,version_label,status,change_note,created_by_user_id,role_description
