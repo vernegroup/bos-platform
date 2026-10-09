@@ -166,7 +166,7 @@ export default function AppShell({children,account,organizationName,productEntit
       <AppAgentSlot />
       {signoutOpen&&<div className="bos-signout-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setSignoutOpen(false)}}><section className="bos-signout-dialog" role="dialog" aria-modal="true" aria-labelledby="bos-signout-title"><h2 id="bos-signout-title">Wylogowanie</h2><p>Czy na pewno chcesz się wylogować?</p><div><button type="button" onClick={()=>setSignoutOpen(false)}>Anuluj</button><button type="button" onClick={()=>signOut({callbackUrl:"/"})}>Wyloguj się</button></div></section></div>}
       {!topbarVisible && <button ref={navHandleRef} className="bos-app-nav-handle" type="button" aria-label="Otwórz menu nawigacji" aria-controls="bos-app-navigation" aria-expanded={mobileOpen} onClick={()=>openMobileNav(navHandleRef.current)}><span aria-hidden="true">☰</span></button>}
-      <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/></Link>
+      <Link href="/app/help" className="bos-app-chat-fab" aria-label="Otwórz pomoc BOS" title="Pomoc BOS"><Icon name="chat"/><span className="bos-app-chat-label">Pomoc</span></Link>
     </div>
   </div>;
 }
