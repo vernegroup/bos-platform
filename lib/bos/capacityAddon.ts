@@ -7,7 +7,14 @@ import { resolveBOSAccess } from "@/lib/bos/access";
 import { resolveBillingCustomerId } from "@/lib/bos/billingRepository";
 import { deliverCapacityAddonConfirmation } from "@/lib/bos/capacityAddonEmail";
 
-export const CAPACITY_ADDON_PRICE_ID = "price_1UOb8W1ETGwirCfz2kz71m3W";
+function capacityAddonPriceId() {
+  const id = process.env.STRIPE_PRICE_ID_CAPACITY_ADDON?.trim();
+  if (!id || !/^price_[A-Za-z0-9]+$/.test(id)) throw new Error("CAPACITY_ADDON_PRICE_NOT_CONFIGURED");
+  if (process.env.VERCEL_ENV === "preview" && !process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_")) {
+    throw new Error("CAPACITY_ADDON_PREVIEW_REQUIRES_STRIPE_TEST_KEY");
+  }
+  return id;
+}
 const ADDON_KIND = "standard_capacity_addon";
 
 export async function createCapacityAddonCheckout(productKey: "onboarding"|"promotions") {
@@ -24,7 +31,7 @@ export async function createCapacityAddonCheckout(productKey: "onboarding"|"prom
   const origin=bosAppUrl();
   const session=await stripe.checkout.sessions.create({
     mode:"payment",
-    line_items:[{price:CAPACITY_ADDON_PRICE_ID,quantity:1}],
+    line_items:[{price:capacityAddonPriceId(),quantity:1}],
     ...(customerId?{customer:customerId}:{customer_email:access.user.email}),
     client_reference_id:access.organization.id,
     metadata:{bos_kind:ADDON_KIND,organization_id:access.organization.id,product_id:rows[0].id,product:productKey,bos_user_id:access.user.id,standards_added:"10"},
@@ -47,7 +54,7 @@ export async function fulfillCapacityAddon(session:Stripe.Checkout.Session,event
     throw new Error("Invalid capacity checkout metadata");
   // Validate the actual paid line item, not only customer-controlled session metadata.
   const lines=await stripe.checkout.sessions.listLineItems(session.id,{limit:10});
-  if(lines.data.length!==1||lines.data[0].price?.id!==CAPACITY_ADDON_PRICE_ID||lines.data[0].quantity!==1)
+  if(lines.data.length!==1||lines.data[0].price?.id!==capacityAddonPriceId()||lines.data[0].quantity!==1)
     throw new Error("Capacity addon price mismatch");
   const sql=db();
   const fulfillment = await sql.begin(async tx=>{
