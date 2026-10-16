@@ -1,6 +1,7 @@
 // Integration tests for capacity addon using simulated BOS sessions, SQL and Stripe.
 // No network, real credentials or writes to Neon/Stripe.
 const test = require("node:test");
+process.env.STRIPE_PRICE_ID_CAPACITY_ADDON = "price_testCapacityAddon4999";
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
