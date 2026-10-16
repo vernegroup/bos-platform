@@ -48,6 +48,11 @@ function bosEmailFrom() {
   return email ? `BOS <${email}>` : null;
 }
 
+function bosEmailReplyTo() {
+  const raw = process.env.BOS_EMAIL_REPLY_TO?.trim();
+  return raw && /^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(raw) ? raw : undefined;
+}
+
 type NewRegistrationNotificationInput = {
   userEmail: string;
   companyName: string;
@@ -82,6 +87,7 @@ export async function sendNewRegistrationNotification(input: NewRegistrationNoti
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [notifyTo],
       subject: "Nowa rejestracja w BOS",
       html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><h1 style="font-size:22px">Nowa rejestracja</h1><p><strong>Organizacja:</strong> ${escapeHtml(input.companyName)}</p><p><strong>E-mail:</strong> ${escapeHtml(input.userEmail)}</p><p><strong>Czas:</strong> ${escapeHtml(registeredAt)}</p><p style="font-size:13px;color:#69747d">Status: konto utworzone, oczekuje na potwierdzenie adresu e-mail.</p></div></body></html>`,
@@ -126,6 +132,7 @@ export async function sendPurchaseClaimEmail(input: PurchaseClaimEmailInput) {
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [input.to],
       subject: `Potwierdzenie zakupu — ${input.productName} — BOS`,
       html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Płatność potwierdzona</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>przyznaliśmy Twojej organizacji licencję na <strong>${escapeHtml(input.productName)}</strong> na 12 miesięcy.</p><p><strong>Licencja jest ważna do: ${escapeHtml(validUntil)}.</strong></p><p>Licencja nie odnawia się automatycznie. Po zakończeniu okresu ważności możesz odnowić ją na kolejny rok.</p><p>Ustaw hasło, aby przejąć konto organizacji i korzystać z zakupionego produktu.</p><p style="margin:28px 0"><a href="${claimUrl}" style="background:#b98b46;color:#fff;text-decoration:none;padding:14px 22px;display:inline-block">Aktywuj dostęp →</a></p><p style="font-size:13px;color:#69747d">Link aktywacyjny jest jednorazowy i wygasa po 24 godzinach.</p></div></body></html>`,
@@ -155,6 +162,7 @@ export async function sendPurchaseConfirmationEmail(input: PurchaseConfirmationE
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [input.to],
       subject: `Potwierdzenie zakupu — ${input.productName} — BOS`,
       html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Płatność potwierdzona</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>przyznaliśmy Twojej organizacji licencję na <strong>${escapeHtml(input.productName)}</strong> na 12 miesięcy.</p><p><strong>Licencja jest ważna do: ${escapeHtml(validUntil)}.</strong></p><p>Licencja nie odnawia się automatycznie. Po zakończeniu okresu ważności możesz odnowić ją na kolejny rok.</p><p>Produkt jest dostępny po zalogowaniu do BOS.</p></div></body></html>`,
@@ -182,6 +190,7 @@ export async function sendOrganizationInviteEmail(input: OrganizationInviteEmail
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [input.to],
       subject: `Zaproszenie do ${input.organizationName} — BOS`,
       html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6"><div style="max-width:560px;margin:0 auto;padding:32px"><div style="font-size:28px;font-weight:700;letter-spacing:.08em">BOS</div><div style="font-size:10px;letter-spacing:.14em;margin-bottom:30px">BUSINESS OPERATING STANDARDS</div><h1 style="font-size:24px">Zaproszenie do organizacji</h1><p>Dzień dobry ${escapeHtml(input.displayName)},</p><p>otrzymujesz zaproszenie do organizacji <strong>${escapeHtml(input.organizationName)}</strong> w BOS.</p><p>Przypisana rola: <strong>${escapeHtml(input.roleLabel)}</strong>.</p><p>Ustaw hasło, aby aktywować konto i dołączyć do organizacji.</p><p style="margin:28px 0"><a href="${inviteUrl}" style="background:#b98b46;color:#fff;text-decoration:none;padding:14px 22px;display:inline-block">Przyjmij zaproszenie →</a></p><p style="font-size:13px;color:#69747d">Link jest jednorazowy i wygasa po 24 godzinach. Jeśli nie oczekujesz tego zaproszenia, zignoruj wiadomość.</p></div></body></html>`,
@@ -219,6 +228,7 @@ export async function sendVerificationEmail(input: VerificationEmailInput) {
     },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [input.to],
       subject: "Potwierdź adres e-mail — BOS",
       html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6">
@@ -280,6 +290,7 @@ export async function sendPasswordResetEmail(input: PasswordResetEmailInput) {
     },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [input.to],
       subject: "Ustaw nowe hasło — BOS",
       html: `<!doctype html><html><body style="font-family:Arial,sans-serif;color:#10253c;line-height:1.6">
@@ -348,6 +359,7 @@ export async function sendCapacityAddonConfirmationEmail(input: {
     },
     body: JSON.stringify({
       from,
+      ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
       to: [input.to],
       template: {
         id: "7a736b1b-b326-4a83-934c-caf6789ef266",
