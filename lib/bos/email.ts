@@ -349,6 +349,12 @@ export async function sendCapacityAddonConfirmationEmail(input: {
   const from = bosEmailFrom();
   if (!apiKey || !from) throw new Error("EMAIL_NOT_CONFIGURED");
   // Stable idempotency key protects against a crash after Resend accepts the email.
+  // Preview never sends capacity confirmations to real customer addresses.
+  const previewRecipient = process.env.BOS_CAPACITY_EMAIL_TEST_RECIPIENT?.trim();
+  if (process.env.VERCEL_ENV === "preview" && previewRecipient !== "delivered@resend.dev") {
+    throw new Error("CAPACITY_EMAIL_PREVIEW_RECIPIENT_NOT_CONFIGURED");
+  }
+  const recipient = process.env.VERCEL_ENV === "preview" ? "delivered@resend.dev" : input.to;
   const idempotencyKey = `bos-capacity-email-${input.checkoutSessionId}`;
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -360,7 +366,7 @@ export async function sendCapacityAddonConfirmationEmail(input: {
     body: JSON.stringify({
       from,
       ...(bosEmailReplyTo() ? { reply_to: bosEmailReplyTo() } : {}),
-      to: [input.to],
+      to: [recipient],
       template: {
         id: "7a736b1b-b326-4a83-934c-caf6789ef266",
         variables: {
