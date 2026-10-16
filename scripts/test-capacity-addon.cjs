@@ -8,7 +8,7 @@ const vm = require("node:vm");
 const ts = require("typescript");
 const path = require("node:path");
 
-function harness({access=null,licensed=false,eligible=licensed,paid=true,price="price_1UOb8W1ETGwirCfz2kz71m3W",existing=false}={}){
+function harness({access=null,licensed=false,eligible=licensed,paid=true,price="price_testCapacityAddon4999",existing=false}={}){
  const calls={stripe:0,queries:[],grants:0};
  const metadata={bos_kind:"standard_capacity_addon",organization_id:"org-test",product_id:"product-test",product:"onboarding",bos_user_id:"user-test",standards_added:"10"};
  const stripe={
