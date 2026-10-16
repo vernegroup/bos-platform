@@ -1,3 +1,4 @@
+process.env.STRIPE_PRICE_ID_CAPACITY_ADDON = "price_testCapacityAddon4999";
 // COMMERCE-02: in-process sandbox connecting real fulfillment + outbox modules.
 // In-memory SQL and Resend mocks; no credentials, external calls, or live payments.
 const test=require("node:test");
@@ -34,7 +35,7 @@ function sandbox(){
   }
  };
  const email=load("lib/bos/capacityAddonEmail.ts",{"server-only":{},"@/lib/db":{db:()=>sql},"@/lib/bos/email":{sendCapacityAddonConfirmationEmail:async(input)=>{state.sends++;assert.equal(input.checkoutSessionId,session.id);assert.equal(input.totalCapacity,20);if(state.failEmail)throw Error("sandbox resend failure");return {messageId:"email_sandbox_1"};}}});
- const addon=load("lib/bos/capacityAddon.ts",{"server-only":{},"@/lib/db":{db:()=>sql},"@/lib/stripe":{stripe:{checkout:{sessions:{listLineItems:async()=>({data:[{price:{id:"price_1UOb8W1ETGwirCfz2kz71m3W"},quantity:1}]})}}}},"@/lib/bos/app-url":{bosAppUrl:()=>"https://sandbox.invalid"},"@/lib/bos/access":{resolveBOSAccess:async()=>null},"@/lib/bos/billingRepository":{resolveBillingCustomerId:async()=>null},"@/lib/bos/capacityAddonEmail":email});
+ const addon=load("lib/bos/capacityAddon.ts",{"server-only":{},"@/lib/db":{db:()=>sql},"@/lib/stripe":{stripe:{checkout:{sessions:{listLineItems:async()=>({data:[{price:{id:"price_testCapacityAddon4999"},quantity:1}]})}}}},"@/lib/bos/app-url":{bosAppUrl:()=>"https://sandbox.invalid"},"@/lib/bos/access":{resolveBOSAccess:async()=>null},"@/lib/bos/billingRepository":{resolveBillingCustomerId:async()=>null},"@/lib/bos/capacityAddonEmail":email});
  return {state,session,fulfill:addon.fulfillCapacityAddon};
 }
 function load(file,modules){
