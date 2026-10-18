@@ -112,7 +112,7 @@ export const bosProducts: readonly BOSProduct[] = [
       kicker: "BOS AWANSE",
       title: "Zmieniaj role bez utraty kontroli nad procesem.",
       description:
-        "BOS Awanse porządkuje awanse i przesunięcia poziome jako proces wejścia pracownika w nową rolę, z własnym standardem i kryterium gotowości.",
+        "Wybierz pracownika i nową rolę, porównaj wymagania stanowiska z obecnym przygotowaniem, uzupełnij braki i zweryfikuj warunki gotowości do zmiany.",
       benefits: [
         ["Nowa rola, nowy standard", "Kompetencje wymagane na nowym stanowisku są opisane niezależnie od poprzedniej roli."],
         ["Ciągłość pracownika", "Proces może korzystać z historii osoby w organizacji bez skracania wymagań nowego stanowiska."],
