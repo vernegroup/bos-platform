@@ -63,7 +63,7 @@ export const bosProducts: readonly BOSProduct[] = [
       kicker: "BOS WDROŻENIA",
       title: "Uporządkuj wdrożenie. Skróć drogę do samodzielności.",
       description:
-        "BOS Wdrożenia prowadzi menedżera przez przygotowanie, realizację i zamknięcie wdrożenia pracownika w jednym, powtarzalnym procesie.",
+        "Przygotuj Standard stanowiska i warunki rozpoczęcia, prowadź pracownika przez zadania oraz potwierdź kryteria gotowości. Wynik wdrożenia pozostaje udokumentowany.",
       benefits: [
         ["Jeden standard", "Stanowisko, czynności krytyczne i oczekiwany rezultat są zapisane w jednym miejscu."],
         ["Kontrola postępu", "Menedżer widzi etap procesu, realizację zadań i moment gotowości pracownika."],
