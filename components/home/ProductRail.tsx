@@ -14,7 +14,6 @@ export default function ProductRail(){
         <div className="bos-product-rail__track">
           {bosProducts.map(product=>(
             <article className="bos-product-rail__item" key={product.id}>
-              <div className="bos-product-rail__name">{product.displayName}</div>
               <ProductDetailsModal product={product.id} variant="rail" />
             </article>
           ))}
