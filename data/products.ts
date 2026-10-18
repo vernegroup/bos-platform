@@ -65,9 +65,9 @@ export const bosProducts: readonly BOSProduct[] = [
       description:
         "Przygotuj Standard stanowiska i warunki rozpoczęcia, prowadź pracownika przez zadania oraz potwierdź kryteria gotowości. Wynik wdrożenia pozostaje udokumentowany.",
       benefits: [
-        ["Jeden standard", "Stanowisko, czynności krytyczne i oczekiwany rezultat są zapisane w jednym miejscu."],
-        ["Kontrola postępu", "Menedżer widzi etap procesu, realizację zadań i moment gotowości pracownika."],
-        ["Mniej improwizacji", "Kolejne wdrożenia wykorzystują ten sam sprawdzony mechanizm zamiast zaczynać od zera."],
+        ["Standard stanowiska", "Zapisz wymagania, czynności krytyczne oraz warunki rozpoczęcia i zakończenia wdrożenia."],
+        ["Etapy i potwierdzenia", "Prowadzący widzi postęp zadań i niespełnione kryteria gotowości."],
+        ["Udokumentowane zakończenie", "Sprawdź wymagane potwierdzenia i zachowaj Kartę Zakończenia procesu."],
       ],
       audience:
         "Dla właścicieli i menedżerów MŚP, którzy chcą wdrażać pracowników w sposób powtarzalny i możliwy do kontrolowania.",
