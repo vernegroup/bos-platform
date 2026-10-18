@@ -10,7 +10,8 @@
     "db:migrate": "node scripts/migrate.mjs",
     "test:onboarding-failsafe": "node scripts/check-onboarding-failsafe.mjs",
     "test:commerce-entitlements": "node scripts/check-commerce-entitlements.mjs",
-    "test:commerce2-entitlements": "node scripts/check-commerce2-entitlements.mjs"
+    "test:commerce2-entitlements": "node scripts/check-commerce2-entitlements.mjs",
+    "test:capacity-addon": "node --test scripts/test-capacity-addon.cjs"
   },
   "dependencies": {
     "argon2": "^0.45.1",

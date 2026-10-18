@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { fulfillCapacityAddon } from "@/lib/bos/capacityAddon";
 import { failCheckoutSession, fulfillCheckoutSession, refundCharge } from "@/lib/bos/purchaseRepository";
 import { fulfillAnnualCheckout, recordAnnualInvoice, syncAnnualSubscription } from "@/lib/bos/subscriptionRepository";
 export const runtime="nodejs";
@@ -11,7 +12,7 @@ export async function POST(request:Request){
   let result:unknown={handled:false,reason:"ignored_event"};
   if(event.type==="checkout.session.completed"||event.type==="checkout.session.async_payment_succeeded"){
    const session=event.data.object;
-   result=session.mode==="subscription"?await fulfillAnnualCheckout(session,event.id):await fulfillCheckoutSession(session,event.id);
+   result=session.metadata?.bos_kind==="standard_capacity_addon"?await fulfillCapacityAddon(session,event.id):session.mode==="subscription"?await fulfillAnnualCheckout(session,event.id):await fulfillCheckoutSession(session,event.id);
   }else if(event.type==="checkout.session.async_payment_failed")result=await failCheckoutSession(event.data.object,event.id);
   else if(event.type==="invoice.paid")result=await recordAnnualInvoice(event.data.object,event.id,true);
   else if(event.type==="invoice.payment_failed")result=await recordAnnualInvoice(event.data.object,event.id,false);

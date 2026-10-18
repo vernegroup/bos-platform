@@ -1,6 +1,7 @@
 import "server-only";
 import { db, hasDatabase } from "@/lib/db";
 import { onboardingStandards } from "@/data/onboardingStandards";
+import { consumeStandardCapacity } from "@/lib/bos/core/standardCapacity";
 
 function tenantId(organizationId?: string) {
   if (!organizationId) throw new Error("organizationId is required for onboarding data.");
@@ -486,7 +487,7 @@ export async function publishDraftStandard(input:{organizationId:string;standard
   if(!input.qualityCheckPassed) throw new Error("Przed publikacją Kryterium Gotowości musi przejść test 4×TAK.");
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
-    const [standard]=await tx`SELECT s.id,s.name,s.current_version_id,sv.id version_id,sv.status,COALESCE(to_jsonb(sv)->>\'role_description\',\'\') role_description
+    const [standard]=await tx`SELECT s.id,s.name,s.product_id,s.current_version_id,sv.id version_id,sv.status,COALESCE(to_jsonb(sv)->>\'role_description\',\'\') role_description
       FROM standards s JOIN standard_versions sv ON sv.standard_id=s.id AND sv.organization_id=s.organization_id
       WHERE s.id=${input.standardId} AND s.organization_id=${organizationId} AND sv.status='DRAFT'
       ORDER BY sv.version_number DESC LIMIT 1 FOR UPDATE OF s,sv`;
@@ -511,6 +512,7 @@ export async function publishDraftStandard(input:{organizationId:string;standard
     });
     if(!completeness.complete) throw new Error(`Standard nie jest gotowy do publikacji: ${completeness.reasons.join(" ")}`);
 
+    await consumeStandardCapacity(tx,{organizationId,standardId:standard.id,productId:standard.product_id});
     await tx`UPDATE standard_versions SET status='PUBLISHED',published_at=now(),published_by_user_id=${input.publishedByUserId},updated_at=now()
       WHERE id=${standard.version_id} AND standard_id=${standard.id} AND organization_id=${organizationId} AND status='DRAFT'`;
     await tx`UPDATE standards SET current_version_id=${standard.version_id},status='ACTIVE',updated_at=now()
@@ -523,7 +525,10 @@ export async function publishDraftStandard(input:{organizationId:string;standard
 export async function createStandard(input:{organizationId?:string;productId:string;name:string;area?:string;createdByUserId:string;versionLabel:string;changeNote?:string;tasks:{name:string;execution:string;readyWhen:string}[]}) {
   const sql=db(); const organizationId=tenantId(input.organizationId);
   return sql.begin(async tx=>{
+    const [member]=await tx`SELECT 1 FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
+    if(!member) throw new Error("Brak aktywnego członkostwa w organizacji.");
     const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id) VALUES(${organizationId},${input.productId},${input.name},${input.area??null},'ACTIVE',${input.createdByUserId}) RETURNING id`;
+    await consumeStandardCapacity(tx,{organizationId,standardId:standard.id,productId:input.productId});
     const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,published_at,created_by_user_id) VALUES(${organizationId},${standard.id},1,${input.versionLabel},'PUBLISHED',${input.changeNote??null},now(),${input.createdByUserId}) RETURNING id`;
     for(let i=0;i<input.tasks.length;i++){const t=input.tasks[i];await tx`INSERT INTO standard_tasks(organization_id,standard_version_id,position,name,execution,ready_when) VALUES(${organizationId},${version.id},${i+1},${t.name},${t.execution},${t.readyWhen})`;}
     await tx`UPDATE standards SET current_version_id=${version.id},updated_at=now() WHERE id=${standard.id} AND organization_id=${organizationId}`;
@@ -535,6 +540,7 @@ export async function createStandard(input:{organizationId?:string;productId:str
 // Shared BOS Core entry point used by product-neutral Standard creation.
 export async function createOrganizationDraftStandard(input:{
   organizationId:string;
+  productId:string;
   name:string;
   area?:string;
   createdByUserId:string;
@@ -549,8 +555,12 @@ export async function createOrganizationDraftStandard(input:{
     const [member]=await tx`SELECT 1 ok FROM memberships
       WHERE organization_id=${organizationId} AND user_id=${input.createdByUserId} AND status='ACTIVE' LIMIT 1`;
     if(!member) throw new Error("Osoba tworząca Standard nie należy aktywnie do organizacji.");
+    const [product]=await tx`SELECT p.id FROM products p JOIN licenses l ON l.product_id=p.id AND l.organization_id=${organizationId}
+      WHERE p.id=${input.productId} AND p.key IN ('onboarding','promotions') AND p.status='ACTIVE'
+      AND l.status='ACTIVE' AND (l.license_type='PERPETUAL' OR (l.license_type='ANNUAL' AND l.valid_until>now())) LIMIT 1`;
+    if(!product) throw new Error("Wybierz produkt BOS z aktywną licencją.");
     const [standard]=await tx`INSERT INTO standards(organization_id,product_id,name,area,status,created_by_user_id)
-      VALUES(${organizationId},NULL,${name},${input.area?.trim()||null},'DRAFT',${input.createdByUserId})
+      VALUES(${organizationId},${input.productId},${name},${input.area?.trim()||null},'DRAFT',${input.createdByUserId})
       RETURNING id`;
     const [version]=await tx`INSERT INTO standard_versions(organization_id,standard_id,version_number,version_label,status,change_note,created_by_user_id)
       VALUES(${organizationId},${standard.id},1,'v1','DRAFT','Wersja robocza',${input.createdByUserId})

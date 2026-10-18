@@ -1,0 +1,33 @@
+name: COMMERCE-02 Capacity Tests
+on:
+  push:
+    branches:
+      - feature/commerce-02-standard-capacity
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capacity-addon-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Simulated session integration tests
+        run: npm run test:capacity-addon
+      - name: Checkout route HTTP response integration tests
+        run: node --test scripts/test-capacity-addon-route.cjs
+      - name: Stripe webhook route integration tests
+        run: node --test scripts/test-capacity-addon-webhook.cjs
+      - name: Genuine Stripe SDK webhook signature tests
+        run: node --test scripts/test-capacity-stripe-signature.cjs
+      - name: Capacity confirmation email outbox tests
+        run: node --test scripts/test-capacity-addon-email.cjs
+      - name: Stateful end-to-end sandbox (mock Stripe/Neon/Resend)
+        run: node --test scripts/test-capacity-addon-sandbox.cjs
+      - name: TypeScript
+        run: npx tsc --noEmit
