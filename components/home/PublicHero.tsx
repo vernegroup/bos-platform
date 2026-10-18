@@ -11,7 +11,7 @@ export default function PublicHero() {
         </h1>
         <div className="bos-land03-hero-copy">
           <p>BOS porządkuje wdrażanie pracowników i przygotowanie do nowych ról — od wymagań stanowiska do udokumentowanej decyzji o gotowości.</p>
-          <div className="bos-land03-hero-actions"><a href="#demonstracja">ZOBACZ, JAK DZIAŁA <span aria-hidden="true">→</span></a><a href="#produkty">POZNAJ OFERTĘ</a></div>
+          <div className="bos-land03-hero-actions"><a href="#produkty">POZNAJ PRODUKTY <span aria-hidden="true">→</span></a><a href="#demonstracja">ZOBACZ PROCES</a></div>
         </div>
         <div className="bos-public-hero__marker" aria-hidden="true">
           <span>PRZEWIŃ</span><i />
