@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CapacityAddonButton from "./CapacityAddonButton";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
@@ -44,6 +45,7 @@ export default async function OrganizationPage(){
      <h3>{license.name}</h3><small>Wersja {license.currentVersion??"—"}</small>
      <dl><div><dt>Licencja</dt><dd>{license.licenseType==="ANNUAL"?"Roczna":"Dożywotnia"}</dd></div><div><dt>{license.validUntil?"Ważna do":"Aktywna od"}</dt><dd>{datePL(license.validUntil??license.grantedAt)}</dd></div></dl>
      <Link href={productHref[license.key]}>Otwórz produkt →</Link>
+     {(access.membership.role==="OWNER"||access.membership.role==="ADMIN") && (license.licenseType==="PERPETUAL"||license.licenseType==="ANNUAL") && <CapacityAddonButton product={license.key} />}
     </article>)}
     {!licenses.length&&<div className="p8-empty">Brak aktywnych licencji produktowych.</div>}
    </div>
