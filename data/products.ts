@@ -114,9 +114,9 @@ export const bosProducts: readonly BOSProduct[] = [
       description:
         "Wybierz pracownika i nową rolę, porównaj wymagania stanowiska z obecnym przygotowaniem, uzupełnij braki i zweryfikuj warunki gotowości do zmiany.",
       benefits: [
-        ["Nowa rola, nowy standard", "Kompetencje wymagane na nowym stanowisku są opisane niezależnie od poprzedniej roli."],
-        ["Ciągłość pracownika", "Proces może korzystać z historii osoby w organizacji bez skracania wymagań nowego stanowiska."],
-        ["Decyzja oparta na gotowości", "Zamknięcie zmiany następuje po weryfikacji wykonania i gotowości do samodzielnej pracy."],
+        ["Wymagania nowej roli", "Określ Standard docelowego stanowiska niezależnie od dotychczasowych obowiązków."],
+        ["Ocena różnic i przekazanie", "Zidentyfikuj braki do uzupełnienia i uporządkuj przekazanie obowiązków."],
+        ["Weryfikacja decyzji", "Sprawdź wymagane warunki i udokumentuj gotowość do nowej roli."],
       ],
       audience:
         "Dla firm, które rozwijają ludzi wewnętrznie i chcą prowadzić awanse oraz przesunięcia według jasnego, udokumentowanego procesu.",
