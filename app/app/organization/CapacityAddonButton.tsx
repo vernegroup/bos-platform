@@ -38,7 +38,7 @@ export default function CapacityAddonButton({ product }: { product: Product }) {
       {error && <p role="alert">{error}</p>}
       <style jsx>{`
         .capacity-addon-action{margin-top:9px}
-        button{display:flex;align-items:center;justify-content:center;width:100%;min-height:36px;padding:8px 12px;background:#fff;border:1px solid #b78a3e;border-radius:3px;color:#8b672e;font:700 9px inherit;cursor:pointer}
+        button{display:flex;align-items:center;justify-content:center;width:100%;min-height:36px;padding:8px 12px;background:#fff;border:1px solid #b78a3e;border-radius:3px;color:#8b672e;font-size:9px;font-weight:700;font-family:inherit;cursor:pointer}
         button:hover:not(:disabled){background:#f7f2e8}
         button:disabled{opacity:.65;cursor:wait}
         p{margin:7px 0 0;color:#a12a2a;font-size:10px}
