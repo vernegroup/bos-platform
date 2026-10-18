@@ -46,3 +46,11 @@
 .bos-public-root .bos-product-rail__item:first-child .bos-product-rail__reveal{background:linear-gradient(180deg,#efd19a,#cba268);color:#091321;border-color:#e6c48c}
 .bos-public-root .bos-product-rail__reveal:hover,.bos-public-root .bos-product-rail__reveal:focus-visible{background:#efd19a;color:#091321;border-color:#efd19a;outline-offset:4px}
 @media(max-width:650px){.bos-public-root .bos-product-rail__track{grid-template-columns:1fr;max-width:500px;padding:0 24px}.bos-public-root .bos-product-rail__reveal{min-height:54px}}
+
+/* LAND-03: same background gradient as authenticated BOS NAV sidebar. */
+.bos-public-root .bos-land03{background:linear-gradient(180deg,#102231,#0b1b29)}
+.bos-public-root .bos-land03__demo,
+.bos-public-root .bos-land03__faq,
+.bos-public-root .bos-land03__closing{background:transparent}
+.bos-public-root .bos-land-explainer,
+.bos-public-root .bos-product-rail{background:linear-gradient(180deg,#102231,#0b1b29)}
