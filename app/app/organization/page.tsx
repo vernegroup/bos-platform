@@ -1,5 +1,7 @@
 import Link from "next/link";
 import CapacityAddonButton from "./CapacityAddonButton";
+import { db } from "@/lib/db";
+import { getStandardCapacity } from "@/lib/bos/core/standardCapacity";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
@@ -14,6 +16,9 @@ const roleLabels={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",U
 export default async function OrganizationPage(){
  const access=await requireBOSAccess();
  const [licenses,members,subscriptions]=await Promise.all([listLicensedProducts(access),listOrganizationMembers(access),listBillingSubscriptions(access)]);
+ const productRows=await db().unsafe("SELECT id,key FROM products WHERE key IN ('onboarding','promotions') AND status='ACTIVE'");
+ const capacities=await Promise.all(productRows.map(async p=>({key:p.key,...await getStandardCapacity(db(),access.organization.id,p.id)})));
+ const capacityByKey=new Map(capacities.map(c=>[c.key,c]));
  const activeMembers=members.filter(member=>member.status==="ACTIVE").length;
  return <>
   <section className="p8-head"><div><h1>Firma</h1><p>Dane organizacji i licencje przypisane do konta BOS.</p></div><span>Aktywna organizacja</span></section>
@@ -44,6 +49,7 @@ export default async function OrganizationPage(){
      <div className="top"><span>BOS</span><b>Aktywna</b></div>
      <h3>{license.name}</h3><small>Wersja {license.currentVersion??"—"}</small>
      <dl><div><dt>Licencja</dt><dd>{license.licenseType==="ANNUAL"?"Roczna":"Dożywotnia"}</dd></div><div><dt>{license.validUntil?"Ważna do":"Aktywna od"}</dt><dd>{datePL(license.validUntil??license.grantedAt)}</dd></div></dl>
+     {capacityByKey.get(license.key) && <div className="p8-capacity"><strong>Limit Standardów: {capacityByKey.get(license.key)!.capacity}</strong><span>Wykorzystano: {capacityByKey.get(license.key)!.used} · Dostępne: {capacityByKey.get(license.key)!.remaining}</span></div>}
      <Link href={productHref[license.key]}>Otwórz produkt →</Link>
      {(access.membership.role==="OWNER"||access.membership.role==="ADMIN") && (license.licenseType==="PERPETUAL"||license.licenseType==="ANNUAL") && <CapacityAddonButton product={license.key} />}
     </article>)}
@@ -59,6 +65,7 @@ export default async function OrganizationPage(){
    .p8-company,.p8-licenses{margin-bottom:28px}.p8-title{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:12px}.p8-title h2{margin:0;color:#183146;font-family:Georgia,serif;font-size:17px;font-weight:500}.p8-title p{margin:5px 0 0;color:#7b858c;font-size:9px}.p8-title>span{color:#8b744e;font-size:8px;font-weight:700}
    .p8-company>dl{margin:0;background:#fff;border:1px solid #e3e2dd;border-radius:6px;display:grid;grid-template-columns:repeat(3,1fr);overflow:hidden}.p8-company>dl>div{min-height:78px;padding:16px;border-right:1px solid #ecebe7;border-bottom:1px solid #ecebe7}.p8-company>dl>div:nth-child(3n){border-right:0}.p8-company>dl>div:nth-last-child(-n+3){border-bottom:0}.p8-company dt,.p8-license-grid dt{color:#8a9298;font-size:7px;font-weight:700;text-transform:uppercase}.p8-company dd{margin:7px 0 0;color:#30495a;font-size:10px;font-weight:600;overflow-wrap:anywhere}.p8-company dd.mono{font-family:monospace;font-size:8px;font-weight:500}
    .p8-billing-action{margin:-1px 0 14px;padding:12px 14px;background:#fff;border:1px solid #e3e2dd;border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:18px}.p8-billing-action>div{display:flex;flex-direction:column;gap:3px}.p8-billing-action strong{color:#183146;font-size:10px}.p8-billing-action span{color:#7b858c;font-size:8px;line-height:1.4}.p8-billing-action>a{flex:0 0 auto;display:inline-flex;min-height:34px;padding:0 15px;align-items:center;justify-content:center;border:1px solid #b78a3e;border-radius:3px;background:#fff;color:#8b672e;text-decoration:none;font-size:8px;font-weight:700}.p8-billing-action>a:hover{background:#f7f2e8}
+   .p8-capacity{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:7px;margin:-4px 0 12px;padding:10px 12px;background:#f7f5ef;border-left:2px solid #b78a3e}.p8-capacity strong{font-size:11px;color:#173146}.p8-capacity span{font-size:9px;color:#687781}
    .p8-license-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.p8-license-grid>article{padding:18px;background:#fff;border:1px solid #e3e2dd;border-radius:6px}.p8-license-grid .top{display:flex;justify-content:space-between;align-items:center}.p8-license-grid .top>span{color:#b18439;font-family:Georgia,serif;font-size:10px;font-weight:700;letter-spacing:.1em}.p8-license-grid .top>b{padding:5px 7px;border-radius:999px;background:#edf6ef;color:#3f7650;font-size:7px}.p8-license-grid h3{margin:20px 0 4px;color:#173146;font-family:Georgia,serif;font-size:18px}.p8-license-grid small{color:#818a90;font-size:8px}.p8-license-grid dl{margin:17px 0;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid #ecebe7;border-bottom:1px solid #ecebe7}.p8-license-grid dl>div{padding:11px 0}.p8-license-grid dl>div+div{padding-left:15px;border-left:1px solid #ecebe7}.p8-license-grid dd{margin:4px 0 0;color:#3a5060;font-size:9px;font-weight:700}.p8-license-grid a{display:flex;height:34px;align-items:center;justify-content:center;background:#b78a3e;color:#fff;text-decoration:none;font-size:8px;font-weight:700}.p8-empty{grid-column:1/-1;padding:25px;background:#fff;border:1px solid #e3e2dd;color:#7b858c;font-size:9px;text-align:center}
    .p8-note{padding:14px 16px;border-left:2px solid #b78a3e;background:#f7f5ef}.p8-note strong{color:#72572a;font-size:9px}.p8-note p{margin:5px 0 0;color:#687781;font-size:9px;line-height:1.5}
    @media(max-width:800px){.p8-summary{grid-template-columns:repeat(2,1fr)}.p8-company>dl{grid-template-columns:repeat(2,1fr)}.p8-company>dl>div,.p8-company>dl>div:nth-child(3n),.p8-company>dl>div:nth-last-child(-n+3){border-right:1px solid #ecebe7;border-bottom:1px solid #ecebe7}.p8-company>dl>div:nth-child(2n){border-right:0}.p8-company>dl>div:nth-last-child(-n+2){border-bottom:0}}
