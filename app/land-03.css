@@ -54,3 +54,8 @@
 .bos-public-root .bos-land03__closing{background:transparent}
 .bos-public-root .bos-land-explainer,
 .bos-public-root .bos-product-rail{background:linear-gradient(180deg,#102231,#0b1b29)}
+
+/* LAND-03: exact perceived NAV background from provided authenticated-panel screenshot (#111920). */
+.bos-public-root .bos-land03,
+.bos-public-root .bos-land-explainer,
+.bos-public-root .bos-product-rail{background:#111920}
