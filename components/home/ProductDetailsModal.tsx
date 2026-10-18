@@ -13,7 +13,7 @@ export default function ProductDetailsModal({product,variant="default",onOpen,re
  function show(){onOpen?.();setCheckoutError("");setOpen(true)}
  async function checkout(){if(checkoutPending)return;setCheckoutPending(true);setCheckoutError("");try{const endpoint=requireAccess?catalogProduct.offer.checkoutEndpoint+"?context=app":catalogProduct.offer.checkoutEndpoint;const response=await fetch(endpoint,{method:"POST"});const payload=await response.json().catch(()=>null) as {url?:string;error?:string}|null;if(response.status===401&&payload?.error==="auth_required"){window.location.assign("/login?callbackUrl=/app/products");return}if(!response.ok||!payload?.url)throw new Error("checkout_failed");window.location.assign(payload.url)}catch{setCheckoutError("Nie udało się otworzyć płatności. Spróbuj ponownie.");setCheckoutPending(false)}}
  const triggerClass=variant==="rail"?"bos-product-rail__reveal":variant==="appRail"?"bos-app-product-rail-item bos-app-product-rail-item--sale":variant==="buyMenu"?"bos-topbar-buy-option":"bos-product-more";
- const triggerLabel=variant==="rail"?"POZNAJ":variant==="appRail"||variant==="buyMenu"?catalogProduct.displayName:"Dowiedz się więcej";
+ const triggerLabel=variant==="rail"?catalogProduct.displayName:variant==="appRail"||variant==="buyMenu"?catalogProduct.displayName:"Dowiedz się więcej";
  return <>
   <button ref={triggerRef} type="button" aria-haspopup="dialog" aria-expanded={open} className={triggerClass} onClick={show}>{triggerLabel} <span aria-hidden="true">→</span></button>
   {open&&<div className="bos-product-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setOpen(false)}}>

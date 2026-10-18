@@ -63,11 +63,11 @@ export const bosProducts: readonly BOSProduct[] = [
       kicker: "BOS WDROŻENIA",
       title: "Uporządkuj wdrożenie. Skróć drogę do samodzielności.",
       description:
-        "BOS Wdrożenia prowadzi menedżera przez przygotowanie, realizację i zamknięcie wdrożenia pracownika w jednym, powtarzalnym procesie.",
+        "Przygotuj Standard stanowiska i warunki rozpoczęcia, prowadź pracownika przez zadania oraz potwierdź kryteria gotowości. Wynik wdrożenia pozostaje udokumentowany.",
       benefits: [
-        ["Jeden standard", "Stanowisko, czynności krytyczne i oczekiwany rezultat są zapisane w jednym miejscu."],
-        ["Kontrola postępu", "Menedżer widzi etap procesu, realizację zadań i moment gotowości pracownika."],
-        ["Mniej improwizacji", "Kolejne wdrożenia wykorzystują ten sam sprawdzony mechanizm zamiast zaczynać od zera."],
+        ["Standard stanowiska", "Zapisz wymagania, czynności krytyczne oraz warunki rozpoczęcia i zakończenia wdrożenia."],
+        ["Etapy i potwierdzenia", "Prowadzący widzi postęp zadań i niespełnione kryteria gotowości."],
+        ["Udokumentowane zakończenie", "Sprawdź wymagane potwierdzenia i zachowaj Kartę Zakończenia procesu."],
       ],
       audience:
         "Dla właścicieli i menedżerów MŚP, którzy chcą wdrażać pracowników w sposób powtarzalny i możliwy do kontrolowania.",
@@ -112,11 +112,11 @@ export const bosProducts: readonly BOSProduct[] = [
       kicker: "BOS AWANSE",
       title: "Zmieniaj role bez utraty kontroli nad procesem.",
       description:
-        "BOS Awanse porządkuje awanse i przesunięcia poziome jako proces wejścia pracownika w nową rolę, z własnym standardem i kryterium gotowości.",
+        "Wybierz pracownika i nową rolę, porównaj wymagania stanowiska z obecnym przygotowaniem, uzupełnij braki i zweryfikuj warunki gotowości do zmiany.",
       benefits: [
-        ["Nowa rola, nowy standard", "Kompetencje wymagane na nowym stanowisku są opisane niezależnie od poprzedniej roli."],
-        ["Ciągłość pracownika", "Proces może korzystać z historii osoby w organizacji bez skracania wymagań nowego stanowiska."],
-        ["Decyzja oparta na gotowości", "Zamknięcie zmiany następuje po weryfikacji wykonania i gotowości do samodzielnej pracy."],
+        ["Wymagania nowej roli", "Określ Standard docelowego stanowiska niezależnie od dotychczasowych obowiązków."],
+        ["Ocena różnic i przekazanie", "Zidentyfikuj braki do uzupełnienia i uporządkuj przekazanie obowiązków."],
+        ["Weryfikacja decyzji", "Sprawdź wymagane warunki i udokumentuj gotowość do nowej roli."],
       ],
       audience:
         "Dla firm, które rozwijają ludzi wewnętrznie i chcą prowadzić awanse oraz przesunięcia według jasnego, udokumentowanego procesu.",

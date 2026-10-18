@@ -1,0 +1,61 @@
+/* LAND-03 isolated visual experiment. */
+.bos-land03{position:relative;z-index:2;color:#f3f1ed;background:#050d19}
+.bos-land03__demo,.bos-land03__faq,.bos-land03__closing{padding:clamp(64px,8vw,116px) clamp(24px,5vw,90px);max-width:1600px;margin:0 auto}
+.bos-land03__eyebrow,.bos-land03__closing>span{display:block;color:#d7aa6b;font-size:11px;font-weight:700;letter-spacing:.24em;margin-bottom:28px}
+.bos-land03 h2{margin:0;color:#f7f4ef;font:400 clamp(38px,5vw,74px)/1.07 Georgia,serif;letter-spacing:-.045em}
+.bos-land03 h2 em{font-style:normal;color:#d7aa6b}
+.bos-land03__heading{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:48px}
+.bos-land03__heading p,.bos-land03__faq>div>p{color:#b8c4d1;line-height:1.8;font-size:16px;max-width:490px}
+.bos-land03__timeline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:66px}
+.bos-land03__timeline article{border-top:1px solid #82643f;padding:28px 0 10px}
+.bos-land03__timeline article>span{color:#d7aa6b;font-size:11px;letter-spacing:.18em}
+.bos-land03__timeline h3{font-size:24px;font-weight:500;margin:30px 0 14px;color:#fff}
+.bos-land03__timeline p,.bos-land03__note{color:#b8c4d1;line-height:1.75;font-size:14px}
+.bos-land03__note{margin-top:32px;font-size:12px}
+.bos-land03__faq{display:grid;grid-template-columns:.85fr 1.15fr;gap:70px;border-top:1px solid rgba(215,170,107,.2)}
+.bos-land03__questions details{border-bottom:1px solid rgba(255,255,255,.17);padding:20px 0}
+.bos-land03__questions summary{display:flex;justify-content:space-between;gap:20px;cursor:pointer;font-size:17px;list-style:none;color:#fff}
+.bos-land03__questions summary::-webkit-details-marker{display:none}
+.bos-land03__questions summary span{color:#d7aa6b;font-size:24px}
+.bos-land03__questions details[open] summary span{transform:rotate(45deg)}
+.bos-land03__questions p{color:#b8c4d1;line-height:1.75;max-width:650px}
+.bos-land03__closing{border-top:1px solid rgba(215,170,107,.2);text-align:center}
+.bos-land03__closing a{display:inline-block;margin-top:36px;border:1px solid #d7aa6b;padding:16px 26px;color:#eac38a;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.15em}
+.bos-land03__closing a:hover{background:#d7aa6b;color:#081321}
+.bos-public-root .bos-land-explainer{background:#07111f;border-color:rgba(215,170,107,.18)}
+.bos-public-root .bos-product-rail{position:relative;background:#07111f}
+@media(max-width:850px){.bos-land03__heading,.bos-land03__faq{grid-template-columns:1fr;gap:24px}.bos-land03__timeline{grid-template-columns:1fr;gap:10px;margin-top:38px}.bos-land03__timeline article{padding-top:20px}.bos-land03__timeline h3{margin-top:16px}}
+
+/* Preserve original wordmark and architecture; position useful content below. */
+.bos-land03-hero-copy{position:absolute;z-index:6;left:clamp(28px,4.2vw,78px);top:calc(48% + 62px);max-width:620px}
+.bos-land03-hero-copy p{font-size:clamp(14px,1.2vw,18px);line-height:1.7;color:#d3dce7;max-width:560px;text-shadow:0 2px 15px #000}
+.bos-land03-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.bos-land03-hero-actions a{display:inline-flex;align-items:center;gap:12px;padding:14px 19px;text-decoration:none;border:1px solid #cba06a;color:#f2d0a1;font-size:11px;font-weight:700;letter-spacing:.12em}
+.bos-land03-hero-actions a:first-child{background:#cba06a;color:#091320}
+.bos-land03-hero-actions a:hover{background:#f1d5aa;color:#091320}
+@media(max-width:700px){.bos-land03-hero-copy{left:24px;right:24px;top:calc(48% + 96px)}.bos-land03-hero-copy p{font-size:13px}.bos-land03-hero-actions{gap:9px;margin-top:14px}.bos-land03-hero-actions a{font-size:9px;padding:11px 12px}}
+
+/* LAND-03 product rail: centered, real buttons styled to match topbar actions. */
+.bos-public-root .bos-product-rail__viewport{overflow:visible}
+.bos-public-root .bos-product-rail__track{width:100%;min-width:0;max-width:1060px;margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,3vw,36px);padding:0 clamp(28px,4.2vw,78px)}
+.bos-public-root .bos-product-rail__track:after{display:none}
+.bos-public-root .bos-product-rail__item{min-width:0;min-height:0;padding:0;display:block}
+.bos-public-root .bos-product-rail__item:first-child:after,.bos-public-root .bos-product-rail__item:first-child:before{display:none}
+.bos-public-root .bos-product-rail__reveal{position:relative;top:auto;left:auto;display:flex;justify-content:center;align-items:center;gap:14px;width:100%;min-height:58px;padding:15px 22px;opacity:1;transform:none;border:1px solid #d2a45b;border-radius:3px;background:transparent;color:#f1d7ad;font-size:clamp(12px,1vw,15px);font-weight:700;letter-spacing:.13em;transition:background .2s,color .2s,border-color .2s}
+.bos-public-root .bos-product-rail__reveal span{margin:0;color:inherit;font-size:18px}
+.bos-public-root .bos-product-rail__item:first-child .bos-product-rail__reveal{background:linear-gradient(180deg,#efd19a,#cba268);color:#091321;border-color:#e6c48c}
+.bos-public-root .bos-product-rail__reveal:hover,.bos-public-root .bos-product-rail__reveal:focus-visible{background:#efd19a;color:#091321;border-color:#efd19a;outline-offset:4px}
+@media(max-width:650px){.bos-public-root .bos-product-rail__track{grid-template-columns:1fr;max-width:500px;padding:0 24px}.bos-public-root .bos-product-rail__reveal{min-height:54px}}
+
+/* LAND-03: same background gradient as authenticated BOS NAV sidebar. */
+.bos-public-root .bos-land03{background:linear-gradient(180deg,#102231,#0b1b29)}
+.bos-public-root .bos-land03__demo,
+.bos-public-root .bos-land03__faq,
+.bos-public-root .bos-land03__closing{background:transparent}
+.bos-public-root .bos-land-explainer,
+.bos-public-root .bos-product-rail{background:linear-gradient(180deg,#102231,#0b1b29)}
+
+/* LAND-03: exact perceived NAV background from provided authenticated-panel screenshot (#111920). */
+.bos-public-root .bos-land03,
+.bos-public-root .bos-land-explainer,
+.bos-public-root .bos-product-rail{background:#111920}
