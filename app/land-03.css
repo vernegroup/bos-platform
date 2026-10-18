@@ -25,3 +25,12 @@
 .bos-public-root .bos-land-explainer{background:#07111f;border-color:rgba(215,170,107,.18)}
 .bos-public-root .bos-product-rail{position:relative;background:#07111f}
 @media(max-width:850px){.bos-land03__heading,.bos-land03__faq{grid-template-columns:1fr;gap:24px}.bos-land03__timeline{grid-template-columns:1fr;gap:10px;margin-top:38px}.bos-land03__timeline article{padding-top:20px}.bos-land03__timeline h3{margin-top:16px}}
+
+/* Preserve original wordmark and architecture; position useful content below. */
+.bos-land03-hero-copy{position:absolute;z-index:6;left:clamp(28px,4.2vw,78px);top:calc(48% + 62px);max-width:620px}
+.bos-land03-hero-copy p{font-size:clamp(14px,1.2vw,18px);line-height:1.7;color:#d3dce7;max-width:560px;text-shadow:0 2px 15px #000}
+.bos-land03-hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
+.bos-land03-hero-actions a{display:inline-flex;align-items:center;gap:12px;padding:14px 19px;text-decoration:none;border:1px solid #cba06a;color:#f2d0a1;font-size:11px;font-weight:700;letter-spacing:.12em}
+.bos-land03-hero-actions a:first-child{background:#cba06a;color:#091320}
+.bos-land03-hero-actions a:hover{background:#f1d5aa;color:#091320}
+@media(max-width:700px){.bos-land03-hero-copy{left:24px;right:24px;top:calc(48% + 96px)}.bos-land03-hero-copy p{font-size:13px}.bos-land03-hero-actions{gap:9px;margin-top:14px}.bos-land03-hero-actions a{font-size:9px;padding:11px 12px}}
