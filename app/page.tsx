@@ -10,6 +10,7 @@ import "./public-hero.css";
 import "./public-products.css";
 import "./landing-explainer.css";
 import "./landing-offer.css";
+import "./land-03.css";
 
 import TopBar from "../components/TopBar";
 import BottomBar from "../components/BottomBar";
@@ -18,6 +19,7 @@ import ProductRail from "../components/home/ProductRail";
 import PublicScene from "../components/home/PublicScene";
 import PublicHero from "../components/home/PublicHero";
 import LandingExplainer from "../components/home/LandingExplainer";
+import LandingPreviewSections from "../components/home/LandingPreviewSections";
 
 export default function HomePage() {
   return (
@@ -29,6 +31,7 @@ export default function HomePage() {
           <PublicHero />
           <LandingExplainer />
           <ProductRail />
+          <LandingPreviewSections />
         </main>
         <BottomBar />
         <BOSSupport />
