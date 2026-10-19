@@ -23,29 +23,9 @@ export async function consumeStandardCapacity(tx:any, input:{
     [input.standardId,input.organizationId,input.productId]
   );
   if(!ownership.length) throw new Error("Standard nie należy do wskazanego produktu i organizacji.");
-  const existing=await tx.unsafe(
-    "SELECT 1 FROM standard_capacity_consumptions WHERE standard_id=$1 AND organization_id=$2 AND product_id=$3",
-    [input.standardId,input.organizationId,input.productId]
-  );
-  if(existing.length) return {newlyConsumed:false};
-  const grants=await tx.unsafe(
-    "SELECT COALESCE(SUM(quantity),0)::int AS capacity FROM standard_capacity_grants WHERE organization_id=$1 AND product_id=$2 AND status='ACTIVE'",
-    [input.organizationId,input.productId]
-  );
-  const used=await tx.unsafe(
-    "SELECT COUNT(*)::int AS used FROM standard_capacity_consumptions WHERE organization_id=$1 AND product_id=$2",
-    [input.organizationId,input.productId]
-  );
-  const capacity=Number(grants[0]?.capacity??0);
-  const consumed=Number(used[0]?.used??0);
-  if(consumed>=capacity) throw new Error(
-    "Wykorzystano limit opublikowanych Standardów. Dokup kolejne 10 miejsc."
-  );
-  await tx.unsafe(
-    "INSERT INTO standard_capacity_consumptions(standard_id,organization_id,product_id) VALUES($1,$2,$3)",
-    [input.standardId,input.organizationId,input.productId]
-  );
-  return {newlyConsumed:true};
+  // Licencja uprawnia do nieograniczonej liczby opublikowanych Standardów.
+  // Zachowujemy historyczne zapisy capacity wyłącznie dla audytu.
+  return {newlyConsumed:false};
 }
 
 export async function getStandardCapacity(sql:any, organizationId:string, productId:string) {
