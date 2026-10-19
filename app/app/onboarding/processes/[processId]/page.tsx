@@ -125,7 +125,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
               <p>{task.readyWhen}</p>
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
                 <TaskStagePanel processId={process.id} taskId={task.id} taskName={task.name} startComplete={startComplete}
-                  stages={stageLabels.map(([stage,,key,actorKey])=>({stage,timestamp:state[key],author:state[actorKey]}))}
+                  stages={stageLabels.map(([stage,,key,actorKey])=>({stage,timestamp:state[key] ? new Date(state[key]).toISOString() : undefined,author:state[actorKey]}))}
                   action={saveStageResult}/>
                 <details className="bos-error-recovery"><summary>WYSTĄPIŁ BŁĄD — jak wrócić do prawidłowego wykonania?</summary><div><b>ZATRZYMAJ → WSKAŻ → POPRAW → POWTÓRZ → SPRAWDŹ</b><p>Błąd nie kasuje wcześniejszych etapów. Zatrzymaj błędne wykonanie, wskaż konkretną różnicę względem Standardu, popraw sposób działania, pozwól powtórzyć czynność i sprawdź rezultat ponownie.</p><small>W notatce zapisuj fakt, np. „Pominięto sprawdzenie uszkodzenia opakowania”, a nie ocenę osoby, np. „nieuważny”.</small></div></details>
                 <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Pominięto sprawdzenie kodu produktu — powtórzyć czynność i sprawdzić rezultat."/></label><div><small>Zapisz zaobserwowany fakt lub działanie do powtórzenia. Nie oceniaj osoby.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
