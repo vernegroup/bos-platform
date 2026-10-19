@@ -1,7 +1,4 @@
 import Link from "next/link";
-import CapacityAddonButton from "./CapacityAddonButton";
-import { db } from "@/lib/db";
-import { getStandardCapacity } from "@/lib/bos/core/standardCapacity";
 import { requireBOSAccess } from "@/lib/bos/access";
 import { listLicensedProducts } from "@/lib/bos/licenseRepository";
 import { listOrganizationMembers } from "@/lib/bos/organizationRepository";
@@ -16,9 +13,6 @@ const roleLabels={OWNER:"Właściciel",ADMIN:"Administrator",MANAGER:"Manager",U
 export default async function OrganizationPage(){
  const access=await requireBOSAccess();
  const [licenses,members,subscriptions]=await Promise.all([listLicensedProducts(access),listOrganizationMembers(access),listBillingSubscriptions(access)]);
- const productRows=await db().unsafe("SELECT id,key FROM products WHERE key IN ('onboarding','promotions') AND status='ACTIVE'");
- const capacities=await Promise.all(productRows.map(async p=>({key:p.key,...await getStandardCapacity(db(),access.organization.id,p.id)})));
- const capacityByKey=new Map(capacities.map(c=>[c.key,c]));
  const activeMembers=members.filter(member=>member.status==="ACTIVE").length;
  return <>
   <section className="p8-head"><div><h1>Firma</h1><p>Dane organizacji i licencje przypisane do konta BOS.</p></div><span>Aktywna organizacja</span></section>
@@ -49,9 +43,7 @@ export default async function OrganizationPage(){
      <div className="top"><span>BOS</span><b>Aktywna</b></div>
      <h3>{license.name}</h3><small>Wersja {license.currentVersion??"—"}</small>
      <dl><div><dt>Licencja</dt><dd>{license.licenseType==="ANNUAL"?"Roczna":"Dożywotnia"}</dd></div><div><dt>{license.validUntil?"Ważna do":"Aktywna od"}</dt><dd>{datePL(license.validUntil??license.grantedAt)}</dd></div></dl>
-     {capacityByKey.get(license.key) && <div className="p8-capacity"><strong>Limit Standardów: {capacityByKey.get(license.key)!.capacity}</strong><span>Wykorzystano: {capacityByKey.get(license.key)!.used} · Dostępne: {capacityByKey.get(license.key)!.remaining}</span></div>}
      <Link href={productHref[license.key]}>Otwórz produkt →</Link>
-     {(access.membership.role==="OWNER"||access.membership.role==="ADMIN") && (license.licenseType==="PERPETUAL"||license.licenseType==="ANNUAL") && <CapacityAddonButton product={license.key} />}
     </article>)}
     {!licenses.length&&<div className="p8-empty">Brak aktywnych licencji produktowych.</div>}
    </div>
