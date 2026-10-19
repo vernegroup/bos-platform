@@ -67,7 +67,7 @@ export default async function BOSAppPage(){
       <div className="bos-home-products">
         <article className="bos-home-product">
           <div className="bos-home-product-head"><div><h3>Standardy organizacji</h3><p>Wspólne definicje pracy używane przez produkty BOS.</p></div><span>{standards.length}</span></div>
-          <Link href="/app/standards">Otwórz repozytorium →</Link>
+          <div style={{display:"flex",gap:16,flexWrap:"wrap"}}><Link href="/app/standards">Otwórz repozytorium →</Link><Link href="/app/standards/new">Biblioteka wzorów →</Link></div>
         </article>
       </div>
     </section>
