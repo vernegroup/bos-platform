@@ -232,22 +232,44 @@ export async function updateTaskNote(input:{organizationId?:string;processId:str
 
 export async function confirmTaskStage(input:{organizationId?:string;processId:string;standardTaskId:string;stage:OnboardingTaskStage;userId:string}) {
   requirePersistedOnboarding();
-  const sql=db(); const organizationId=tenantId(input.organizationId); const now=new Date();
-  const [process]=await sql`SELECT status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} LIMIT 1`;
-  if(!process || process.status==='PLANNED') throw new Error("Najpierw potwierdź wszystkie warunki rozpoczęcia.");
-  const actor=await sql`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} LIMIT 1`;
-  if(!actor[0]) throw new Error("Osoba potwierdzająca etap nie należy do tej organizacji.");
-  const rows=input.stage==="EXPLAINED"
-    ? await sql`UPDATE onboarding_task_progress SET explained_at=${now},explained_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} RETURNING id`
-    : input.stage==="SHOWN"
-    ? await sql`UPDATE onboarding_task_progress SET shown_at=${now},shown_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND explained_at IS NOT NULL RETURNING id`
-    : input.stage==="TOGETHER"
-    ? await sql`UPDATE onboarding_task_progress SET together_at=${now},together_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND shown_at IS NOT NULL RETURNING id`
-    : input.stage==="SOLO"
-    ? await sql`UPDATE onboarding_task_progress SET solo_at=${now},solo_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND together_at IS NOT NULL RETURNING id`
-    : await sql`UPDATE onboarding_task_progress SET checked_at=${now},checked_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND solo_at IS NOT NULL RETURNING id`;
-  if(!rows[0]) throw new Error("Etapy BOS potwierdzaj kolejno: WYJAŚNIJ → POKAŻ → RAZEM → SAM → SPRAWDŹ.");
-  await sql`UPDATE onboarding_processes SET status='IN_PROGRESS',updated_at=now() WHERE id=${input.processId} AND organization_id=${organizationId} AND status='PAUSED'`;
+  const sql=db(); const organizationId=tenantId(input.organizationId);
+  if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(input.stage)) throw new Error("Nieprawidłowy etap BOS.");
+  return sql.begin(async tx=>{
+    // Serialize stage confirmations with closure decisions for the same process.
+    const [process]=await tx`SELECT status FROM onboarding_processes WHERE id=${input.processId} AND organization_id=${organizationId} FOR UPDATE`;
+    if(!process) throw new Error("Nie znaleziono procesu.");
+    if(!["IN_PROGRESS","PAUSED","READY_TO_CLOSE"].includes(process.status)) {
+      throw new Error(process.status==="PLANNED"?"Najpierw potwierdź wszystkie warunki rozpoczęcia.":"Nie można potwierdzić etapu w zamkniętym procesie.");
+    }
+    const [actor]=await tx`SELECT 1 ok FROM memberships WHERE organization_id=${organizationId} AND user_id=${input.userId} AND status='ACTIVE' LIMIT 1`;
+    if(!actor) throw new Error("Osoba potwierdzająca etap nie należy aktywnie do tej organizacji.");
+    const [task]=await tx`SELECT explained_at,shown_at,together_at,solo_at,checked_at FROM onboarding_task_progress
+      WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} FOR UPDATE`;
+    if(!task) throw new Error("Nie znaleziono czynności w tym procesie.");
+    const fields={
+      EXPLAINED:"explained_at",SHOWN:"shown_at",TOGETHER:"together_at",SOLO:"solo_at",CHECKED:"checked_at"
+    } as const;
+    const field=fields[input.stage];
+    // Replayed requests are no-ops: original timestamp and author must remain unchanged.
+    if(task[field]) return;
+    const predecessor={
+      EXPLAINED:null,SHOWN:"explained_at",TOGETHER:"shown_at",SOLO:"together_at",CHECKED:"solo_at"
+    } as const;
+    const previous=predecessor[input.stage];
+    if(previous&&!task[previous]) throw new Error("Etapy BOS potwierdzaj kolejno: WYJAŚNIJ → POKAŻ → RAZEM → SAM → SPRAWDŹ.");
+    const now=new Date();
+    const rows=input.stage==="EXPLAINED"
+      ? await tx`UPDATE onboarding_task_progress SET explained_at=${now},explained_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND explained_at IS NULL RETURNING id`
+      : input.stage==="SHOWN"
+      ? await tx`UPDATE onboarding_task_progress SET shown_at=${now},shown_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND shown_at IS NULL AND explained_at IS NOT NULL RETURNING id`
+      : input.stage==="TOGETHER"
+      ? await tx`UPDATE onboarding_task_progress SET together_at=${now},together_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND together_at IS NULL AND shown_at IS NOT NULL RETURNING id`
+      : input.stage==="SOLO"
+      ? await tx`UPDATE onboarding_task_progress SET solo_at=${now},solo_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND solo_at IS NULL AND together_at IS NOT NULL RETURNING id`
+      : await tx`UPDATE onboarding_task_progress SET checked_at=${now},checked_by_user_id=${input.userId},updated_at=now() WHERE organization_id=${organizationId} AND onboarding_process_id=${input.processId} AND standard_task_id=${input.standardTaskId} AND checked_at IS NULL AND solo_at IS NOT NULL RETURNING id`;
+    if(!rows[0]) throw new Error("Nie udało się potwierdzić etapu BOS. Odśwież stan procesu.");
+    if(process.status==="PAUSED") await tx`UPDATE onboarding_processes SET status='IN_PROGRESS',updated_at=now() WHERE id=${input.processId} AND organization_id=${organizationId} AND status='PAUSED'`;
+  });
 }
 
 export async function listOnboardingStartOptions(organizationId?:string) {
