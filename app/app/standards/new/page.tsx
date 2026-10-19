@@ -27,9 +27,12 @@ async function useTemplate(formData:FormData){
  redirect(target(id,returnTo));
 }
 
-export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string;returnTo?:"promotions"|"onboarding";mode?:"own"}>}){
- const access=await requireBOSAccess(); const {error,returnTo,mode}=await searchParams;
+export default async function NewOrganizationStandardPage({searchParams}:{searchParams:Promise<{error?:string;returnTo?:"promotions"|"onboarding";mode?:"own";area?:string}>}){
+ const access=await requireBOSAccess(); const {error,returnTo,mode,area}=await searchParams;
  const templates=await listStandardTemplates();
+ const areas=[...new Set(templates.map(t=>t.area))].sort((a,b)=>a.localeCompare(b,"pl"));
+ const selectedArea=areas.includes(area??"")?area??"":"";
+ const visibleTemplates=selectedArea?templates.filter(t=>t.area===selectedArea):templates;
  const licensed=await listLicensedProducts(access);
  const productRows=await db().unsafe("SELECT id,key FROM products WHERE key IN ('onboarding','promotions') AND status='ACTIVE'");
  const availableProducts=productRows.filter(p=>licensed.some(l=>l.key===p.key));
@@ -46,7 +49,13 @@ export default async function NewOrganizationStandardPage({searchParams}:{search
     <Link href={`/app/standards/new?mode=own${returnTo?`&returnTo=${returnTo}`:""}`} className="bos-standard-secondary-action">STWÓRZ WŁASNY →</Link></div>
    <p className="bos-template-intro">Wzór zostanie skopiowany do Twojej organizacji jako wersja robocza. Możesz go od razu opublikować albo dowolnie zmienić.</p>
    {error==="template"&&<p role="alert">Wybierz dostępny wzór BOS.</p>}
-   <div className="bos-template-grid">{templates.map(t=><article className="bos-template-card" key={t.id}>
+   <form method="get" style={{display:"flex",gap:12,alignItems:"end",flexWrap:"wrap",marginBottom:20}}>
+    {returnTo&&<input type="hidden" name="returnTo" value={returnTo}/>}
+    <label>Obszar <select name="area" defaultValue={selectedArea}><option value="">Wszystkie obszary</option>{areas.map(a=><option key={a} value={a}>{a}</option>)}</select></label>
+    <button type="submit" className="bos-standard-secondary-action">FILTRUJ</button>
+    <span aria-live="polite">{visibleTemplates.length} {visibleTemplates.length===1?"wzór":"wzorów"}</span>
+   </form>
+   <div className="bos-template-grid">{visibleTemplates.map(t=><article className="bos-template-card" key={t.id}>
     <div><span className="bos-dashboard-section-kicker">WZÓR BOS · {t.area}</span><h3>{t.name}</h3><p>{t.description}</p></div>
     <div className="bos-template-meta"><span>{t.taskCount} czynności</span><span>{t.requirementCount} warunki</span><span>{t.criterionCount} kryteria</span><span>v{t.version}</span></div>
     <form action={useTemplate}><input type="hidden" name="templateId" value={t.id}/><input type="hidden" name="returnTo" value={returnTo??""}/>
