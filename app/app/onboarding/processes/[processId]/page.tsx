@@ -1,3 +1,4 @@
+import TaskStagePanel from "@/components/bos-ux3/TaskStagePanel";
 import HelpProcessContext from "@/components/app-shell/HelpProcessContext";
 export const dynamic = "force-dynamic";
 import Link from "next/link";
@@ -108,19 +109,9 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
               <div><strong>{task.name}</strong><p>{task.execution}</p>{task.isCritical&&<small className="bos-context-inline">K — błąd w tej czynności może mieć poważne konsekwencje. K nie oznacza po prostu „ważne”.</small>}{task.hint&&<small>WSKAZÓWKA: {task.hint}</small>}</div>
               <p>{task.readyWhen}</p>
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
-                {stageLabels.map(([stage,label,key,actorKey],stageIndex)=>{ const done=Boolean(state[key]); const previousKey=stageIndex>0?stageLabels[stageIndex-1][2]:null; const previousDone=stageIndex===0||Boolean(previousKey&&state[previousKey]);
-                  const guidance={
-                    EXPLAINED:["Powiedz, co ma zrobić, po co, jaki ma być rezultat i na co uważać.","Przejdź dalej, gdy pracownik potrafi własnymi słowami opisać zadanie."],
-                    SHOWN:["Wykonaj czynność tak, jak robi się ją naprawdę. Pokazuj rezultat i punkty kontroli.","Przejdź dalej po rzeczywistej demonstracji, nie po samym omówieniu."],
-                    TOGETHER:["Pracownik wykonuje czynność. Ty pomagasz tylko tam, gdzie jest to potrzebne.","RAZEM nie oznacza wykonania zadania za pracownika."],
-                    SOLO:["Oddaj wykonanie pracownikowi bez prowadzenia krok po kroku.","SAM zaznacz dopiero po rzeczywistym samodzielnym wykonaniu. „Rozumiem” nie wystarcza."],
-                    CHECKED:["Porównaj rzeczywisty rezultat z prawidłowym wykonaniem i warunkiem SPRAWDŹ.","Potwierdź dopiero wtedy, gdy rezultat spełnia Standard."]
-                  }[stage];
-                  return <div className={`bos-process-stage ${!done&&previousDone?"is-current":""}`} key={stage}>
-                    <form action={confirmStage}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><input type="hidden" name="stage" value={stage}/><button type="submit" className={done?"is-done":""} disabled={done||!previousDone||!startComplete} aria-pressed={done}><span>{String(stageIndex+1).padStart(2,"0")}</span><strong>{label}</strong>{done&&<i aria-hidden="true">✓</i>}</button></form>
-                    {!done&&previousDone&&<div className="bos-stage-current-guidance"><p>{guidance[0]}</p><small>{guidance[1]}</small></div>}
-                    {done&&<small className="bos-stage-audit">{shortDate(state[key])} · {state[actorKey]||"—"}</small>}
-                  </div>; })}
+                <TaskStagePanel processId={process.id} taskId={task.id} taskName={task.name} startComplete={startComplete}
+                  stages={stageLabels.map(([stage,,key,actorKey])=>({stage,timestamp:state[key],author:state[actorKey]}))}
+                  action={confirmStage}/>
                 <details className="bos-error-recovery"><summary>WYSTĄPIŁ BŁĄD — jak wrócić do prawidłowego wykonania?</summary><div><b>ZATRZYMAJ → WSKAŻ → POPRAW → POWTÓRZ → SPRAWDŹ</b><p>Błąd nie kasuje wcześniejszych etapów. Zatrzymaj błędne wykonanie, wskaż konkretną różnicę względem Standardu, popraw sposób działania, pozwól powtórzyć czynność i sprawdź rezultat ponownie.</p><small>W notatce zapisuj fakt, np. „Pominięto sprawdzenie uszkodzenia opakowania”, a nie ocenę osoby, np. „nieuważny”.</small></div></details>
                 <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Pominięto sprawdzenie kodu produktu — powtórzyć czynność i sprawdzić rezultat."/></label><div><small>Zapisz zaobserwowany fakt lub działanie do powtórzenia. Nie oceniaj osoby.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
               </div>
