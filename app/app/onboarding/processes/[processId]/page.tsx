@@ -13,6 +13,21 @@ async function confirmStage(formData: FormData) {
   if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap BOS.");
   await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
+async function saveStageResult(_state:{ok:boolean}, data:FormData) {
+  "use server";
+  const access=await requireBOSAccess();
+  const processId=String(data.get("processId")||"");
+  const standardTaskId=String(data.get("standardTaskId")||"");
+  const stage=String(data.get("stage")||"") as OnboardingTaskStage;
+  try {
+    if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap");
+    await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id});
+    revalidatePath("/app/onboarding/processes/"+processId);
+    return {ok:true,stage,nonce:Date.now()};
+  } catch(e) {
+    return {ok:false,error:e instanceof Error?e.message:"Błąd zapisu",nonce:Date.now()};
+  }
+}
 async function confirmStart(formData:FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const requirementId=String(formData.get("requirementId")??"");
@@ -111,7 +126,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
               <div className="bos-process-stage-flow" aria-label={`Etapy BOS dla: ${task.name}`}>
                 <TaskStagePanel processId={process.id} taskId={task.id} taskName={task.name} startComplete={startComplete}
                   stages={stageLabels.map(([stage,,key,actorKey])=>({stage,timestamp:state[key],author:state[actorKey]}))}
-                  action={confirmStage}/>
+                  action={saveStageResult}/>
                 <details className="bos-error-recovery"><summary>WYSTĄPIŁ BŁĄD — jak wrócić do prawidłowego wykonania?</summary><div><b>ZATRZYMAJ → WSKAŻ → POPRAW → POWTÓRZ → SPRAWDŹ</b><p>Błąd nie kasuje wcześniejszych etapów. Zatrzymaj błędne wykonanie, wskaż konkretną różnicę względem Standardu, popraw sposób działania, pozwól powtórzyć czynność i sprawdź rezultat ponownie.</p><small>W notatce zapisuj fakt, np. „Pominięto sprawdzenie uszkodzenia opakowania”, a nie ocenę osoby, np. „nieuważny”.</small></div></details>
                 <form action={saveNote} className="bos-process-note-form"><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="standardTaskId" value={task.id}/><label><span>NOTATKA FAKTOGRAFICZNA</span><textarea name="note" maxLength={500} defaultValue={state.note||""} placeholder="Np. Pominięto sprawdzenie kodu produktu — powtórzyć czynność i sprawdzić rezultat."/></label><div><small>Zapisz zaobserwowany fakt lub działanie do powtórzenia. Nie oceniaj osoby.</small><button type="submit">ZAPISZ NOTATKĘ</button></div></form>
               </div>
