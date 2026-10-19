@@ -1,4 +1,4 @@
-import TaskStagePanel from "@/components/bos-ux3/TaskStagePanel";
+import TaskStagePanel, { type StageConfirmationResult } from "@/components/bos-ux3/TaskStagePanel";
 import HelpProcessContext from "@/components/app-shell/HelpProcessContext";
 export const dynamic = "force-dynamic";
 import Link from "next/link";
@@ -13,7 +13,7 @@ async function confirmStage(formData: FormData) {
   if(!["EXPLAINED","SHOWN","TOGETHER","SOLO","CHECKED"].includes(stage)) throw new Error("Nieprawidłowy etap BOS.");
   await confirmTaskStage({organizationId:access.organization.id,processId,standardTaskId,stage,userId:access.user.id}); revalidatePath(`/app/onboarding/processes/${processId}`); revalidatePath("/app/onboarding"); redirect(`/app/onboarding/processes/${processId}#task-${standardTaskId}`);
 }
-async function saveStageResult(_state:{ok:boolean}, data:FormData) {
+async function saveStageResult(_state:StageConfirmationResult, data:FormData):Promise<StageConfirmationResult> {
   "use server";
   const access=await requireBOSAccess();
   const processId=String(data.get("processId")||"");
