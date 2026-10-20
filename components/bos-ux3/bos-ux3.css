@@ -22,3 +22,25 @@
 .bos-ux3-audit summary{cursor:pointer;font-weight:600}
 .bos-ux3-audit__content{padding-top:.7rem}
 @media(max-width:640px){.bos-ux3-header,.bos-ux3-action{flex-direction:column}.bos-ux3-action__controls{width:100%}}
+
+/* UX3-04B-FIX: preserve a readable progress panel at desktop/tablet widths. */
+.bos-ux3-process-card .bos-process-task-head,
+.bos-ux3-process-card .bos-process-task-row{grid-template-columns:38px minmax(160px,1fr) minmax(150px,1fr) minmax(300px,1.5fr)}
+.bos-ux3-process-card .bos-process-stage-flow{display:flex!important;flex-direction:column!important;align-items:stretch!important;flex-wrap:nowrap!important;min-width:0;width:100%}
+.bos-ux3-process-card .bos-ux3-task-panel{display:flex;flex-direction:column;gap:.65rem;width:100%;min-width:0;max-width:100%;overflow-wrap:break-word}
+.bos-ux3-process-card .bos-ux3-sequence__item{min-width:0}
+.bos-ux3-process-card .bos-ux3-sequence__item span:last-child{min-width:0}
+.bos-ux3-process-card .bos-ux3-audit{min-width:0}
+.bos-ux3-process-card .bos-ux3-audit__content{overflow-wrap:anywhere}
+@media(max-width:1100px){
+ .bos-ux3-process-card .bos-process-task-head{display:none}
+ .bos-ux3-process-card .bos-process-task-row{grid-template-columns:32px minmax(0,1fr)!important;gap:10px 14px}
+ .bos-ux3-process-card .bos-process-task-row>span:first-child{grid-column:1;grid-row:1}
+ .bos-ux3-process-card .bos-process-task-row>div:nth-child(2){grid-column:2;grid-row:1}
+ .bos-ux3-process-card .bos-process-task-row>p{grid-column:2;grid-row:2}
+ .bos-ux3-process-card .bos-process-task-row>.bos-process-stage-flow{grid-column:2;grid-row:3;min-width:0}
+}
+@media(max-width:600px){
+ .bos-ux3-process-card .bos-process-task-row{grid-template-columns:24px minmax(0,1fr)!important}
+ .bos-ux3-process-card .bos-ux3-action{flex-direction:column}
+}
