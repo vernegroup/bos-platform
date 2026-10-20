@@ -58,7 +58,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
  const readinessPassed=p.readiness.filter(x=>x.result==="PASS").length;
  const transitionDone=p.transition.filter(x=>x.confirmation==="DONE").length;
  const gateGuidance=[
-  {name:"STANDARD",ok:p.gates.standard,detail:"Standard roli B musi być dostępny i poprawnie przypisany do procesu.",href:"#assessment"},
+  {name:"STANDARD",ok:p.gates.standard,detail:"Brak dostępnego Standardu roli B w tym procesie. Sprawdź bibliotekę Standardów i dostępność opublikowanej wersji. Jeżeli Standard istnieje, ale nie jest przypisany do tego procesu, skontaktuj się z administratorem — ten ekran nie umożliwia zmiany przypisania.",href:"/app/standards"},
   {name:"PROCES",ok:p.gates.process,detail:"Uzupełnij wymagane dane procesu zmiany roli.",href:"#assessment"},
   {name:"OCENA WEJŚCIOWA",ok:p.gates.entry,detail:"Oceń wszystkie wymagania roli B i zakończ wymagane weryfikacje.",href:"#assessment"},
   {name:"WDROŻENIE",ok:p.gates.deployment,detail:"Dokończ pięć etapów BOS dla wszystkich czynności oznaczonych DO WDROŻENIA.",href:"#deployment"},
@@ -79,7 +79,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   <section className="bos-role-transition-hero" aria-label="Zmiana roli A do B">
    <div className="bos-role-node bos-role-node-from"><span>ROLA A · OBECNIE</span><strong>{p.fromRole}</strong><small>punkt wyjścia pracownika</small></div>
    <div className="bos-role-transition-axis"><span>A</span><i>→</i><span>B</span><small>MAPA RÓŻNICY</small></div>
-   <div className="bos-role-node bos-role-node-to"><span>ROLA B · CEL</span><strong>{p.toRole}</strong><small>{p.standardName} · {p.standardVersion}</small></div>
+   <div className="bos-role-node bos-role-node-to"><span>ROLA B · CEL</span><strong>{p.toRole}</strong><small>{p.standardName?(p.standardVersion?`${p.standardName} · ${p.standardVersion}`:p.standardName):"BRAK PRZYPISANEGO STANDARDU"}</small></div>
   </section>
 
   <section className="bos-promotion-delta-summary">
