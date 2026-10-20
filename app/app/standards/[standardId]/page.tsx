@@ -198,7 +198,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
         <div><StandardSubmitButton pendingLabel="Zapisywanie…">DODAJ WARUNEK</StandardSubmitButton></div>
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
-      current.startRequirements.map((requirement,index)=><div className="bos-standard-detail-head" key={requirement.id}>
+      current.startRequirements.map((requirement,index)=><div className="bos-standard-detail-head bos-ux3-standard-edit-row" key={requirement.id}>
         <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {startCategoryLabel[requirement.category]??requirement.category}</span>
           {!isDraft&&<p>{requirement.requirement}</p>}</div>
         {isDraft&&<form action={editStartRequirement} style={{display:"grid",gap:8,width:"100%"}}>
@@ -234,7 +234,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
         <div><StandardSubmitButton disabled={!canAddCriterion} pendingLabel="Zapisywanie…">{canAddCriterion?"DODAJ KRYTERIUM":"OSIĄGNIĘTO LIMIT 3"}</StandardSubmitButton></div>
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
-      current.readinessCriteria.map((criterion,index)=><div className="bos-standard-detail-head" key={criterion.id}>
+      current.readinessCriteria.map((criterion,index)=><div className="bos-standard-detail-head bos-ux3-standard-edit-row" key={criterion.id}>
         <div style={{minWidth:180}}><span className="bos-dashboard-section-kicker">{String(index+1).padStart(2,"0")} · {verificationMethodLabel[criterion.verificationMethod]??criterion.verificationMethod}</span>
           {!isDraft&&<><p>{criterion.criterion}</p>{criterion.verificationMethodOther&&<p>{criterion.verificationMethodOther}</p>}</>}</div>
         {isDraft&&<form action={editReadinessCriterion} style={{display:"grid",gap:8,width:"100%"}}>
