@@ -105,7 +105,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         {!startComplete&&<div className="bos-operational-empty"><strong>Realizacja jeszcze zablokowana</strong><p>Potwierdź wszystkie warunki rozpoczęcia. Dopiero wtedy proces przejdzie z PLANOWANE do W TOKU i odblokuje etapy BOS.</p></div>}
       </section>
 
-      <section className="bos-process-card">
+      <section className="bos-process-card bos-ux3-process-card">
         <div className="bos-dashboard-section-head">
           <div><span className="bos-dashboard-section-kicker">REALIZACJA</span><h2>Karta Postępu</h2></div>
           <span className="bos-dashboard-count">{progress.completed} z {progress.total} czynności gotowych</span>
