@@ -1,3 +1,4 @@
+import GateConfirmation, { type GateResult } from "@/components/bos-ux3/GateConfirmation";
 import TaskStagePanel, { type StageConfirmationResult } from "@/components/bos-ux3/TaskStagePanel";
 import HelpProcessContext from "@/components/app-shell/HelpProcessContext";
 export const dynamic = "force-dynamic";
@@ -7,6 +8,31 @@ import { revalidatePath } from "next/cache";
 import { confirmReadinessCriterion, confirmStartRequirement, confirmTaskStage, getProcess, getProcessProgress, getStandard, updateTaskNote, type OnboardingTaskStage } from "@/lib/bos/onboardingRepository";
 import { requireBOSAccess } from "@/lib/bos/access";
 
+async function saveStartResult(_state:GateResult,data:FormData):Promise<GateResult>{
+  "use server";
+  const access=await requireBOSAccess();
+  const processId=String(data.get("processId")??"");
+  const requirementId=String(data.get("requirementId")??"");
+  try{
+    await confirmStartRequirement({organizationId:access.organization.id,processId,requirementId,userId:access.user.id});
+    revalidatePath("/app/onboarding/processes/"+processId);
+    revalidatePath("/app/onboarding");
+    return {ok:true,nonce:Date.now()};
+  }catch(error){return {ok:false,error:error instanceof Error?error.message:"Błąd zapisu",nonce:Date.now()};}
+}
+async function saveReadinessResult(_state:GateResult,data:FormData):Promise<GateResult>{
+  "use server";
+  const access=await requireBOSAccess();
+  const processId=String(data.get("processId")??"");
+  const criterionId=String(data.get("criterionId")??"");
+  const note=String(data.get("note")??"");
+  try{
+    await confirmReadinessCriterion({organizationId:access.organization.id,processId,criterionId,userId:access.user.id,note});
+    revalidatePath("/app/onboarding/processes/"+processId);
+    revalidatePath("/app/onboarding");
+    return {ok:true,nonce:Date.now()};
+  }catch(error){return {ok:false,error:error instanceof Error?error.message:"Błąd zapisu",nonce:Date.now()};}
+}
 async function confirmStage(formData: FormData) {
   "use server";
   const access=await requireBOSAccess(); const processId=String(formData.get("processId")??""); const standardTaskId=String(formData.get("standardTaskId")??""); const stage=String(formData.get("stage")??"") as OnboardingTaskStage;
@@ -100,9 +126,9 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         {version.startRequirements.length===0?<div className="bos-operational-empty"><strong>Brak dodatkowych warunków rozpoczęcia</strong><p>Standard nie definiuje warunków wymagających potwierdzenia.</p></div>:
           <div className="bos-start-check-list">{version.startRequirements.map(req=>{const check=process.startChecks.find(x=>x.requirementId===req.id);const done=Boolean(check?.isSatisfied);return <div className="bos-start-check-row" key={req.id}>
             <span>{String(req.order).padStart(2,"0")}</span><div><strong>{req.requirement}</strong><small>{({TOOLS:"NARZĘDZIA",ACCESS:"DOSTĘPY",MATERIALS:"MATERIAŁY",INSTRUCTIONS:"INSTRUKCJE",WORKPLACE:"STANOWISKO PRACY",OTHER:"INNE"} as Record<string,string>)[req.category]??req.category}</small></div>
-            <form action={confirmStart}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="requirementId" value={req.id}/><button className={done?"is-done":""} disabled={done}>{done?"POTWIERDZONE ✓":"POTWIERDŹ"}</button></form>
+            <GateConfirmation kind="start" processId={process.id} itemId={req.id} label="Warunek spełniony — zapisz potwierdzenie" done={done} disabled={false} action={saveStartResult}/>
           </div>})}</div>}
-        {!startComplete&&<div className="bos-operational-empty"><strong>Realizacja jeszcze zablokowana</strong><p>Potwierdź wszystkie warunki rozpoczęcia. Dopiero wtedy proces przejdzie z PLANOWANE do W TOKU i odblokuje etapy BOS.</p></div>}
+        {!startComplete&&<div className="bos-operational-empty"><strong>Realizacja jeszcze zablokowana</strong><p>Potwierdź wszystkie warunki rozpoczęcia. Pozostały: {version.startRequirements.filter(req=>!process.startChecks.find(check=>check.requirementId===req.id)?.isSatisfied).map(req=>req.requirement).join("; ")}. Dopiero wtedy proces przejdzie z PLANOWANE do W TOKU i odblokuje etapy BOS.</p></div>}
       </section>
 
       <section className="bos-process-card bos-ux3-process-card">
@@ -146,7 +172,7 @@ export default async function ProcessDetailPage({ params }: { params: Promise<{ 
         <aside className="bos-context-guide"><strong>4×TAK · TEST JAKOŚCI KRYTERIUM</strong><p>Przed potwierdzeniem sprawdź: czy rezultat jest obserwowalny? Czy da się go sprawdzić w realnej pracy? Czy dwie osoby powinny dojść do podobnej oceny? Czy kryteria obejmują wszystkie czynności K? To kontrola jakości oceny — nie automatyczna decyzja o pracowniku.</p></aside>
         <div className="bos-readiness-list">{version.readinessCriteria.map(c=>{const check=process.readinessChecks.find(x=>x.criterionId===c.id);const passed=Boolean(check?.isPassed);return <article key={c.id} id={`readiness-${c.id}`}>
           <div><span>{String(c.order).padStart(2,"0")} · {({OBSERVATION:"OBSERWACJA",INDEPENDENT_TASK:"SAMODZIELNE ZADANIE",WORK_SAMPLE:"PRÓBKA PRACY",CONTROL_QUESTIONS:"PYTANIA KONTROLNE",KNOWLEDGE_TEST:"TEST WIEDZY",OTHER:"INNA"} as Record<string,string>)[c.verificationMethod]??c.verificationMethod}</span><strong>{c.criterion}</strong>{c.verificationMethodOther&&<p>{c.verificationMethodOther}</p>}{passed&&<><small>Potwierdził: {check?.checkedBy||"—"} · {shortDate(check?.checkedAt)}</small>{check?.note&&<p className="bos-readiness-evidence"><b>Zapisany fakt:</b> {check.note}</p>}</>}</div>
-          {passed?<b className="bos-readiness-pass">✓ KRYTERIUM POTWIERDZONE</b>:<form action={confirmReadiness}><input type="hidden" name="processId" value={process.id}/><input type="hidden" name="criterionId" value={c.id}/><input name="note" maxLength={500} placeholder="Fakt z weryfikacji (opcjonalnie)"/><button disabled={!tasksGate||!criticalGate}>POTWIERDŹ KRYTERIUM</button></form>}
+          <GateConfirmation kind="readiness" processId={process.id} itemId={c.id} label="Spełnienie ocenione — zapisz potwierdzenie" done={passed} disabled={!tasksGate||!criticalGate} blockedReason="Najpierw ukończ wszystkie czynności oraz SAM + SPRAWDŹ dla wszystkich K." note action={saveReadinessResult}/>
         </article>})}</div>
       </section>
 
