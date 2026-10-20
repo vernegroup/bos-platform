@@ -4380,3 +4380,12 @@
 }
 
 @media(max-width:1439px){.bos-app-shell .bos-app-chat-label{display:none}}
+
+/* UX3-05-FIX: readable gate summaries on narrow viewports. */
+@media(max-width:600px){
+ .bos-guided-close-gate>div{grid-template-columns:28px minmax(0,1fr)!important;gap:6px 12px;padding:14px 0;align-items:start}
+ .bos-guided-close-gate>div>span{grid-column:1;grid-row:1}
+ .bos-guided-close-gate>div>strong{grid-column:2;grid-row:1;min-width:0}
+ .bos-guided-close-gate>div>p{grid-column:2;grid-row:2;min-width:0;overflow-wrap:normal;word-break:normal}
+ .bos-guided-close-gate>div>b{grid-column:2;grid-row:3;justify-self:start}
+}
