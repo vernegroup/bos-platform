@@ -4389,3 +4389,12 @@
  .bos-guided-close-gate>div>p{grid-column:2;grid-row:2;min-width:0;overflow-wrap:normal;word-break:normal}
  .bos-guided-close-gate>div>b{grid-column:2;grid-row:3;justify-self:start}
 }
+
+/* UX3-06B: editor submit feedback and narrow-screen form controls. */
+.bos-ux3-standard-saving{display:inline-block;margin-inline-start:10px;font-size:.82rem;line-height:1.5;color:#35566c}
+@media(max-width:600px){
+ .bos-standard-detail-head form{min-width:0;max-width:100%}
+ .bos-standard-detail-head form input:not([type="checkbox"]):not([type="hidden"]),.bos-standard-detail-head form textarea,.bos-standard-detail-head form select{box-sizing:border-box;max-width:100%;min-width:0;width:100%}
+ .bos-standard-detail-head form .bos-standard-primary-action{max-width:100%;white-space:normal;overflow-wrap:break-word}
+ .bos-ux3-standard-saving{display:block;margin:8px 0 0}
+}
