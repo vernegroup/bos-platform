@@ -73,7 +73,7 @@ export default function TaskStagePanel({processId,taskId,taskName,startComplete,
     {current&&startComplete&&!canConfirm&&<NextStep description="Zakończ poprzedni etap, aby przejść dalej."/>}
     <SaveFeedback status={feedback} message={pending?undefined:acknowledged?.error} author={acknowledged?.ok?acknowledged.author:undefined} timestamp={acknowledged?.ok?acknowledged.recordedAt:undefined}/>
     {refreshing&&<p role="status">Aktualizowanie postępu z serwera…</p>}
-    <AuditDetails><ol>{stages.filter(x=>x.timestamp).map(x=><li key={x.stage}>{BOS_STAGE_COPY[x.stage].title} — {x.author||"Autor nieznany"} · <time dateTime={x.timestamp}>{formatAuditDate(x.timestamp)}</time></li>)}</ol></AuditDetails>
+    <AuditDetails><ol>{stages.filter(x=>x.timestamp).map(x=><li key={x.stage}>{BOS_STAGE_COPY[x.stage].title} — {x.author||"Autor nieznany"} · <time dateTime={x.timestamp}>{formatAuditDate(x.timestamp!)}</time></li>)}</ol></AuditDetails>
     <small>{completed} z 5 etapów udokumentowanych. Potwierdzenie zapisuje deklarację prowadzącego, nie automatyczną ocenę kompetencji.</small>
   </div>;
 }
