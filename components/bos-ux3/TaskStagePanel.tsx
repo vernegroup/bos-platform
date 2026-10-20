@@ -20,6 +20,9 @@ export type TaskStagePanelProps = {
   action:StageConfirmationAction;
 };
 
+const auditDateFormatter = new Intl.DateTimeFormat("pl-PL", {dateStyle:"medium",timeStyle:"short",timeZone:"Europe/Warsaw"});
+function formatAuditDate(value:string):string {const date=new Date(value);return Number.isNaN(date.getTime())?value:auditDateFormatter.format(date)+" (Warszawa)";}
+
 function StageSubmit({label,pending,disabled}:{label:string;pending:boolean;disabled:boolean}) {
   return <button type="submit" disabled={disabled||pending} aria-disabled={disabled||pending}>
     {pending?"Zapisywanie…":label}
@@ -70,7 +73,7 @@ export default function TaskStagePanel({processId,taskId,taskName,startComplete,
     {current&&startComplete&&!canConfirm&&<NextStep description="Zakończ poprzedni etap, aby przejść dalej."/>}
     <SaveFeedback status={feedback} message={pending?undefined:acknowledged?.error} author={acknowledged?.ok?acknowledged.author:undefined} timestamp={acknowledged?.ok?acknowledged.recordedAt:undefined}/>
     {refreshing&&<p role="status">Aktualizowanie postępu z serwera…</p>}
-    <AuditDetails><ol>{stages.filter(x=>x.timestamp).map(x=><li key={x.stage}>{BOS_STAGE_COPY[x.stage].title} — {x.author||"Autor nieznany"} · {x.timestamp}</li>)}</ol></AuditDetails>
+    <AuditDetails><ol>{stages.filter(x=>x.timestamp).map(x=><li key={x.stage}>{BOS_STAGE_COPY[x.stage].title} — {x.author||"Autor nieznany"} · <time dateTime={x.timestamp}>{formatAuditDate(x.timestamp)}</time></li>)}</ol></AuditDetails>
     <small>{completed} z 5 etapów udokumentowanych. Potwierdzenie zapisuje deklarację prowadzącego, nie automatyczną ocenę kompetencji.</small>
   </div>;
 }
