@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
+import StandardSubmitButton from "@/components/bos-ux3/StandardSubmitButton";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {
@@ -141,7 +142,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <input name="name" required maxLength={160} defaultValue={standard.name} style={{padding:10}}/>
       <input name="area" maxLength={160} defaultValue={standard.area} placeholder="Obszar" style={{padding:10}}/>
       <label style={{display:"grid",gap:6}}><span className="bos-dashboard-section-kicker">OPIS STANOWISKA</span><textarea name="roleDescription" required maxLength={1200} defaultValue={current.roleDescription} placeholder="Opisz stanowisko własnymi słowami: za co odpowiada pracownik i jaki jest oczekiwany rezultat jego pracy." rows={4} style={{padding:10}}/></label>
-      <div><button type="submit" className="bos-standard-primary-action">ZAPISZ WERSJĘ ROBOCZĄ</button></div></div></form>}
+      <div><StandardSubmitButton pendingLabel="Zapisywanie…">ZAPISZ WERSJĘ ROBOCZĄ</StandardSubmitButton></div></div></form>}
 
     <aside className="bos-guidance"><div><span className="bos-guidance-eyebrow">TERAZ · STANDARD</span><strong>{isDraft?"Przygotuj treść wersji roboczej":"Sprawdź opublikowaną wersję"}</strong><p>{isDraft?"Uzupełnij dane stanowiska, czynności, warunki rozpoczęcia i kryteria gotowości. Zapisanie zmian nie publikuje Standardu. Publikację uruchamiasz osobno po kontroli kompletności.":"Ta wersja stanowi zapis Standardu. Aby zmienić treść na przyszłość, przygotuj nową wersję roboczą. Rozpoczęte procesy pozostają przy przypisanej wersji."}</p></div><details><summary>? Jak działa wersjonowanie?</summary><p>Wersja robocza służy do przygotowania zmian. Publikacja tworzy wersję używaną w nowych procesach, bez przepisywania historii istniejących Wdrożeń i Awansów.</p></details></aside>
     <nav className="bos-standard-tabs" aria-label="Sekcje standardu"><span className="is-active">CZYNNOŚCI</span><span>SZCZEGÓŁY</span><span>PLIKI</span><a href="#historia">HISTORIA WERSJI</a></nav>
@@ -158,7 +159,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
       <textarea name="readyWhen" placeholder="Co dodatkowo sprawdzić przy SPRAWDŹ? (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <textarea name="hint" placeholder="Podpowiedź / wskazówka (opcjonalnie)" disabled={!canAdd} rows={2} style={{padding:10}}/>
       <label><input type="checkbox" name="isCritical" disabled={!canAdd}/> K — czynność krytyczna</label><aside className="bos-context-guide is-compact"><strong>KIEDY OZNACZYĆ K?</strong><p>Zapytaj: co się stanie, jeśli pracownik zrobi tę czynność źle? K oznacza ryzyko poważnych konsekwencji, nie samo znaczenie czynności.</p></aside>
-      <div><button type="submit" className="bos-standard-primary-action" disabled={!canAdd}>{canAdd?"DODAJ CZYNNOŚĆ":"OSIĄGNIĘTO LIMIT 18"}</button></div>
+      <div><StandardSubmitButton disabled={!canAdd} pendingLabel="Zapisywanie…">{canAdd?"DODAJ CZYNNOŚĆ":"OSIĄGNIĘTO LIMIT 18"}</StandardSubmitButton></div>
     </form></section>}
 
     {current.tasks.length===0?<section className="bos-standard-detail-head"><div><span className="bos-dashboard-section-kicker">BRAK CZYNNOŚCI</span>
@@ -172,7 +173,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
           <form action={editTask} style={{display:"grid",gap:8,width:"100%"}}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="taskId" value={task.id}/>
             <input name="name" required maxLength={240} defaultValue={task.name} style={{padding:8}}/><textarea name="execution" required defaultValue={task.execution} rows={2} style={{padding:8}}/>
             <textarea name="readyWhen" defaultValue={task.readyWhen} placeholder="Co dodatkowo sprawdzić przy SPRAWDŹ? (opcjonalnie)" rows={2} style={{padding:8}}/><textarea name="hint" defaultValue={task.hint} rows={2} style={{padding:8}}/>
-            <label><input type="checkbox" name="isCritical" defaultChecked={task.isCritical}/> K — czynność krytyczna</label><div><button className="bos-standard-primary-action" type="submit">ZAPISZ CZYNNOŚĆ</button></div>
+            <label><input type="checkbox" name="isCritical" defaultChecked={task.isCritical}/> K — czynność krytyczna</label><div><StandardSubmitButton>ZAPISZ CZYNNOŚĆ</StandardSubmitButton></div>
           </form>
           <div style={{display:"flex",gap:8,alignItems:"flex-start",flexWrap:"wrap"}}>
             <form action={reorderTask}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="taskId" value={task.id}/><input type="hidden" name="direction" value="UP"/><button type="submit" disabled={index===0}>↑ W GÓRĘ</button></form>
@@ -194,7 +195,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
           <option value="INSTRUCTIONS">INSTRUKCJE</option><option value="WORKPLACE">STANOWISKO PRACY</option><option value="OTHER">INNE</option>
         </select>
         <textarea name="requirement" required rows={2} placeholder="Co musi być gotowe przed rozpoczęciem?" style={{padding:10}}/>
-        <div><button type="submit" className="bos-standard-primary-action">DODAJ WARUNEK</button></div>
+        <div><StandardSubmitButton pendingLabel="Zapisywanie…">DODAJ WARUNEK</StandardSubmitButton></div>
       </form></div>}
       {current.startRequirements.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze warunków rozpoczęcia.":"Ta wersja nie zawiera warunków rozpoczęcia."}</p></div>:
       current.startRequirements.map((requirement,index)=><div className="bos-standard-detail-head" key={requirement.id}>
@@ -207,7 +208,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
             <option value="INSTRUCTIONS">INSTRUKCJE</option><option value="WORKPLACE">STANOWISKO PRACY</option><option value="OTHER">INNE</option>
           </select>
           <textarea name="requirement" required rows={2} defaultValue={requirement.requirement} style={{padding:8}}/>
-          <div><button type="submit" className="bos-standard-primary-action">ZAPISZ WARUNEK</button></div>
+          <div><StandardSubmitButton pendingLabel="Zapisywanie…">ZAPISZ WARUNEK</StandardSubmitButton></div>
         </form>}
         {isDraft&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           <form action={reorderStartRequirement}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="requirementId" value={requirement.id}/><input type="hidden" name="direction" value="UP"/><button type="submit" disabled={index===0}>↑ W GÓRĘ</button></form>
@@ -230,7 +231,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
           <option value="CONTROL_QUESTIONS">PYTANIA KONTROLNE</option><option value="KNOWLEDGE_TEST">TEST WIEDZY</option><option value="OTHER">INNA</option>
         </select>
         <input name="verificationMethodOther" placeholder="Jeśli INNA — opisz metodę weryfikacji" disabled={!canAddCriterion} style={{padding:10}}/>
-        <div><button type="submit" className="bos-standard-primary-action" disabled={!canAddCriterion}>{canAddCriterion?"DODAJ KRYTERIUM":"OSIĄGNIĘTO LIMIT 3"}</button></div>
+        <div><StandardSubmitButton disabled={!canAddCriterion} pendingLabel="Zapisywanie…">{canAddCriterion?"DODAJ KRYTERIUM":"OSIĄGNIĘTO LIMIT 3"}</StandardSubmitButton></div>
       </form></div>}
       {current.readinessCriteria.length===0?<div className="bos-standard-detail-head"><p>{isDraft?"Nie zdefiniowano jeszcze kryteriów gotowości.":"Ta wersja nie zawiera kryteriów gotowości."}</p></div>:
       current.readinessCriteria.map((criterion,index)=><div className="bos-standard-detail-head" key={criterion.id}>
@@ -244,7 +245,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
             <option value="CONTROL_QUESTIONS">PYTANIA KONTROLNE</option><option value="KNOWLEDGE_TEST">TEST WIEDZY</option><option value="OTHER">INNA</option>
           </select>
           <input name="verificationMethodOther" defaultValue={criterion.verificationMethodOther??""} placeholder="Wymagane tylko dla metody INNA" style={{padding:8}}/>
-          <div><button type="submit" className="bos-standard-primary-action">ZAPISZ KRYTERIUM</button></div>
+          <div><StandardSubmitButton pendingLabel="Zapisywanie…">ZAPISZ KRYTERIUM</StandardSubmitButton></div>
         </form>}
         {isDraft&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           <form action={reorderReadinessCriterion}><input type="hidden" name="standardId" value={standard.id}/><input type="hidden" name="returnTo" value={returnTo??""}/><input type="hidden" name="criterionId" value={criterion.id}/><input type="hidden" name="direction" value="UP"/><button type="submit" disabled={index===0}>↑ W GÓRĘ</button></form>
@@ -267,7 +268,7 @@ export default async function StandardDetailPage({params,searchParams}:{params:P
                 <label><input type="checkbox" name="realWork" required/> TAK — kryterium można sprawdzić w rzeczywistej pracy.</label>
                 <label><input type="checkbox" name="repeatable" required/> TAK — dwie osoby powinny dojść do podobnej oceny.</label>
                 <label><input type="checkbox" name="coversCritical" required/> TAK — kryterium obejmuje czynności K istotne dla gotowości do roli.</label>
-                <button type="submit" className="bos-standard-primary-action">OPUBLIKUJ STANDARD</button>
+                <StandardSubmitButton pendingLabel="Publikowanie…">OPUBLIKUJ STANDARD</StandardSubmitButton>
               </form>
               <p>Publikacja zamknie edycję tej wersji. Dalsze zmiany będą wymagały utworzenia nowej wersji.</p>
             </div>
