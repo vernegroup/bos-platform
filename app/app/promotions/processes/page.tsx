@@ -15,8 +15,8 @@ export default async function PromotionProcessesPage() {
       <section className="bos-app-intro bos-promotions-view-head">
         <div>
           <div className="bos-app-kicker">01 / PRZEPROWADŹ</div>
-          <h1>Zmiany w toku</h1>
-          <p>Każdy awans lub przesunięcie poziome pozostaje osobnym procesem z właścicielem, datą wejścia i kontrolą kryteriów gotowości.</p>
+          <h1>Przygotowanie do nowej roli</h1>
+          <p>Otwórz proces, aby sprawdzić wymagania nowej roli, brakujące potwierdzenia i następne działania przed decyzją. Każda zmiana ma własnego prowadzącego i historię.</p>
         </div>
           <Link href="/app/promotions/processes/new" className="bos-standard-primary-action">+ NOWA ZMIANA</Link>
       </section>
@@ -29,7 +29,7 @@ export default async function PromotionProcessesPage() {
       </div>
 
       <section className="bos-promotion-list bos-promotions-operational-list">
-        <header><span>PRACOWNIK</span><span>ZMIANA</span><span>TYP</span><span>WEJŚCIE</span><span>PROWADZĄCY</span><span>KONTROLA</span><span /></header>
+        <header><span>PRACOWNIK</span><span>ZMIANA</span><span>TYP</span><span>WEJŚCIE</span><span>PROWADZĄCY</span><span>PRZED DECYZJĄ</span><span /></header>
         {rows.map((row) => {
           return (
             <Link href={`/app/promotions/processes/${row.id}`} className="bos-promotion-row" key={row.id}>
@@ -38,7 +38,7 @@ export default async function PromotionProcessesPage() {
               <b>{row.type}</b>
               <span>{row.effectiveOn}</span>
               <span>{row.owner}</span>
-              <span>{row.gates.readyAllowed?"7/7 · GOTOWY DO DECYZJI":`${[row.gates.standard,row.gates.process,row.gates.entry,row.gates.deployment,row.gates.k,row.gates.readiness,row.gates.transition].filter(Boolean).length}/7 BRAMEK`}</span>
+              <span>{row.gates.readyAllowed?"7/7 · GOTOWY DO DECYZJI":`${7-[row.gates.standard,row.gates.process,row.gates.entry,row.gates.deployment,row.gates.k,row.gates.readiness,row.gates.transition].filter(Boolean).length} DO SPEŁNIENIA`}</span>
               <i>→</i>
             </Link>
           );
@@ -46,7 +46,7 @@ export default async function PromotionProcessesPage() {
         {!rows.length && <div className="bos-operational-empty"><strong>Brak aktywnych zmian</strong><p>Procesy awansu i przesunięcia poziomego pojawią się tutaj po ich uruchomieniu.</p></div>}
       </section>
 
-      <div className="bos-promotions-rule-note"><span>ZASADA PROCESU</span><p>Zmiana stanowiska zostaje zamknięta dopiero po potwierdzeniu wszystkich kryteriów i zapisaniu wyniku w historii organizacji.</p></div>
+      <div className="bos-promotions-rule-note"><span>ZASADA PROCESU</span><p>Spełnienie bramek umożliwia podjęcie decyzji, ale nie zastępuje oceny człowieka. BOS zapisuje potwierdzenia i historię zmiany roli.</p></div>
     </>
   );
 }
