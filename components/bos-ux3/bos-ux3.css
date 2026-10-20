@@ -53,3 +53,11 @@
 .bos-ux3-gate__blocked{color:var(--app-muted,#666);line-height:1.5}
 .bos-ux3-gate__done{color:#176d47}
 .bos-ux3-gate .bos-ux3-feedback{max-width:100%;overflow-wrap:anywhere}
+
+/* UX3-04C-FIX C-01: full-width confirmation status on narrow screens. */
+@media(max-width:600px){
+  .bos-start-check-row>.bos-ux3-gate{grid-column:2;grid-row:auto;width:100%;min-width:0;align-items:stretch}
+  .bos-start-check-row>.bos-ux3-gate .bos-ux3-gate__done{display:block;overflow-wrap:normal;word-break:normal;white-space:normal}
+  .bos-start-check-row>.bos-ux3-gate form{width:100%}
+  .bos-start-check-row>.bos-ux3-gate button{width:100%;white-space:normal}
+}
