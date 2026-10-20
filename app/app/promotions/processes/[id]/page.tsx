@@ -73,7 +73,7 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   <div className="bos-standard-back"><Link href="/app/promotions/processes">← ZMIANY W TOKU</Link></div>
   <section className="bos-app-intro bos-promotions-view-head"><div>
    <div className="bos-app-kicker">BOS / AWANSE / MAPA ZMIANY</div>
-   <h1>{p.employee}</h1><p>{p.type} · prowadzący: {p.owner}</p>
+   <h1>Przygotowanie do nowej roli</h1><p><strong>{p.employee}</strong> · {p.type} · prowadzący: {p.owner}</p>
   </div><div className="bos-app-build-state"><span>STAN PROCESU</span><strong>{lifecyclePL}</strong></div></section>
 
   <section className="bos-role-transition-hero" aria-label="Zmiana roli A do B">
@@ -92,10 +92,12 @@ export default async function PromotionProcessPage({params}:{params:Promise<{id:
   </section>
 
   <section className="bos-promotion-gate-strip" aria-label="Bramki decyzji">
-   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===firstPendingGate?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"SPEŁNIONA":"—"}</b></div>)}
+   {([["STANDARD",p.gates.standard],["PROCES",p.gates.process],["OCENA WEJŚCIOWA",p.gates.entry],["WDROŻENIE",p.gates.deployment],["K",p.gates.k],["GOTOWOŚĆ",p.gates.readiness],["PRZEJŚCIE",p.gates.transition]] as const).map(([name,ok],i)=><div key={name} data-state={ok?"complete":i===firstPendingGate?"current":"pending"}><span>{String(i+1).padStart(2,"0")}</span><strong>{name}</strong><b>{ok?"SPEŁNIONA":i===firstPendingGate?"DO WYKONANIA":"NIESPEŁNIONA"}</b></div>)}
   </section>
 
-  {pendingGates.length>0&&<aside className="bos-context-guide bos-promotion-gate-guidance" aria-live="polite"><strong>BRAKUJE DO DECYZJI GOTOWY</strong><p>{pendingGates.length===1?"Pozostała 1 niespełniona bramka.":"Niespełnione bramki są wskazane poniżej."}</p><div>{pendingGates.map(g=><a href={g.href} key={g.name}><b>{g.name}</b><span>{g.detail}</span></a>)}</div></aside>}
+  {pendingGates.length>0&&<aside className="bos-context-guide bos-promotion-gate-guidance" aria-live="polite"><strong>Co jeszcze trzeba zrobić przed decyzją?</strong><p>{pendingGates.length===1?"Pozostała 1 niespełniona bramka.":"Sprawdź poniższe wymagania i przejdź do odpowiednich sekcji. Zapisane potwierdzenia nie zastępują oceny pracy przez prowadzącego."}</p><div>{pendingGates.map(g=><a href={g.href} key={g.name}><b>{g.name}</b><span>{g.detail}</span></a>)}</div></aside>}
+
+  {pendingGates.length===0&&<aside className="bos-context-guide bos-promotion-gate-guidance" role="status"><strong>Wszystkie 7 bramek zostało spełnionych</strong><p>Możesz przejść do decyzji. BOS dokumentuje potwierdzenia, a o gotowości pracownika decyduje uprawniona osoba.</p><a href="#decision">PRZEJDŹ DO DECYZJI →</a></aside>}
 
   <section className="bos-process-card" id="assessment">
    <div className="bos-dashboard-section-head"><div><span className="bos-dashboard-section-kicker">MAPA RÓŻNICY A → B</span><h2>Co z roli B jest już potwierdzone, a czego brakuje?</h2></div><span className="bos-dashboard-count">{assessed} z {p.tasks.length} ocenionych</span></div>
